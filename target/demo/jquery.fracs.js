@@ -36,9 +36,10 @@
 	};
 	
 
-	var FracsResult = function ( rect, visible, viewport, possible ) {
+	var FracsResult = function ( rect, rectRelative, visible, viewport, possible ) {
 
 		this.rect = rect;
+		this.rectRelative = rectRelative;
 		this.visible = visible;
 		this.viewport = viewport;
 		this.possible = possible;
@@ -55,7 +56,12 @@
 
 		this.rectsEqual = function ( that ) {
 			
-			return this.rect.equals( that.rect );
+			if ( this.rect === undefined && that.rect === undefined ) {
+				return true;
+			} else if ( this.rect === undefined || that.rect === undefined ) {
+				return false;
+			};
+			return this.rect.equals( that.rect ) && this.rectRelative.equals( that.rectRelative );
 		};
 	};
 
@@ -66,26 +72,15 @@
 		this.callback = callback;
 		this.prevFracs = undefined;
 
-		this.rect = function () {
-
-			return globals.rect( this.target );
-		};
-
-		this.fracs = function () {
-
-			return globals.fracs( globals.rect( this.target ), globals.viewport() );
-		};
-
+		var THIS = this; // so methods can be bound and unbound
 		this.check = function () {
 
-			var fracs = this.fracs();
-			if ( this.prevFracs === undefined || !this.prevFracs.fracsEqual( fracs ) ) {
-				this.callback.call( this.target, fracs, this.prevFracs );
-				this.prevFracs = fracs;
+			var fracs = globals.fracs( globals.rect( THIS.target ), globals.viewport() );
+			if ( THIS.prevFracs === undefined || !THIS.prevFracs.equals( fracs ) ) {
+				THIS.callback.call( THIS.target, fracs, THIS.prevFracs );
+				THIS.prevFracs = fracs;
 			};
 		};
-
-		this.checkProxy = $.proxy( this.check, this );
 	};
 
 
@@ -124,14 +119,16 @@
 			var intersection = rect.intersection( viewport );
 
 			if ( intersection === undefined ) {
-				return new FracsResult( undefined, 0.0, 0.0, 0.0 );
+				return new FracsResult( undefined, undefined, 0.0, 0.0, 0.0 );
 			};
 
+			var intersectionRelative = new Rect( intersection.left - rect.left, intersection.top - rect.top, intersection.width, intersection.height );
 			var intersectionArea = intersection.area();
 			var possibleArea = Math.min( rect.width, viewport.width ) * Math.min( rect.height, viewport.height );
 
 			return new FracsResult(
 				intersection,
+				intersectionRelative,
 				1.0 * intersectionArea / rect.area(),
 				1.0 * intersectionArea / viewport.area(),
 				1.0 * intersectionArea / possibleArea
@@ -139,8 +136,10 @@
 		},
 
 		round: function ( value, decs ) {
-		
-			decs = decs || 3;
+
+			if ( isNaN( decs ) || decs <= 0 ) {
+				return Math.round( value );
+			};
 			return Math.round( value * Math.pow( 10, decs ) ) / Math.pow( 10, decs );
 		}
 
@@ -156,8 +155,8 @@
 				var data = new FracsData( this, callback );
 				$( this ).data( namespace, data );
 				$( window )
-					.bind( "scroll", data.checkProxy )
-					.bind( "resize", data.checkProxy );
+					.bind( "scroll", data.check )
+					.bind( "resize", data.check );
 				data.check();
 			} );
 		},
@@ -170,8 +169,8 @@
 				var data = $this.data( namespace );
 				$this.removeData( namespace );
 				$( window )
-					.unbind( "scroll", data.checkProxy )
-					.unbind( "resize", data.checkProxy );
+					.unbind( "scroll", data.check )
+					.unbind( "resize", data.check );
 			} );
 		},
 
@@ -186,7 +185,7 @@
 			} );
 		},
 
-		current: function () {
+		fracs: function () {
 
 			return globals.fracs( globals.rect( this.get( 0 ) ), globals.viewport() );
 		},
@@ -204,8 +203,8 @@
 
 		if ( methods[method] ) {
 			return methods[method].apply( this, Array.prototype.slice.call( arguments, 1 ) );
-		} else if ( !method ) {
-			return methods.current.apply( this, arguments );
+		} else if ( method === undefined ) {
+			return methods.fracs.apply( this, arguments );
 		} else if ( method instanceof Function ) {
 			return methods.init.apply( this, arguments );
 		} else {

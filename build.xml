@@ -49,10 +49,10 @@
 		<attribute name="dir" />
 		<sequential>
 			<scripp:process>
-		        <fileset dir="@{dir}" includes="**/*.less,**/*.css,**/*.js" excludes="inc/**/*,**/*.min.css,**/*.min.js" />
+				<fileset dir="@{dir}" includes="**/*.less,**/*.css,**/*.js" excludes="inc/**/*,**/*.min.css,**/*.min.js" />
 				<globmapper from="*.less" to="*.css" />
-		        <globmapper from="*.css" to="*.css" />
-		        <globmapper from="*.js" to="*.js" />
+				<globmapper from="*.css" to="*.css" />
+				<globmapper from="*.js" to="*.js" />
 			</scripp:process>
 			<delete dir="@{dir}/inc">
 				<fileset dir="@{dir}" includes="**/*.less" />
