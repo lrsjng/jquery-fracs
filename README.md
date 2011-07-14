@@ -1,4 +1,4 @@
-# jQuery.fracs v0.2
+# jQuery.fracs v0.3
 
 For now there is a small [website](http://larsjung.de/fracs) and a [demo](http://larsjung.de/fracs/demo) online.
 
@@ -13,6 +13,12 @@ please respect their rights.
 
 
 ## Changelog
+
+### v0.3
+*2011-07-13*
+
+* 
+
 
 ### v0.2
 *2011-07-12*

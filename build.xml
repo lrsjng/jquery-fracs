@@ -41,7 +41,8 @@
 		<scripp.dir dir="${build.dir}/demo/js" />
 		<copy file="${build.dir}/jquery.fracs.js" todir="${build.dir}/demo" />
 
-		<scripp:jsmin file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/jquery.fracs.min.js" />
+		<scripp:jsmin file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/jquery.fracs-${project.version}.min.js" />
+		<move file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/jquery.fracs-${project.version}.js" />
 	</target>
 
 

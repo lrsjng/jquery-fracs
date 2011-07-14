@@ -9,7 +9,24 @@ body {
 	font-family: Ubuntu, Arial, sans;
 	font-size: 16px;
 	color: #333;
-	margin: 80px;
+	
+	> h1 {
+		display: inline-block;
+		margin: 30px;
+		padding: 10px;
+		font-size: 3em;
+		border-bottom: 4px solid #eee;
+	}
+}
+
+a, a:active, a:visited {
+	color: #e44d26;
+	text-decoration: none;
+	.transition( all 0.2s ease-in-out );
+
+	&:hover {
+		color: #ff8d38;
+	}
 }
 
 section {
@@ -25,12 +42,18 @@ section {
 		display: inline-block;
 		overflow: hidden;
 		margin: 10px;
-		padding: 8px;
+		padding: 8px 16px 16px 16px;
 		.border-radius( 5px );
 		background-color: rgba(255,255,255,0.5);
 
 		.idx {
 			font-weight: bold;
+			font-size: 1.8em;
+			color: rgba(0,0,0,0.5);
+		}
+		ul {
+			margin-top: 6px;
+			margin-left: 1.2em;
 		}
 	}
 }
@@ -50,14 +73,24 @@ section {
 		text-align: center;
 		margin-bottom: 1em;
 	}
-	ul {
+	h2 {
+		font-size: 1em;
+		text-align: left;
+		margin: 1em 0 0.6em 0;
+	}
+	.fracs {
 		list-style: none;
 		margin: 0;
 		padding: 0;
 
-		li.header {
-			font-weight: bold;
-			margin-bottom: 4px;
+		li {
+			margin: 0;
+			padding: 0;
+		 
+			&.header {
+				font-weight: bold;
+				margin-bottom: 4px;
+			}
 		}
 
 		span {
@@ -70,6 +103,19 @@ section {
 		span.idx {
 			width: 30px;
 			text-align: center;
+		}
+	}
+	.groups {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		
+		span {
+			display: inline-block;
+			margin: 0 4px;
+			padding: 0 4px 2px 4px;
+			width: 65px;
+			overflow: hidden;
 		}
 	}
 }

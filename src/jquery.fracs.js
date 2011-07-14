@@ -1,12 +1,19 @@
-( function( $ ) {
+/*
+ * %BUILD_NAME% %BUILD_VERSION%
+ * http://larsjung.de/fracs
+ * 
+ * provided under the terms of the CC BY-SA 3.0 License
+ * http://creativecommons.org/licenses/by-sa/3.0/
+ */
 
+( function( $ ) {
 
 	var Rect = function ( left, top, width, height ) {
 
-		this.left = left;
-		this.top = top;
-		this.width = width;
-		this.height = height;
+		this.left = Math.round( left );
+		this.top = Math.round( top );
+		this.width = Math.round( width );
+		this.height = Math.round( height );
 		this.right = left + width;
 		this.bottom = top + height;
 
@@ -34,16 +41,19 @@
 			return new Rect( left, top, width, height );
 		};
 	};
-	
 
-	var FracsResult = function ( rect, rectRelative, visible, viewport, possible ) {
 
-		this.rect = rect;
-		this.rectRelative = rectRelative;
-		this.visible = visible;
-		this.viewport = viewport;
-		this.possible = possible;
-		
+	var FracsResult = function ( rectDocument, rectElement, rectViewport, visible, viewport, possible ) {
+
+		this.rects = rectDocument === undefined ? undefined : {
+			document: rectDocument,
+			element: rectElement,
+			viewport: rectViewport
+		};
+		this.visible = visible || 0.0;
+		this.viewport = viewport || 0.0;
+		this.possible = possible || 0.0;
+
 		this.equals = function ( that ) {
 			
 			return this.fracsEqual( that ) && this.rectsEqual( that );
@@ -56,29 +66,93 @@
 
 		this.rectsEqual = function ( that ) {
 			
-			if ( this.rect === undefined && that.rect === undefined ) {
-				return true;
-			} else if ( this.rect === undefined || that.rect === undefined ) {
-				return false;
+			if ( this.rects === undefined || that.rects === undefined ) {
+				return this.rects === that.rects;
 			};
-			return this.rect.equals( that.rect ) && this.rectRelative.equals( that.rectRelative );
+			return this.rects.document.equals( that.rects.document )
+				&& this.rects.element.equals( that.rects.element )
+				&& this.rects.viewport.equals( that.rects.viewport );
 		};
 	};
 
 
-	var FracsData = function ( htmlElement, callback ) {
+	var FracsData = function ( htmlElement ) {
 
 		this.target = htmlElement;
-		this.callback = callback;
+		this.callbacks = [];
 		this.prevFracs = undefined;
 
-		var THIS = this; // so methods can be bound and unbound
+		this.bind = function ( callback ) {
+
+			if ( callback !== undefined && $.inArray( callback, this.callbacks ) === -1 ) {
+				this.callbacks.push( callback );
+			};
+		};
+
+		this.unbind = function ( callback ) {
+
+			if ( callback === undefined ) {
+				this.callbacks = [];
+			} else {
+				var idx = $.inArray( callback, this.callbacks );
+				if ( idx >= 0 ) {
+					this.callbacks.splice( idx, 1 );
+				};
+			};
+		};
+
+		var THIS = this; // so method can be easily bound to events
 		this.check = function () {
 
 			var fracs = globals.fracs( globals.rect( THIS.target ), globals.viewport() );
 			if ( THIS.prevFracs === undefined || !THIS.prevFracs.equals( fracs ) ) {
-				THIS.callback.call( THIS.target, fracs, THIS.prevFracs );
+				$.each( THIS.callbacks, function ( idx, callback ) {
+					callback.call( THIS.target, fracs, THIS.prevFracs );					
+				} );
 				THIS.prevFracs = fracs;
+			};
+		};
+	};
+
+
+	var FracsGroup = function ( targets, property, callback ) {
+
+		this.targets = [];
+		this.callback = callback;
+		this.prevBest = undefined;
+		this.property = property;
+
+		for ( var idx in targets ) {
+			var target = targets[idx];
+			if ( target instanceof HTMLElement ) {
+				this.targets.push( {
+					element: target,
+					fracs: undefined
+				} );
+			};
+		};
+
+		var THIS = this; // so method can be easily bound to events
+		this.check = function () {
+
+			var best = undefined;
+			var viewport = globals.viewport();
+
+			for ( var idx in THIS.targets ) {
+				var target = THIS.targets[idx];
+				target.fracs = globals.fracs( target.element, viewport );
+				if ( best === undefined || target.fracs[ THIS.property ] > best.fracs[ THIS.property ] ) {
+					best = target;
+				};
+			};
+
+			if ( best.fracs[ THIS.property ] == 0.0 ) {
+				best = undefined;
+			};
+			
+			if ( THIS.prevBest !== best ) {
+				THIS.callback.call( THIS, best, THIS.prevBest );					
+				THIS.prevBest = best;
 			};
 		};
 	};
@@ -116,19 +190,24 @@
 		
 		fracs: function ( rect, viewport ) {
 
+			rect = rect instanceof HTMLElement ? globals.rect( rect ) : rect;
+			viewport = viewport || globals.viewport();
+
 			var intersection = rect.intersection( viewport );
 
 			if ( intersection === undefined ) {
-				return new FracsResult( undefined, undefined, 0.0, 0.0, 0.0 );
+				return new FracsResult();
 			};
 
-			var intersectionRelative = new Rect( intersection.left - rect.left, intersection.top - rect.top, intersection.width, intersection.height );
+			var intersectionElementSpace = new Rect( intersection.left - rect.left, intersection.top - rect.top, intersection.width, intersection.height );
+			var intersectionViewportSpace = new Rect( intersection.left - viewport.left, intersection.top - viewport.top, intersection.width, intersection.height );
 			var intersectionArea = intersection.area();
 			var possibleArea = Math.min( rect.width, viewport.width ) * Math.min( rect.height, viewport.height );
 
 			return new FracsResult(
 				intersection,
-				intersectionRelative,
+				intersectionElementSpace,
+				intersectionViewportSpace,
 				1.0 * intersectionArea / rect.area(),
 				1.0 * intersectionArea / viewport.area(),
 				1.0 * intersectionArea / possibleArea
@@ -148,29 +227,38 @@
 
 	var methods = {
 
-		init: function ( callback ) {
-
-			return this.each( function () {
-				
-				var data = new FracsData( this, callback );
-				$( this ).data( namespace, data );
-				$( window )
-					.bind( "scroll", data.check )
-					.bind( "resize", data.check );
-				data.check();
-			} );
-		},
-
-		destroy: function () {
+		bind: function ( callback ) {
 
 			return this.each( function () {
 				
 				var $this = $( this );
 				var data = $this.data( namespace );
-				$this.removeData( namespace );
-				$( window )
-					.unbind( "scroll", data.check )
-					.unbind( "resize", data.check );
+				if ( data === undefined ) {
+					data = new FracsData( this );	
+					$this.data( namespace, data );
+					$( window )
+						.bind( "scroll", data.check )
+						.bind( "resize", data.check );
+				};
+				data.bind( callback );
+			} );
+		},
+
+		unbind: function ( callback ) {
+
+			return this.each( function () {
+				
+				var $this = $( this );
+				var data = $this.data( namespace );
+				if ( data !== undefined ) {
+					data.unbind( callback );
+					if ( data.callbacks.length === 0 ) {
+						$this.removeData( namespace );
+						$( window )
+							.unbind( "scroll", data.check )
+							.unbind( "resize", data.check );
+					};
+				};
 			} );
 		},
 
@@ -193,6 +281,16 @@
 		rect: function () {
 
 			return globals.rect( this.get( 0 ) );
+		},
+
+		max: function ( property, callback ) {
+
+			var data = new FracsGroup( this, property, callback );
+			$( window )
+				.bind( "scroll", data.check )
+				.bind( "resize", data.check );
+			data.check();
+			return this;
 		}
 
 	};
@@ -206,7 +304,7 @@
 		} else if ( method === undefined ) {
 			return methods.fracs.apply( this, arguments );
 		} else if ( method instanceof Function ) {
-			return methods.init.apply( this, arguments );
+			return methods.bind.apply( this, arguments );
 		} else {
 			$.error( "Method " +  method + " does not exist on jQuery." + namespace );
 		};
