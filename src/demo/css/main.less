@@ -36,6 +36,7 @@ section {
 	border: 2px solid #333;
 	height: 250px;
 	overflow: hidden;
+	cursor: pointer;
 
 	.label {
 		position: relative;
@@ -86,10 +87,16 @@ section {
 		li {
 			margin: 0;
 			padding: 0;
-		 
+			cursor: pointer;
+			border: 1px solid rgba(0,0,0,0);
+			.border-radius( 4px );
+			
 			&.header {
 				font-weight: bold;
 				margin-bottom: 4px;
+			}
+			&.section:hover {
+				border-color: #ddd;
 			}
 		}
 

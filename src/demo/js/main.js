@@ -8,26 +8,33 @@
 		// generate content
 		for ( var i = 1; i < 10; i++ ) {
 			
-			//section
-			var $section = $( "<section />" ).appendTo( $body )
+			( function () {
+				
+				//section
+				var $section = $( "<section title='scroll to this element' />" ).appendTo( $body )
 				.width( i * 300 )
 				.height( Math.round( Math.random() * 600 ) + 100 );
-			var $label = $( "<div class='label'><span class='idx'>#" + i + "</span></div>" ).appendTo( $section );
-			var $ul = $( "<ul />" ).appendTo( $label );
-			$ul.append( $( "<li><span class='info possible' /> of max possible visibility</li>" ) );
-			$ul.append( $( "<li><span class='info visible' /> visible</li>" ) );
-			$ul.append( $( "<li><span class='info viewport' /> of viewport</li>" ) );
-			var $rectsul = $( "<li>visible rect <span class='info dims' /><ul /></li>" ).appendTo( $ul ).find( "ul" );
-			$rectsul.append( $( "<li>document space <span class='info rect' /></li>" ) );
-			$rectsul.append( $( "<li>element space <span class='info rectElementSpace' /></li>" ) );
-			$rectsul.append( $( "<li>viewport space <span class='info rectViewportSpace' /></li>" ) );
-			
-			// panel
-			var $li = $( "<li />" ).appendTo( $panelFracs );
-			$li.append( $( "<span class='idx'>" + i + "</span>" ) );
-			$li.append( $( "<span class='info possible' /><span class='info visible' /><span class='info viewport' />" ) );
+				var $label = $( "<div class='label'><span class='idx'>#" + i + "</span></div>" ).appendTo( $section );
+				var $ul = $( "<ul />" ).appendTo( $label );
+				$ul.append( $( "<li><span class='info possible' /> of max possible visibility</li>" ) );
+				$ul.append( $( "<li><span class='info visible' /> visible</li>" ) );
+				$ul.append( $( "<li><span class='info viewport' /> of viewport</li>" ) );
+				var $rectsul = $( "<li>visible rect <span class='info dims' /><ul /></li>" ).appendTo( $ul ).find( "ul" );
+				$rectsul.append( $( "<li>document space <span class='info rect' /></li>" ) );
+				$rectsul.append( $( "<li>element space <span class='info rectElementSpace' /></li>" ) );
+				$rectsul.append( $( "<li>viewport space <span class='info rectViewportSpace' /></li>" ) );
+				
+				// panel
+				var $li = $( "<li class='section' title='scroll to this element' />" ).appendTo( $panelFracs );
+				$li.append( $( "<span class='idx'>" + i + "</span>" ) );
+				$li.append( $( "<span class='info possible' /><span class='info visible' /><span class='info viewport' />" ) );
 
-			$section.data( "panel", $li );
+				$section.add( $li ).click( function () {
+					$section.fracs( "scrollTo", 50, 50, 500 );
+				} );
+				
+				$section.data( "panel", $li );
+			})();
 		};
 
 		// init fracs
@@ -78,19 +85,20 @@
 		var $group = $s.eq(3).add( $s.eq(4) ).add( $s.eq(5) ).add( $s.eq(6) ).add( $s.eq(7) );
 		$group.fracs( "max", "possible", function ( best ) {
 			$( "#panel .groups .possible" )
-				.text( best !== undefined ? $( best.element ).find( ".idx" ).text(): "N/A" )
+				.text( best !== undefined ? $( best.element ).find( ".idx" ).text(): "undefined" )
 				.stop( true ).css( "background-color", "rgb(250,250,150)" ).animate( { "background-color": "#fff" }, 1000 );
 		} );
 		$group.fracs( "max", "visible", function ( best ) {
 			$( "#panel .groups .visible" )
-				.text( best !== undefined ? $( best.element ).find( ".idx" ).text(): "N/A" )
+				.text( best !== undefined ? $( best.element ).find( ".idx" ).text(): "undefined" )
 				.stop( true ).css( "background-color", "rgb(250,250,150)" ).animate( { "background-color": "#fff" }, 1000 );
 		} );
 		$group.fracs( "max", "viewport", function ( best ) {
 			$( "#panel .groups .viewport" )
-				.text( best !== undefined ? $( best.element ).find( ".idx" ).text(): "N/A" )
+				.text( best !== undefined ? $( best.element ).find( ".idx" ).text(): "undefined" )
 				.stop( true ).css( "background-color", "rgb(250,250,150)" ).animate( { "background-color": "#fff" }, 1000 );
 		} );
+		
 	} );
 
 } )( jQuery );

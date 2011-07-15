@@ -1,6 +1,7 @@
-# jQuery.fracs v0.3
+# jQuery.fracs v0.4
 
-For now there is a small [website](http://larsjung.de/fracs) and a [demo](http://larsjung.de/fracs/demo) online.
+Please have a look at the [project page](http://larsjung.de/fracs) for documentation.
+And there is a live [demo](http://larsjung.de/fracs/demo) of some features.
 
 
 ## License and References
@@ -14,10 +15,20 @@ please respect their rights.
 
 ## Changelog
 
+### v0.4
+*2011-07-15*
+
+* added scroll methods
+* added FracsElement
+
+
 ### v0.3
 *2011-07-13*
 
-* 
+* some API changes
+* cleaned code
+* first test of grouping elements
+* added FracsGroup
 
 
 ### v0.2

@@ -75,6 +75,21 @@
 		};
 	};
 
+	
+	var FracsElement = function ( htmlElement, fracs ) {
+		
+		this.element = htmlElement;
+		this.fracs = fracs;
+		
+		this.update = function () {
+			
+			var fracs = globals.fracs( this.element );
+			var changed = this.fracs === undefined || !this.fracs.equals( fracs );
+			this.fracs = fracs;
+			return changed;
+		};
+	};
+	
 
 	var FracsData = function ( htmlElement ) {
 
@@ -125,10 +140,7 @@
 		for ( var idx in targets ) {
 			var target = targets[idx];
 			if ( target instanceof HTMLElement ) {
-				this.targets.push( {
-					element: target,
-					fracs: undefined
-				} );
+				this.targets.push( new FracsElement( target ) );
 			};
 		};
 
@@ -140,7 +152,7 @@
 
 			for ( var idx in THIS.targets ) {
 				var target = THIS.targets[idx];
-				target.fracs = globals.fracs( target.element, viewport );
+				target.update();
 				if ( best === undefined || target.fracs[ THIS.property ] > best.fracs[ THIS.property ] ) {
 					best = target;
 				};
@@ -220,6 +232,12 @@
 				return Math.round( value );
 			};
 			return Math.round( value * Math.pow( 10, decs ) ) / Math.pow( 10, decs );
+		},
+
+		scrollTo: function ( left, top, duration ) {
+
+			duration = duration || 1000;
+			$( "html,body" ).stop( true ).animate( { scrollLeft: left, scrollTop: top }, duration );
 		}
 
 	};
@@ -290,6 +308,16 @@
 				.bind( "scroll", data.check )
 				.bind( "resize", data.check );
 			data.check();
+			return this;
+		},
+
+		scrollTo: function ( paddingLeft, paddingTop, duration ) {
+			
+			paddingLeft = paddingLeft || 0;
+			paddingTop = paddingTop || 0;
+
+			var rect = globals.rect( this.get( 0 ) );
+			globals.scrollTo( rect.left - paddingLeft, rect.top - paddingTop, duration );
 			return this;
 		}
 
