@@ -17,6 +17,35 @@ body {
 		font-size: 3em;
 		border-bottom: 4px solid #eee;
 	}
+	> section {
+		position: relative;
+		background-color: #ccc;
+		margin: 30px;
+		border: 2px solid #333;
+		height: 250px;
+		overflow: hidden;
+		cursor: pointer;
+	
+		.label {
+			position: relative;
+			display: inline-block;
+			overflow: hidden;
+			margin: 10px;
+			padding: 8px 16px 16px 16px;
+			.border-radius( 5px );
+			background-color: rgba(255,255,255,0.5);
+	
+			.idx {
+				font-weight: bold;
+				font-size: 1.8em;
+				color: rgba(0,0,0,0.5);
+			}
+			ul {
+				margin-top: 6px;
+				margin-left: 1.2em;
+			}
+		}
+	}
 }
 
 a, a:active, a:visited {
@@ -29,42 +58,12 @@ a, a:active, a:visited {
 	}
 }
 
-section {
-	position: relative;
-	background-color: #ccc;
-	margin: 30px;
-	border: 2px solid #333;
-	height: 250px;
-	overflow: hidden;
-	cursor: pointer;
 
-	.label {
-		position: relative;
-		display: inline-block;
-		overflow: hidden;
-		margin: 10px;
-		padding: 8px 16px 16px 16px;
-		.border-radius( 5px );
-		background-color: rgba(255,255,255,0.5);
-
-		.idx {
-			font-weight: bold;
-			font-size: 1.8em;
-			color: rgba(0,0,0,0.5);
-		}
-		ul {
-			margin-top: 6px;
-			margin-left: 1.2em;
-		}
-	}
-}
-
-#panel {
+.panel {
 	font-size: 0.85em;
 	position: fixed;
-	top: 8px;
+	bottom: 8px;
 	right: 8px;
-	padding: 8px;
 	background-color: #fff;
 	z-index: 1;
 	border: 2px solid #555;
@@ -72,57 +71,66 @@ section {
 	h1 {
 		font-size: 1.2em;
 		text-align: center;
-		margin-bottom: 1em;
+		margin: 8px 0 0 0;
 	}
-	h2 {
-		font-size: 1em;
-		text-align: left;
-		margin: 1em 0 0.6em 0;
-	}
-	.fracs {
-		list-style: none;
-		margin: 0;
-		padding: 0;
+	> section {
+		float: right;
+		margin: 8px;
 
-		li {
+		h2 {
+			font-size: 1em;
+			text-align: left;
+			margin: 1em 0 0.6em 0;
+		}
+		.fracs {
+			list-style: none;
 			margin: 0;
 			padding: 0;
-			cursor: pointer;
-			border: 1px solid rgba(0,0,0,0);
-			.border-radius( 4px );
+	
+			li {
+				margin: 0;
+				padding: 0;
+				cursor: pointer;
+				border: 1px solid rgba(0,0,0,0);
+				.border-radius( 4px );
+				
+				&.header {
+					font-weight: bold;
+					margin-bottom: 4px;
+				}
+				&.section:hover {
+					border-color: #ddd;
+				}
+			}
+	
+			span {
+				display: inline-block;
+				margin: 0 4px;
+				padding: 0 4px 2px 4px;
+				width: 65px;
+				overflow: hidden;
+			}
+			span.idx {
+				width: 30px;
+				text-align: center;
+			}
+		}
+		.groups {
+			list-style: none;
+			margin: 0;
+			padding: 0;
 			
-			&.header {
-				font-weight: bold;
-				margin-bottom: 4px;
+			span {
+				display: inline-block;
+				margin: 0 4px;
+				padding: 0 4px 2px 4px;
+				width: 65px;
+				overflow: hidden;
 			}
-			&.section:hover {
-				border-color: #ddd;
-			}
 		}
-
-		span {
-			display: inline-block;
-			margin: 0 4px;
-			padding: 0 4px 2px 4px;
-			width: 65px;
-			overflow: hidden;
-		}
-		span.idx {
-			width: 30px;
-			text-align: center;
-		}
-	}
-	.groups {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		
-		span {
-			display: inline-block;
-			margin: 0 4px;
-			padding: 0 4px 2px 4px;
-			width: 65px;
-			overflow: hidden;
+		#outline {
+			border: 1px solid #ccc;
+			background-color: #fff;
 		}
 	}
 }

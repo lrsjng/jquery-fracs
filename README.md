@@ -1,4 +1,4 @@
-# jQuery.fracs v0.4
+# jQuery.fracs v0.5
 
 Please have a look at the [project page](http://larsjung.de/fracs) for documentation.
 And there is a live [demo](http://larsjung.de/fracs/demo) of some features.
@@ -14,6 +14,12 @@ please respect their rights.
 
 
 ## Changelog
+
+### v0.5
+*2011-07-15*
+
+* added soft link
+
 
 ### v0.4
 *2011-07-15*

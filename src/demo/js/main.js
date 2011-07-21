@@ -2,8 +2,43 @@
 
 	$( function () {
 
+		demo();
+
+		$.each( [ "possible", "visible", "viewport", "width", "height", "left", "right", "top", "bottom" ], function ( idx, property ) {
+			$.each( [ "min", "max" ], function ( idx, relation ) {
+				console.log( relation, property );
+				$( "body > section" ).fracs( relation, property ).each( function () {
+					console.log( $( this ).find( ".label .idx" ).text() );
+				} );
+			} );
+		} );
+		
+		$( "#outline" ).fracs( "outline", {
+			crop: true,
+			styles: [
+				{
+					selector: "body > section",
+					strokeWidth: "auto",
+					strokeStyle: "auto",
+					fillStyle: "auto"
+				},
+				{
+					selector: "body > h1",
+					strokeWidth: undefined,
+					strokeStyle: undefined,
+					fillStyle: "rgb(200,200,200)"
+				}
+			]
+		} );
+		var outline = $( "#outline" ).data( "outline" );
+		$( "#outlineHeader" ).text( "Document " + outline.docRect.width + "x" + outline.docRect.height );
+	} );
+
+
+	var demo = function () {
+
 		$body = $( "body" );
-		$panelFracs = $( "#panel .fracs" );
+		$panelFracs = $( ".panel .fracs" );
 
 		// generate content
 		for ( var i = 1; i < 10; i++ ) {
@@ -38,7 +73,7 @@
 		};
 
 		// init fracs
-		$( "section" ).fracs( function ( fracs ) {
+		$( "body > section" ).fracs( function ( fracs ) {
 			var $section = $( this );
 			var $panel = $section.data( "panel" );
 			var $label = $section.find( ".label" );
@@ -68,37 +103,38 @@
 		} );
 
 		// initial check
-		$( "section" ).fracs( "check" );
+		$( "body > section" ).fracs( "check" );
 
 		// test unbind
-		$( "section" ).eq( 5 ).fracs( "unbind" ).find( ".label" ).empty().append( "<span class='idx'>#6</span> (unbound)" );
+		$( "body > section" ).eq( 5 ).fracs( "unbind" ).find( ".label" ).empty().append( "<span class='idx'>#6</span> (unbound)" );
 
 		// test multiple binds
-		$( "section" ).eq( 7 ).fracs( function ( fracs ) {
+		$( "body > section" ).eq( 7 ).fracs( function ( fracs ) {
 			if ( fracs.possible == 1 ) {
 				console.log( "#8 max possible visibility" );
 			};
 		} );
 		
 		// init groups
-		var $s = $( "section" );
+		var $s = $( "body > section" );
 		var $group = $s.eq(3).add( $s.eq(4) ).add( $s.eq(5) ).add( $s.eq(6) ).add( $s.eq(7) );
 		$group.fracs( "max", "possible", function ( best ) {
-			$( "#panel .groups .possible" )
+			$( ".panel .groups .possible" )
 				.text( best !== undefined ? $( best.element ).find( ".idx" ).text(): "undefined" )
 				.stop( true ).css( "background-color", "rgb(250,250,150)" ).animate( { "background-color": "#fff" }, 1000 );
 		} );
 		$group.fracs( "max", "visible", function ( best ) {
-			$( "#panel .groups .visible" )
+			$( ".panel .groups .visible" )
 				.text( best !== undefined ? $( best.element ).find( ".idx" ).text(): "undefined" )
 				.stop( true ).css( "background-color", "rgb(250,250,150)" ).animate( { "background-color": "#fff" }, 1000 );
 		} );
 		$group.fracs( "max", "viewport", function ( best ) {
-			$( "#panel .groups .viewport" )
+			$( ".panel .groups .viewport" )
 				.text( best !== undefined ? $( best.element ).find( ".idx" ).text(): "undefined" )
 				.stop( true ).css( "background-color", "rgb(250,250,150)" ).animate( { "background-color": "#fff" }, 1000 );
 		} );
 		
-	} );
+	};
 
+	
 } )( jQuery );

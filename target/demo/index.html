@@ -2,8 +2,8 @@
 <html class="no-js">
 <head>
 	<meta charset="utf-8">
-	<title>jQuery.fracs 0.4 Demo</title>
-	<meta name="version" content="jQuery.fracs 0.4">
+	<title>jQuery.fracs 0.5 Demo</title>
+	<meta name="version" content="jQuery.fracs 0.5">
 	<meta name="description" content="Test and demo page for jQuery.fracs">
 	<meta name="author" content="Lars Jung">
 	<meta name="keywords" content="jQuery.fracs, lrsjng">
@@ -14,21 +14,27 @@
 	<script src="js/lib/modernizr.min.js"></script>
 </head>
 <body>
-	<h1><a href="http://larsjung.de/fracs" title="jQuery.fracs project page">jQuery.fracs</a> 0.4 Demo</h1>
-	<aside id="panel">
-		<h1><a href="http://larsjung.de/fracs" title="jQuery.fracs project page">jQuery.fracs</a> 0.4 Demo</h1>
-		<h2>Fractions</h2>
-		<ul class="fracs">
-			<li class='header'>
-				<span class='idx'>#</span><span class='info' title="fraction of the element that is visible compared to the maximal possible area that might be visible">possible</span><span class='info' title="fraction of the element that is visible">visible</span><span class='info' title="fraction of the viewport (window) that is taken by this element">viewport</span>
-			</li>
-		</ul>
-		<h2>Group Maximums ( #4 .. #8 )</h2>
-		<ul class="groups">
-			<li><span>possible:</span><span class='possible'>undefined</span></li>
-			<li><span>visible:</span><span class='visible'>undefined</span></li>
-			<li><span>viewport:</span><span class='viewport'>undefined</span></li>
-		</ul>
+	<h1><a href="http://larsjung.de/fracs" title="jQuery.fracs project page">jQuery.fracs</a> 0.5 Demo</h1>
+	<aside class="panel">
+		<h1><a href="http://larsjung.de/fracs" title="jQuery.fracs project page">jQuery.fracs</a> 0.5 Demo</h1>
+		<section>
+			<h2>Fractions</h2>
+			<ul class="fracs">
+				<li class='header'>
+					<span class='idx'>#</span><span class='info' title="fraction of the element that is visible compared to the maximal possible area that might be visible">possible</span><span class='info' title="fraction of the element that is visible">visible</span><span class='info' title="fraction of the viewport (window) that is taken by this element">viewport</span>
+				</li>
+			</ul>
+			<h2>Group Maximums ( #4 .. #8 )</h2>
+			<ul class="groups">
+				<li><span>possible:</span><span class='possible'>undefined</span></li>
+				<li><span>visible:</span><span class='visible'>undefined</span></li>
+				<li><span>viewport:</span><span class='viewport'>undefined</span></li>
+			</ul>
+		</section>
+		<section>
+			<h2 id="outlineHeader">Document</h2>
+			<canvas id="outline" width="300" height="300"></canvas>
+		</section>
 	</aside>
 	<script src="js/lib/jquery.min.js"></script>
 	<script src="js/lib/jquery-ui.custom.min.js"></script>
