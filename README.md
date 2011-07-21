@@ -16,9 +16,10 @@ please respect their rights.
 ## Changelog
 
 ### v0.5
-*2011-07-15*
+*2011-07-21*
 
-* added soft link
+* added soft link, outline, min, max
+* refactorings
 
 
 ### v0.4
