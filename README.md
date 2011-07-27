@@ -1,19 +1,25 @@
-# jQuery.fracs v0.5
+# jQuery.fracs v0.7
 
 Please have a look at the [project page](http://larsjung.de/fracs) for documentation.
-And there is a live [demo](http://larsjung.de/fracs/demo) of some features.
+There is also a [demo](http://larsjung.de/fracs/demo) of some features.
 
-
-## License and References
-
-<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png" /></a>  
-[jQuery.fracs](http://larsjung.de/fracs) is provided under the terms of the [CC BY-SA 3.0 License](http://creativecommons.org/licenses/by-sa/3.0/).  
-It is based on
-[jQuery](http://jquery.com),
-please respect their rights.
+[jQuery.fracs](http://larsjung.de/fracs) is provided under the terms of the MIT License.  
 
 
 ## Changelog
+
+### v0.7
+*2011-07-27*
+
+* changed license to MIT license, see `LICENSE.txt`
+
+
+### v0.6
+*2011-07-26*
+
+* added envelope
+* started test suite
+
 
 ### v0.5
 *2011-07-21*

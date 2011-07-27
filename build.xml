@@ -37,10 +37,16 @@
 			<replacefilter token="%BUILD_STAMP%" value="${build.stamp}" />
 		</replace>
 
+		<!-- demo -->
 		<scripp.dir dir="${build.dir}/demo/css" />
 		<scripp.dir dir="${build.dir}/demo/js" />
 		<copy file="${build.dir}/jquery.fracs.js" todir="${build.dir}/demo" />
 
+		<!-- test -->
+		<scripp.dir dir="${build.dir}/test/js" />
+		<copy file="${build.dir}/jquery.fracs.js" todir="${build.dir}/test" />
+
+		<!-- release -->
 		<scripp:jsmin file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/jquery.fracs-${project.version}.min.js" />
 		<move file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/jquery.fracs-${project.version}.js" />
 	</target>

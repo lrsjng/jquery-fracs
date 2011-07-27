@@ -2,8 +2,7 @@
  * %BUILD_NAME% %BUILD_VERSION%
  * http://larsjung.de/fracs
  * 
- * provided under the terms of the CC BY-SA 3.0 License
- * http://creativecommons.org/licenses/by-sa/3.0/
+ * provided under the terms of the MIT License
  */
 
 ( function( $ ) {
@@ -14,11 +13,11 @@
 		this.top = Math.round( top );
 		this.width = Math.round( width );
 		this.height = Math.round( height );
-		this.right = left + width;
-		this.bottom = top + height;
+		this.right = this.left + this.width;
+		this.bottom = this.top + this.height;
 
 		this.equals = function ( that ) {
-			
+
 			return this.left === that.left && this.top === that.top && this.width === that.width && this.height === that.height;
 		};
 		
@@ -38,6 +37,17 @@
 			if ( width < 0 || height < 0 ) {
 				return undefined;
 			};
+			return new Rect( left, top, width, height );
+		};
+
+		this.envelope = function ( rect ) {
+
+			var left = Math.min( this.left, rect.left );
+			var right = Math.max( this.right, rect.right );
+			var top = Math.min( this.top, rect.top );
+			var bottom = Math.max( this.bottom, rect.bottom );
+			var width = right - left;
+			var height = bottom - top;
 			return new Rect( left, top, width, height );
 		};
 	};
@@ -116,17 +126,17 @@
 			};
 		};
 
-		var THIS = this; // so method can be easily bound to events
-		this.check = function () {
+		// method uses proxy so it can be easily bound to events
+		this.check = $.proxy( function () {
 
-			var fracs = globals.fracs( globals.rect( THIS.target ), globals.viewport() );
-			if ( THIS.prevFracs === undefined || !THIS.prevFracs.equals( fracs ) ) {
-				$.each( THIS.callbacks, function ( idx, callback ) {
-					callback.call( THIS.target, fracs, THIS.prevFracs );					
-				} );
-				THIS.prevFracs = fracs;
+			var fracs = globals.fracs( globals.rect( this.target ), globals.viewport() );
+			if ( this.prevFracs === undefined || !this.prevFracs.equals( fracs ) ) {
+				$.each( this.callbacks, $.proxy( function ( idx, callback ) {
+					callback.call( this.target, fracs, this.prevFracs );					
+				}, this ) );
+				this.prevFracs = fracs;
 			};
-		};
+		}, this );
 	};
 
 
@@ -144,29 +154,29 @@
 			};
 		};
 
-		var THIS = this; // so method can be easily bound to events
-		this.check = function () {
+		// method uses proxy so it can be easily bound to events
+		this.check = $.proxy( function () {
 
 			var best = undefined;
 			var viewport = globals.viewport();
 
-			for ( var idx in THIS.targets ) {
-				var target = THIS.targets[idx];
+			for ( var idx in this.targets ) {
+				var target = this.targets[idx];
 				target.update();
-				if ( best === undefined || target.fracs[ THIS.property ] > best.fracs[ THIS.property ] ) {
+				if ( best === undefined || target.fracs[this.property] > best.fracs[this.property] ) {
 					best = target;
 				};
 			};
 
-			if ( best.fracs[ THIS.property ] == 0.0 ) {
+			if ( best.fracs[this.property] == 0.0 ) {
 				best = undefined;
 			};
 			
-			if ( THIS.prevBest !== best ) {
-				THIS.callback.call( THIS, best, THIS.prevBest );					
-				THIS.prevBest = best;
+			if ( this.prevBest !== best ) {
+				this.callback.call( this, best, this.prevBest );					
+				this.prevBest = best;
 			};
-		};
+		}, this );
 	};
 
 
@@ -347,6 +357,15 @@
 
 
 	var globals = {
+
+		internal: {
+			Rect: Rect,
+			FracsResult: FracsResult,
+			FracsElement: FracsElement,
+			FracsData: FracsData,
+			FracsGroup: FracsGroup,
+			Outline: Outline
+		},
 
 		document: function () {
 
@@ -541,6 +560,16 @@
 				return $( elements );
 			};
 			return this;
+		},
+
+		envelope: function () {
+
+			var envelope = undefined;
+			this.each( function () {
+				var rect = $.fracs.rect( this );
+				envelope = envelope === undefined ? rect : envelope.envelope( rect );
+			} );
+			return envelope;
 		},
 
 		scrollTo: function ( paddingLeft, paddingTop, duration ) {
