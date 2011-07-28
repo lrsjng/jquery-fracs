@@ -22,6 +22,7 @@
 
 	<target name="clean" depends="init">
 		<delete dir="${build.dir}" />
+		<delete dir="${release.dir}" />
 	</target>
 
 
@@ -30,6 +31,7 @@
 		<copy todir="${build.dir}">
 		    <fileset dir="${src.dir}" />
 		</copy>
+		<copy file="LICENSE.txt" todir="${build.dir}" />
 		<replace dir="${build.dir}">
 			<replacefilter token="%BUILD%" value="${build.label}" />
 			<replacefilter token="%BUILD_NAME%" value="${project.name}" />
@@ -46,9 +48,18 @@
 		<scripp.dir dir="${build.dir}/test/js" />
 		<copy file="${build.dir}/jquery.fracs.js" todir="${build.dir}/test" />
 
-		<!-- release -->
+		<!-- scripts -->
 		<scripp:jsmin file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/jquery.fracs-${project.version}.min.js" />
 		<move file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/jquery.fracs-${project.version}.js" />
+
+		<!-- release -->
+		<mkdir dir="${release.dir}" />
+		<tar destfile="${release.dir}/${project.name}-${project.version}.tar" basedir="${build.dir}"/>
+		<gzip destfile="${release.dir}/${project.name}-${project.version}.tar.gz" src="${release.dir}/${project.name}-${project.version}.tar"/>
+		<delete file="${release.dir}/${project.name}-${project.version}.tar" />
+		<zip destfile="${release.dir}/${project.name}-${project.version}.zip" basedir="${build.dir}" />
+		<copy file="${build.dir}/jquery.fracs-${project.version}.js" todir="${release.dir}" />
+		<copy file="${build.dir}/jquery.fracs-${project.version}.min.js" todir="${release.dir}" />
 	</target>
 
 
