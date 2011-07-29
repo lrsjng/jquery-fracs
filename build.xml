@@ -2,7 +2,7 @@
 <project
 	name="jQuery.fracs"
 	basedir="."
-	default="build"
+	default="release"
 	xmlns:scripp="antlib:de.larsjung.scripp.ant"
 >
 	<target name="init">
@@ -26,47 +26,67 @@
 	</target>
 
 
-	<target name="build" depends="clean">
+	<target name="build-prepare" depends="clean">
 		<mkdir dir="${build.dir}" />
 		<copy todir="${build.dir}">
 		    <fileset dir="${src.dir}" />
+			<fileset file="LICENSE.txt" />
+			<fileset file="README.md" />
 		</copy>
-		<copy file="LICENSE.txt" todir="${build.dir}" />
 		<replace dir="${build.dir}">
 			<replacefilter token="%BUILD%" value="${build.label}" />
 			<replacefilter token="%BUILD_NAME%" value="${project.name}" />
 			<replacefilter token="%BUILD_VERSION%" value="${project.version}" />
 			<replacefilter token="%BUILD_STAMP%" value="${build.stamp}" />
 		</replace>
+		<scripp:js file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/jquery.fracs-${project.version}.js" />
+		<scripp:jsmin file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/jquery.fracs-${project.version}.min.js" />
+		<delete file="${build.dir}/jquery.fracs.js" />		
+	</target>
 
+
+	<target name="build" depends="build-prepare">
 		<!-- demo -->
 		<scripp.dir dir="${build.dir}/demo/css" />
 		<scripp.dir dir="${build.dir}/demo/js" />
-		<copy file="${build.dir}/jquery.fracs.js" todir="${build.dir}/demo" />
+		<copy file="${build.dir}/jquery.fracs-${project.version}.min.js" tofile="${build.dir}/demo/jquery.fracs.js" />
 
 		<!-- test -->
 		<scripp.dir dir="${build.dir}/test/js" />
-		<copy file="${build.dir}/jquery.fracs.js" todir="${build.dir}/test" />
+		<copy file="${build.dir}/jquery.fracs-${project.version}.min.js" tofile="${build.dir}/test/jquery.fracs.js" />
+	</target>
 
-		<!-- scripts -->
-		<scripp:jsmin file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/jquery.fracs-${project.version}.min.js" />
-		<move file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/jquery.fracs-${project.version}.js" />
 
-		<!-- release -->
+	<target name="build-uncompressed" depends="build-prepare">
+		<!-- demo -->
+		<scripp.dir dir="${build.dir}/demo/css" compress="false" />
+		<scripp.dir dir="${build.dir}/demo/js" compress="false" />
+		<copy file="${build.dir}/jquery.fracs-${project.version}.js" tofile="${build.dir}/demo/jquery.fracs.js" />
+
+		<!-- test -->
+		<scripp.dir dir="${build.dir}/test/js" compress="false" />
+		<copy file="${build.dir}/jquery.fracs-${project.version}.js" tofile="${build.dir}/test/jquery.fracs.js" />
+	</target>
+
+
+	<target name="release" depends="build">
 		<mkdir dir="${release.dir}" />
 		<tar destfile="${release.dir}/${project.name}-${project.version}.tar" basedir="${build.dir}"/>
 		<gzip destfile="${release.dir}/${project.name}-${project.version}.tar.gz" src="${release.dir}/${project.name}-${project.version}.tar"/>
 		<delete file="${release.dir}/${project.name}-${project.version}.tar" />
 		<zip destfile="${release.dir}/${project.name}-${project.version}.zip" basedir="${build.dir}" />
-		<copy file="${build.dir}/jquery.fracs-${project.version}.js" todir="${release.dir}" />
-		<copy file="${build.dir}/jquery.fracs-${project.version}.min.js" todir="${release.dir}" />
+		<copy todir="${release.dir}">
+			<fileset file="${build.dir}/jquery.fracs-${project.version}.js" />
+			<fileset file="${build.dir}/jquery.fracs-${project.version}.min.js" />
+		</copy>
 	</target>
 
 
 	<macrodef name="scripp.dir">
 		<attribute name="dir" />
+		<attribute name="compress" default="true" />
 		<sequential>
-			<scripp:process>
+			<scripp:process compress="@{compress}">
 				<fileset dir="@{dir}" includes="**/*.less,**/*.css,**/*.js" excludes="inc/**/*,**/*.min.css,**/*.min.js" />
 				<globmapper from="*.less" to="*.css" />
 				<globmapper from="*.css" to="*.css" />
