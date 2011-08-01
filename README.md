@@ -1,42 +1,42 @@
 # jQuery.fracs
 
-* [Download, docs and demo](http://larsjung.de/fracs)
-* [Sources at GitHub](http://github.com/lrsjng/jQuery.fracs)
+* Website with download, docs and demo: <http://larsjung.de/fracs>
+* Sources: <http://github.com/lrsjng/jQuery.fracs>
 
 jQuery.fracs is provided under the terms of the [MIT License](http://github.com/lrsjng/jQuery.fracs/blob/master/LICENSE.txt).  
 
 
 ## Changelog
 
-### v0.7
-*2011-07-27*
+### v0.7.1 · *2011-08-01*
+
+* fixed unchecked use of console.log
+
+
+### v0.7 · *2011-07-27*
 
 * changed license to MIT license, see `LICENSE.txt`
 
 
-### v0.6
-*2011-07-26*
+### v0.6 · *2011-07-26*
 
 * added envelope
 * started test suite
 
 
-### v0.5
-*2011-07-21*
+### v0.5 · *2011-07-21*
 
 * added soft link, outline, min, max
 * refactorings
 
 
-### v0.4
-*2011-07-15*
+### v0.4 · *2011-07-15*
 
 * added scroll methods
 * added FracsElement
 
 
-### v0.3
-*2011-07-13*
+### v0.3 · *2011-07-13*
 
 * some API changes
 * cleaned code
@@ -44,11 +44,6 @@ jQuery.fracs is provided under the terms of the [MIT License](http://github.com/
 * added FracsGroup
 
 
-### v0.2
-*2011-07-12*
+### v0.2 · *2011-07-12*
 
 * improved demo
-
-
-### v0.1
-*2011-07-12*

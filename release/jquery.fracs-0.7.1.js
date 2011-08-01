@@ -1,5 +1,5 @@
 /*
- * jQuery.fracs 0.7
+ * jQuery.fracs 0.7.1
  * http://larsjung.de/fracs
  * 
  * provided under the terms of the MIT License
@@ -183,7 +183,9 @@
 	var Outline = function ( canvas, options ) {
 
 		if ( !( canvas instanceof HTMLElement ) || canvas.nodeName.toLowerCase() !== "canvas" ) {
-			console.error( "Outline needs a canvas but found: " + ( canvas && canvas.nodeName.toLowerCase() ) );
+			if ( window.console ) {
+				window.console.error( "Outline needs a canvas but found: " + ( canvas && canvas.nodeName.toLowerCase() ) );
+			};
 			return undefined;
 		};
 

@@ -1,14 +1,24 @@
 ( function( $ ) {
 
+	// http://paulirish.com/2009/log-a-lightweight-wrapper-for-consolelog/
+	$.log = function () {
+		$.log.history = $.log.history || [];
+		$.log.history.push( arguments );
+		if ( window.console ) {
+			window.console.log( Array.prototype.slice.call( arguments ) );
+		};
+	};
+
+
 	$( function () {
 
 		demo();
 
 		$.each( [ "possible", "visible", "viewport", "width", "height", "left", "right", "top", "bottom" ], function ( idx, property ) {
 			$.each( [ "min", "max" ], function ( idx, relation ) {
-				console.log( relation, property );
+				$.log( relation, property );
 				$( "body > section" ).fracs( relation, property ).each( function () {
-					console.log( $( this ).find( ".label .idx" ).text() );
+					$.log( $( this ).find( ".label .idx" ).text() );
 				} );
 			} );
 		} );
@@ -111,7 +121,7 @@
 		// test multiple binds
 		$( "body > section" ).eq( 7 ).fracs( function ( fracs ) {
 			if ( fracs.possible == 1 ) {
-				console.log( "#8 max possible visibility" );
+				$.log( "#8 max possible visibility" );
 			};
 		} );
 		
