@@ -8,6 +8,19 @@ jQuery.fracs is provided under the terms of the [MIT License](http://github.com/
 
 ## Changelog
 
+### v0.8 · *2011-08-09*
+
+* added `duration`, `focusWidth` and `focusHeight` to `OutlineOptions`
+* added static methods
+	* `jQuery.fracs.scroll`
+	* `jQuery.fracs.scrollState`
+* added methods to `Rect`
+	* `bind`
+	* `unbind`
+	* `check`
+	* `fracs`
+
+
 ### v0.7.1 · *2011-08-01*
 
 * fixed unchecked use of console.log

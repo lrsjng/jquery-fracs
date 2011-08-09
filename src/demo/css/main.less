@@ -138,17 +138,23 @@ a, a:active, a:visited {
 				text-align: center;
 			}
 		}
-		.groups {
+		.groups, .scrollstate {
 			list-style: none;
 			margin: 0;
 			padding: 0;
 			
-			span {
+			li {
 				display: inline-block;
-				margin: 0 4px;
-				padding: 0 4px 2px 4px;
-				width: 65px;
-				overflow: hidden;
+				span {
+					display: inline-block;
+					margin: 0 4px;
+					padding: 0 4px 2px 4px;
+					width: 65px;
+					overflow: hidden;
+				}
+				span:nth-child(2) {
+					width: 40px;
+				}
 			}
 		}
 		#outline {

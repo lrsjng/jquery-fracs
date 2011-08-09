@@ -1,11 +1,12 @@
 /*
- * jQuery.fracs 0.7.1
+ * jQuery.fracs 0.8
  * http://larsjung.de/fracs
  * 
  * provided under the terms of the MIT License
  */
 
 ( function( $ ) {
+
 
 	var Rect = function ( left, top, width, height ) {
 
@@ -50,6 +51,45 @@
 			var height = bottom - top;
 			return new Rect( left, top, width, height );
 		};
+
+
+		var fracsData = undefined;
+
+		this.bind = function ( callback ) {
+
+			if ( fracsData === undefined ) {
+				fracsData = new FracsData( this );	
+				$( window )
+					.bind( "scroll", fracsData.check )
+					.bind( "resize", fracsData.check );
+			};
+			fracsData.bind( callback );
+		},
+
+		this.unbind = function ( callback ) {
+
+			if ( fracsData !== undefined ) {
+				fracsData.unbind( callback );
+				if ( fracsData.callbacks.length === 0 ) {
+					$( window )
+						.unbind( "scroll", fracsData.check )
+						.unbind( "resize", fracsData.check );
+					fracsData = undefined;
+				};
+			};
+		};
+
+		this.check = function () {
+
+			if ( fracsData ) {
+				fracsData.check();
+			};
+		};
+
+		this.fracs = function () {
+
+			$.fracs.fracs( this );
+		};
 	};
 
 
@@ -93,7 +133,7 @@
 		
 		this.update = function () {
 			
-			var fracs = globals.fracs( this.element );
+			var fracs = $.fracs.fracs( this.element );
 			var changed = this.fracs === undefined || !this.fracs.equals( fracs );
 			this.fracs = fracs;
 			return changed;
@@ -101,9 +141,9 @@
 	};
 	
 
-	var FracsData = function ( htmlElement ) {
+	var FracsData = function ( htmlElementOrRect ) {
 
-		this.target = htmlElement;
+		this.target = htmlElementOrRect;
 		this.callbacks = [];
 		this.prevFracs = undefined;
 
@@ -129,7 +169,8 @@
 		// method uses proxy so it can be easily bound to events
 		this.check = $.proxy( function () {
 
-			var fracs = globals.fracs( globals.rect( this.target ), globals.viewport() );
+			var rect = this.target instanceof HTMLElement ? $.fracs.rect( this.target ) : this.target;
+			var fracs = $.fracs.fracs( rect, $.fracs.viewport() );
 			if ( this.prevFracs === undefined || !this.prevFracs.equals( fracs ) ) {
 				$.each( this.callbacks, $.proxy( function ( idx, callback ) {
 					callback.call( this.target, fracs, this.prevFracs );					
@@ -158,7 +199,7 @@
 		this.check = $.proxy( function () {
 
 			var best = undefined;
-			var viewport = globals.viewport();
+			var viewport = $.fracs.viewport();
 
 			for ( var idx in this.targets ) {
 				var target = this.targets[idx];
@@ -191,6 +232,9 @@
 
 		var defaults = {
 			crop: false,
+			duration: 100,
+			focusWidth: 0.5,
+			focusHeight: 0.5,
 			styles: [
 				{
 					selector: "header,footer,section,article",
@@ -260,13 +304,17 @@
 						}, this ) );
 				}, this ) )
 				.attr( "unselectable", "on" )
+				.css( "-webkit-user-select", "none" )
+				.css( "-khtml-user-select", "none" )
 				.css( "-moz-user-select", "none" )
+				.css( "-o-user-select", "none" )
+				.css( "user-select", "none" )
 				.each( function () { 
 					this.onselectstart = function () {
 						return false;
 					};
 				} );
-			this.$window.bind( "resize scroll", $.proxy( this.draw, this ) );
+			this.$window.bind( "load resize scroll", $.proxy( this.draw, this ) );
 			this.draw();
 		};
 		
@@ -331,7 +379,7 @@
 			this.context.clearRect( 0, 0, this.$canvas.width(), this.$canvas.height() );
 
 			this.context.scale( this.scale, this.scale );
-			this.drawRect( this.context, this.docRect, 1, "#000" );
+			//this.drawRect( this.context, this.docRect, 1, "#000" );
 			this.applyStyles( this.context );
 			if ( this.drag === true ) {
 				this.drawRect( this.context, this.vpRect, undefined, undefined, "rgba(228,77,38,0.6)" );
@@ -347,7 +395,7 @@
 			var r = this.$canvas.fracs( "rect" );
 			var x = event.pageX - r.left;
 			var y = event.pageY - r.top;
-			$.fracs.scrollTo( x / this.scale - this.vpRect.width / 2, y / this.scale - this.vpRect.height / 2, 100 );
+			$.fracs.scrollTo( x / this.scale - this.vpRect.width * this.settings.focusWidth, y / this.scale - this.vpRect.height * this.settings.focusHeight, this.settings.duration );
 		};
 
 
@@ -355,12 +403,17 @@
 	};
 
 
-	var namespace = "fracs";
 
 
-	var globals = {
+	/*******************************
+	 * jQuery.fracs static methods
+	 *******************************/
 
+	$.fracs = {
+
+		// just for testing purposes
 		internal: {
+			
 			Rect: Rect,
 			FracsResult: FracsResult,
 			FracsElement: FracsElement,
@@ -390,8 +443,8 @@
 		
 		fracs: function ( rect, viewport ) {
 
-			rect = rect instanceof HTMLElement ? globals.rect( rect ) : rect;
-			viewport = viewport || globals.viewport();
+			rect = rect instanceof HTMLElement ? $.fracs.rect( rect ) : rect;
+			viewport = viewport || $.fracs.viewport();
 
 			var intersection = rect.intersection( viewport );
 
@@ -424,12 +477,41 @@
 
 		scrollTo: function ( left, top, duration ) {
 
-			duration = duration || 1000;
+			duration = duration !== undefined ? duration : 1000;
 			$( "html,body" ).stop( true ).animate( { scrollLeft: left, scrollTop: top }, duration );
+		},
+		
+		scroll: function ( left, top, duration ) {
+
+			duration = duration !== undefined ? duration : 1000;
+			var $window = $( window );
+			$( "html,body" ).stop( true ).animate( { scrollLeft: $window.scrollLeft() + left, scrollTop: $window.scrollTop() + top }, duration );
+		},
+		
+		scrollState: function () {
+			
+			var document = $.fracs.document();
+			var viewport = $.fracs.viewport();
+			
+			var width = document.width - viewport.width;
+			var height = document.height - viewport.height;
+			
+			return {
+				right: width <= 0 ? undefined : viewport.left / width,
+				bottom: height <= 0 ? undefined : viewport.top / height
+			};
 		}
 
 	};
 
+
+
+
+	/*******************************
+	 * jQuery.fracs methods
+	 *******************************/
+
+	var NAMESPACE = "fracs";
 
 	var methods = {
 
@@ -438,10 +520,10 @@
 			return this.each( function () {
 				
 				var $this = $( this );
-				var data = $this.data( namespace );
+				var data = $this.data( NAMESPACE );
 				if ( data === undefined ) {
 					data = new FracsData( this );	
-					$this.data( namespace, data );
+					$this.data( NAMESPACE, data );
 					$( window )
 						.bind( "scroll", data.check )
 						.bind( "resize", data.check );
@@ -455,11 +537,11 @@
 			return this.each( function () {
 				
 				var $this = $( this );
-				var data = $this.data( namespace );
+				var data = $this.data( NAMESPACE );
 				if ( data !== undefined ) {
 					data.unbind( callback );
 					if ( data.callbacks.length === 0 ) {
-						$this.removeData( namespace );
+						$this.removeData( NAMESPACE );
 						$( window )
 							.unbind( "scroll", data.check )
 							.unbind( "resize", data.check );
@@ -472,7 +554,7 @@
 
 			return this.each( function () {
 				
-				var data = $( this ).data( namespace );
+				var data = $( this ).data( NAMESPACE );
 				if ( data ) {
 					data.check();
 				};
@@ -481,12 +563,12 @@
 
 		fracs: function () {
 
-			return globals.fracs( globals.rect( this.get( 0 ) ), globals.viewport() );
+			return $.fracs.fracs( $.fracs.rect( this.get( 0 ) ), $.fracs.viewport() );
 		},
 
 		rect: function () {
 
-			return globals.rect( this.get( 0 ) );
+			return $.fracs.rect( this.get( 0 ) );
 		},
 
 		max: function ( property, callback ) {
@@ -579,8 +661,8 @@
 			paddingLeft = paddingLeft || 0;
 			paddingTop = paddingTop || 0;
 
-			var rect = globals.rect( this.get( 0 ) );
-			globals.scrollTo( rect.left - paddingLeft, rect.top - paddingTop, duration );
+			var rect = $.fracs.rect( this.get( 0 ) );
+			$.fracs.scrollTo( rect.left - paddingLeft, rect.top - paddingTop, duration );
 			return this;
 		},
 		
@@ -617,8 +699,7 @@
 	};
 
 
-	$[namespace] = globals;
-	$.fn[namespace] = function( method ) {
+	$.fn.fracs = function( method ) {
 
 		if ( methods[method] ) {
 			return methods[method].apply( this, Array.prototype.slice.call( arguments, 1 ) );
@@ -627,7 +708,7 @@
 		} else if ( method instanceof Function ) {
 			return methods.bind.apply( this, arguments );
 		} else {
-			$.error( "Method " +  method + " does not exist on jQuery." + namespace );
+			$.error( "Method " +  method + " does not exist on jQuery.fracs" );
 		};
 	};
 

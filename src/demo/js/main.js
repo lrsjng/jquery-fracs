@@ -130,21 +130,36 @@
 		var $group = $s.eq(3).add( $s.eq(4) ).add( $s.eq(5) ).add( $s.eq(6) ).add( $s.eq(7) );
 		$group.fracs( "max", "possible", function ( best ) {
 			$( ".panel .groups .possible" )
-				.text( best !== undefined ? $( best.element ).find( ".idx" ).text(): "undefined" )
+				.text( best !== undefined ? $( best.element ).find( ".idx" ).text(): "undef." )
 				.stop( true ).css( "background-color", "rgb(250,250,150)" ).animate( { "background-color": "#fff" }, 1000 );
 		} );
 		$group.fracs( "max", "visible", function ( best ) {
 			$( ".panel .groups .visible" )
-				.text( best !== undefined ? $( best.element ).find( ".idx" ).text(): "undefined" )
+				.text( best !== undefined ? $( best.element ).find( ".idx" ).text(): "undef." )
 				.stop( true ).css( "background-color", "rgb(250,250,150)" ).animate( { "background-color": "#fff" }, 1000 );
 		} );
 		$group.fracs( "max", "viewport", function ( best ) {
 			$( ".panel .groups .viewport" )
-				.text( best !== undefined ? $( best.element ).find( ".idx" ).text(): "undefined" )
+				.text( best !== undefined ? $( best.element ).find( ".idx" ).text(): "undef." )
 				.stop( true ).css( "background-color", "rgb(250,250,150)" ).animate( { "background-color": "#fff" }, 1000 );
 		} );
-		
+
+		var prevState = undefined;
+		$( window ).bind( "scroll resize load", function () {
+			var state = $.fracs.scrollState();
+			if ( prevState === undefined || state.right !== prevState.right ) {
+				$( ".panel .scrollstate .right" )
+					.text( state.right !== undefined ? $.fracs.round( state.right * 100, 1 ) + "%" : "undef." )
+					.stop( true ).css( "background-color", "rgb(250,250,150)" ).animate( { "background-color": "#fff" }, 1000 );
+			};
+			if ( prevState === undefined ||  state.bottom !== prevState.bottom ) {
+				$( ".panel .scrollstate .bottom" )
+					.text( state.bottom !== undefined ? $.fracs.round( state.bottom * 100, 1 ) + "%" : "undef." )
+					.stop( true ).css( "background-color", "rgb(250,250,150)" ).animate( { "background-color": "#fff" }, 1000 );
+			};
+			prevState = state;
+		} );
 	};
 
-	
+
 } )( jQuery );
