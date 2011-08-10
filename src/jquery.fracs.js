@@ -224,9 +224,6 @@
 	var Outline = function ( canvas, options ) {
 
 		if ( !( canvas instanceof HTMLElement ) || canvas.nodeName.toLowerCase() !== "canvas" ) {
-			if ( window.console ) {
-				window.console.error( "Outline needs a canvas but found: " + ( canvas && canvas.nodeName.toLowerCase() ) );
-			};
 			return undefined;
 		};
 
@@ -238,35 +235,32 @@
 			styles: [
 				{
 					selector: "header,footer,section,article",
-					strokeWidth: undefined,
-					strokeStyle: undefined,
 					fillStyle: "rgb(230,230,230)"
 				},
 				{
 					selector: "h1",
-					strokeWidth: undefined,
-					strokeStyle: undefined,
 					fillStyle: "rgb(240,140,060)"
 				},
 				{
 					selector: "h2",
-					strokeWidth: undefined,
-					strokeStyle: undefined,
 					fillStyle: "rgb(200,100,100)"
 				},
 				{
 					selector: "h3",
-					strokeWidth: undefined,
-					strokeStyle: undefined,
 					fillStyle: "rgb(100,200,100)"
 				},
 				{
 					selector: "h4",
-					strokeWidth: undefined,
-					strokeStyle: undefined,
 					fillStyle: "rgb(100,100,200)"
 				}
-			]
+			],
+			viewportStyle: {
+				fillStyle: "rgba(228,77,38,0.3)"
+			},
+			viewportDragStyle: {
+				fillStyle: "rgba(228,77,38,0.6)"
+			},
+			invertViewport: false
 		};
 		this.settings = $.extend( {}, defaults, options );
 		
@@ -302,6 +296,7 @@
 							this.drag = false;
 							this.draw();
 						}, this ) );
+					return false;
 				}, this ) )
 				.attr( "unselectable", "on" )
 				.css( "-webkit-user-select", "none" )
@@ -323,8 +318,7 @@
 			
 			for ( idx in this.settings.styles ) {
 				var style = this.settings.styles[idx];
-				var $elements = $( style.selector );
-				$elements.each( function () {
+				$( style.selector ).each( function () {
 					THIS.drawElement( context, this, style.strokeWidth, style.strokeStyle, style.fillStyle );
 				} );
 			};
@@ -342,25 +336,61 @@
 		};
 
 
-		this.drawRect = function ( context, rect, lineWidth, strokeStyle, fillStyle ) {
+		this.drawRect = function ( context, rect, lineWidth, strokeStyle, fillStyle, invert ) {
+
+			invert = invert || false;
+
+			if ( lineWidth !== undefined && this.scale !== undefined ) {
+				lineWidth = lineWidth > 0.2 / this.scale ? lineWidth : 0.2 / this.scale;
+			};
 
 			if ( strokeStyle !== undefined || fillStyle !== undefined ) {
-				context.beginPath();
-				context.rect( rect.left, rect.top, rect.width, rect.height );
-				if ( fillStyle !== undefined ) {
-					context.fillStyle = fillStyle;
-					context.fill();
-				};
-				if ( strokeStyle !== undefined ) {
-					if ( this.scale === undefined ) {
-						context.lineWidth = lineWidth;
-					} else {
-						context.lineWidth = lineWidth > 0.2 / this.scale ? lineWidth : 0.2 / this.scale;
+				if ( invert === false ) {
+						context.beginPath();
+						context.rect( rect.left, rect.top, rect.width, rect.height );
+						if ( fillStyle !== undefined ) {
+							context.fillStyle = fillStyle;
+							context.fill();
+						};
+						if ( strokeStyle !== undefined ) {
+							context.lineWidth = lineWidth;
+							context.strokeStyle = strokeStyle;
+							context.stroke();
+						};
+				} else {
+					if ( fillStyle !== undefined ) {
+						context.beginPath();
+						context.rect( 0, 0, this.docRect.width, rect.top );
+						context.rect( 0, rect.top, rect.left, rect.height );
+						context.rect( rect.right, rect.top, this.docRect.right - rect.right, rect.height );
+						context.rect( 0, rect.bottom, this.docRect.width, this.docRect.bottom - rect.bottom );
+						context.fillStyle = fillStyle;
+						context.fill();
 					};
-					context.strokeStyle = strokeStyle;
-					context.stroke();
+					if ( strokeStyle !== undefined ) {
+						context.beginPath();
+						context.rect( rect.left, rect.top, rect.width, rect.height );
+						context.lineWidth = lineWidth;
+						context.strokeStyle = strokeStyle;
+						context.stroke();
+					};
 				};
 			};
+		};
+
+		
+		this.drawViewport = function () {
+
+			if ( this.drag === true && this.settings.viewportDragStyle !== undefined ) {
+				var storkeWidth = this.settings.viewportDragStyle.storkeWidth;
+				var strokeStyle = this.settings.viewportDragStyle.strokeStyle;
+				var fillStyle = this.settings.viewportDragStyle.fillStyle;
+			} else {
+				var storkeWidth = this.settings.viewportStyle.storkeWidth;
+				var strokeStyle = this.settings.viewportStyle.strokeStyle;
+				var fillStyle = this.settings.viewportStyle.fillStyle;
+			};
+			this.drawRect( this.context, this.vpRect, storkeWidth, strokeStyle, fillStyle, this.settings.invertViewport );
 		};
 
 
@@ -381,11 +411,7 @@
 			this.context.scale( this.scale, this.scale );
 			//this.drawRect( this.context, this.docRect, 1, "#000" );
 			this.applyStyles( this.context );
-			if ( this.drag === true ) {
-				this.drawRect( this.context, this.vpRect, undefined, undefined, "rgba(228,77,38,0.6)" );
-			} else {
-				this.drawRect( this.context, this.vpRect, undefined, undefined, "rgba(228,77,38,0.3)" );
-			};
+			this.drawViewport();
 			this.context.scale( 1 / this.scale, 1 / this.scale );
 		};
 

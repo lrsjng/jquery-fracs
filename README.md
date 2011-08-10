@@ -8,6 +8,12 @@ jQuery.fracs is provided under the terms of the [MIT License](http://github.com/
 
 ## Changelog
 
+### v0.8.1 · *2011-08-10*
+
+* added viewport styling to `OutlineOptions`
+* fixed text selection on dragging
+
+
 ### v0.8 · *2011-08-09*
 
 * added `duration`, `focusWidth` and `focusHeight` to `OutlineOptions`
