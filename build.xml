@@ -41,7 +41,11 @@
 		</replace>
 		<scripp:js file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/jquery.fracs-${project.version}.js" />
 		<scripp:jsmin file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/jquery.fracs-${project.version}.min.js" />
-		<delete file="${build.dir}/jquery.fracs.js" />		
+		<scripp:js file="${build.dir}/jquery.fracs-core.js" tofile="${build.dir}/jquery.fracs-core-${project.version}.js" />
+		<scripp:jsmin file="${build.dir}/jquery.fracs-core.js" tofile="${build.dir}/jquery.fracs-core-${project.version}.min.js" />
+		<delete dir="${build.dir}/inc" />		
+		<delete file="${build.dir}/jquery.fracs.js" />
+		<delete file="${build.dir}/jquery.fracs-core.js" />
 	</target>
 
 
@@ -69,15 +73,14 @@
 	</target>
 
 
-	<target name="release" depends="build">
+	<target name="release" depends="build-uncompressed">
 		<mkdir dir="${release.dir}" />
 		<tar destfile="${release.dir}/${project.name}-${project.version}.tar" basedir="${build.dir}"/>
 		<gzip destfile="${release.dir}/${project.name}-${project.version}.tar.gz" src="${release.dir}/${project.name}-${project.version}.tar"/>
 		<delete file="${release.dir}/${project.name}-${project.version}.tar" />
 		<zip destfile="${release.dir}/${project.name}-${project.version}.zip" basedir="${build.dir}" />
 		<copy todir="${release.dir}">
-			<fileset file="${build.dir}/jquery.fracs-${project.version}.js" />
-			<fileset file="${build.dir}/jquery.fracs-${project.version}.min.js" />
+			<fileset file="${build.dir}/jquery.fracs-*.js" />
 		</copy>
 	</target>
 

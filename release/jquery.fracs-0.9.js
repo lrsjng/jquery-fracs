@@ -1,8 +1,12 @@
 /*
- * jQuery.fracs 0.8.1
+ * jQuery.fracs 0.9
  * http://larsjung.de/fracs
  * 
  * provided under the terms of the MIT License
+ */
+
+/*
+ * jQuery.fracs - core
  */
 
 ( function( $ ) {
@@ -10,6 +14,7 @@
 
 	var Rect = function ( left, top, width, height ) {
 
+		var fracsData = undefined;
 		this.left = Math.round( left );
 		this.top = Math.round( top );
 		this.width = Math.round( width );
@@ -51,9 +56,6 @@
 			var height = bottom - top;
 			return new Rect( left, top, width, height );
 		};
-
-
-		var fracsData = undefined;
 
 		this.bind = function ( callback ) {
 
@@ -125,6 +127,49 @@
 		};
 	};
 
+
+	var ScrollState = function () {
+		
+		var document = $.fracs.document();
+		var viewport = $.fracs.viewport();
+		
+		var width = document.width - viewport.width;
+		var height = document.height - viewport.height;
+		
+		this.width = width <= 0 ? undefined : viewport.left / width;
+		this.height = height <= 0 ? undefined : viewport.top / height;
+		
+		this.left = viewport.left;
+		this.top = viewport.top;
+		this.right = document.right - viewport.right;
+		this.bottom = document.bottom - viewport.bottom;
+		
+		this.equals = function ( that ) {
+			
+			return this.width === that.width && this.height === that.height
+				&& this.left === that.left && this.top === that.top
+				&& this.right === that.right && this.bottom === that.bottom;
+		};
+	};
+
+
+	var ScrollStateTracker = function () {
+		
+		this.prevState = new ScrollState();
+		this.callbacks = [];
+		
+		$( window ).bind( "resize scroll load", $.proxy( function () {
+			
+			var state = new ScrollState();
+			if ( !this.prevState.equals( state ) ) {
+				$.each( this.callbacks, $.proxy( function ( idx, callback ) {
+					callback.call( window, state, this.prevState );					
+				}, this ) );
+				this.prevState = state;
+			};
+		}, this ) );
+	}
+	
 	
 	var FracsElement = function ( htmlElement, fracs ) {
 		
@@ -221,6 +266,302 @@
 	};
 
 
+
+	/*******************************
+	 * init and register plugin
+	 *******************************/
+
+	$.fracs = function () {
+
+		return $.fracs.fracs.apply( this, arguments );
+	};
+	$.fracs.internal = {
+
+		dataNs: "fracs",
+		methods: {},
+		objects: {}
+	};
+	$.fn.fracs = function( method ) {
+
+		var methods = $.fracs.internal.methods;
+		if ( methods[method] ) {
+			return methods[method].apply( this, Array.prototype.slice.call( arguments, 1 ) );
+		} else if ( method === undefined ) {
+			return methods.fracs.apply( this, arguments );
+		} else if ( method instanceof Function ) {
+			return methods.bind.apply( this, arguments );
+		} else {
+			$.error( "Method " +  method + " does not exist on jQuery.fracs" );
+		};
+	};
+
+
+
+	/*******************************
+	 * static methods
+	 *******************************/
+
+	$.extend( $.fracs, {
+
+		document: function () {
+
+			var $document = $( document );
+			return new Rect( 0, 0, $document.width(), $document.height() );
+		},
+
+		viewport: function () {
+
+			var $window = $( window );
+			return new Rect( $window.scrollLeft(), $window.scrollTop(), $window.width(), $window.height() );
+		},
+
+		rect: function ( htmlElement ) {
+
+			var $target = $( htmlElement );
+			var offset = $target.offset();
+			return new Rect( offset.left, offset.top, $target.outerWidth(), $target.outerHeight() );
+		},
+		
+		fracs: function ( rect, viewport ) {
+
+			rect = rect instanceof HTMLElement ? $.fracs.rect( rect ) : rect;
+			viewport = viewport || $.fracs.viewport();
+
+			var intersection = rect.intersection( viewport );
+
+			if ( intersection === undefined ) {
+				return new FracsResult();
+			};
+
+			var intersectionElementSpace = new Rect( intersection.left - rect.left, intersection.top - rect.top, intersection.width, intersection.height );
+			var intersectionViewportSpace = new Rect( intersection.left - viewport.left, intersection.top - viewport.top, intersection.width, intersection.height );
+			var intersectionArea = intersection.area();
+			var possibleArea = Math.min( rect.width, viewport.width ) * Math.min( rect.height, viewport.height );
+
+			return new FracsResult(
+				intersection,
+				intersectionElementSpace,
+				intersectionViewportSpace,
+				intersectionArea / rect.area(),
+				intersectionArea / viewport.area(),
+				intersectionArea / possibleArea
+			);
+		},
+
+		round: function ( value, decs ) {
+
+			if ( isNaN( decs ) || decs <= 0 ) {
+				return Math.round( value );
+			};
+			return Math.round( value * Math.pow( 10, decs ) ) / Math.pow( 10, decs );
+		},
+
+		scrollTo: function ( left, top, duration ) {
+
+			duration = duration !== undefined ? duration : 1000;
+			$( "html,body" ).stop( true ).animate( { scrollLeft: left, scrollTop: top }, duration );
+		},
+		
+		scroll: function ( left, top, duration ) {
+
+			duration = duration !== undefined ? duration : 1000;
+			var $window = $( window );
+			$( "html,body" ).stop( true ).animate( { scrollLeft: $window.scrollLeft() + left, scrollTop: $window.scrollTop() + top }, duration );
+		},
+		
+		scrollState: function ( callback ) {
+			
+			if ( callback instanceof Function ) {
+				scrollStateTracker.callbacks.push( callback );
+			} else {
+				return new ScrollState();
+			};
+		}
+	} );
+
+
+
+	/*******************************
+	 * methods
+	 *******************************/
+
+	$.extend( $.fracs.internal.methods, {
+
+		bind: function ( callback ) {
+
+			return this.each( function () {
+				
+				var $this = $( this );
+				var data = $this.data( $.fracs.internal.dataNs );
+				if ( data === undefined ) {
+					data = new FracsData( this );	
+					$this.data( $.fracs.internal.dataNs, data );
+					$( window ).bind( "scroll resize", data.check );
+				};
+				data.bind( callback );
+			} );
+		},
+
+		unbind: function ( callback ) {
+
+			return this.each( function () {
+				
+				var $this = $( this );
+				var data = $this.data( $.fracs.internal.dataNs );
+				if ( data !== undefined ) {
+					data.unbind( callback );
+					if ( data.callbacks.length === 0 ) {
+						$this.removeData( $.fracs.internal.dataNs );
+						$( window ).unbind( "scroll resize", data.check );
+					};
+				};
+			} );
+		},
+
+		check: function () {
+
+			return this.each( function () {
+				
+				var data = $( this ).data( $.fracs.internal.dataNs );
+				if ( data ) {
+					data.check();
+				};
+			} );
+		},
+
+		fracs: function () {
+
+			return $.fracs.fracs( $.fracs.rect( this.get( 0 ) ), $.fracs.viewport() );
+		},
+
+		rect: function () {
+
+			return $.fracs.rect( this.get( 0 ) );
+		},
+
+		max: function ( property, callback ) {
+
+			if ( callback instanceof Function ) {
+				var data = new FracsGroup( this, property, callback );
+				$( window ).bind( "scroll resize", data.check );
+				data.check();
+				return this;
+			} else {
+				var obj = undefined;
+				if ( $.inArray( property, [ "possible", "visible", "viewport" ] ) >= 0 ) {
+					obj = "fracs";
+				} else if ( $.inArray( property, [ "width", "height", "left", "right", "top", "bottom" ] ) >= 0 ) {
+					obj = "rect";
+				} else {
+					return this;
+				};
+
+				var elements = [];
+				var maxValue = undefined;
+				this.each( function () {
+					var fracs = $.fracs[obj]( this );
+					if ( maxValue === undefined || fracs[property] > maxValue ) {
+						elements = [ this ];
+						maxValue = fracs[property];
+					} else if ( fracs[property] === maxValue ) {
+						elements.push( this );
+					};
+				} );
+				return $( elements );
+			};
+		},
+
+		min: function ( property ) {
+
+			var obj = undefined;
+			if ( $.inArray( property, [ "possible", "visible", "viewport" ] ) >= 0 ) {
+				obj = "fracs";
+			} else if ( $.inArray( property, [ "width", "height", "left", "right", "top", "bottom" ] ) >= 0 ) {
+				obj = "rect";
+			} else {
+				return this;
+			};
+			
+			var elements = [];
+			var minValue = undefined;
+			this.each( function () {
+				var fracs = $.fracs[obj]( this );
+				if ( minValue === undefined || fracs[property] < minValue ) {
+					elements = [ this ];
+					minValue = fracs[property];
+				} else if ( fracs[property] === minValue ) {
+					elements.push( this );
+				};
+			} );
+			return $( elements );
+		},
+
+		envelope: function () {
+
+			var envelope = undefined;
+			this.each( function () {
+				var rect = $.fracs.rect( this );
+				envelope = envelope === undefined ? rect : envelope.envelope( rect );
+			} );
+			return envelope;
+		},
+
+		scrollTo: function ( paddingLeft, paddingTop, duration ) {
+			
+			paddingLeft = paddingLeft || 0;
+			paddingTop = paddingTop || 0;
+
+			var rect = $.fracs.rect( this.get( 0 ) );
+			$.fracs.scrollTo( rect.left - paddingLeft, rect.top - paddingTop, duration );
+			return this;
+		},
+		
+		softLink: function ( paddingLeft, paddingTop, duration ) {
+			
+			return this.filter( "a[href^=#]" ).each( function () {
+
+				var $a = $( this );
+				var href = $a.attr( "href" );
+				$a.click( function () {
+					$( href ).fracs( "scrollTo", paddingLeft, paddingTop, duration );
+				} );
+			} );
+		}
+
+	} );
+
+
+	
+	/*******************************
+	 * objects
+	 *******************************/
+
+	$.extend( $.fracs.internal.objects, {
+
+		Rect: Rect,
+		FracsResult: FracsResult,
+		ScrollState: ScrollState,
+		ScrollStateTracker: ScrollStateTracker,
+		FracsElement: FracsElement,
+		FracsData: FracsData,
+		FracsGroup: FracsGroup
+	} );
+
+
+	var scrollStateTracker = new ScrollStateTracker();
+
+	
+} )( jQuery );
+
+
+
+/*
+ * jQuery.fracs - outline
+ */
+
+( function( $ ) {
+
+
 	var Outline = function ( canvas, options ) {
 
 		if ( !( canvas instanceof HTMLElement ) || canvas.nodeName.toLowerCase() !== "canvas" ) {
@@ -283,6 +624,7 @@
 			this.$canvas
 				.css( "cursor", "pointer" )
 				.mousedown( $.proxy( function ( event ) {
+					event.preventDefault();
 					this.drag = true;
 					this.scroll( event );
 					this.$canvas.css( "cursor", "crosshair" ).addClass( "dragOn" );
@@ -290,25 +632,17 @@
 					this.$window
 						.bind( "mousemove", scrollProxy )
 						.one( "mouseup", $.proxy( function ( event ) {
+							event.preventDefault();
 							this.$canvas.css( "cursor", "pointer" ).removeClass( "dragOn" );
 							this.$htmlBody.css( "cursor", "auto" );
 							this.$window.unbind( "mousemove", scrollProxy );
 							this.drag = false;
 							this.draw();
 						}, this ) );
-					return false;
-				}, this ) )
-				.attr( "unselectable", "on" )
-				.css( "-webkit-user-select", "none" )
-				.css( "-khtml-user-select", "none" )
-				.css( "-moz-user-select", "none" )
-				.css( "-o-user-select", "none" )
-				.css( "user-select", "none" )
-				.each( function () { 
-					this.onselectstart = function () {
-						return false;
-					};
-				} );
+				}, this ) );
+			canvas.onselectstart = function () {
+				return false;
+			};
 			this.$window.bind( "load resize scroll", $.proxy( this.draw, this ) );
 			this.draw();
 		};
@@ -428,281 +762,23 @@
 		this.init();
 	};
 
+	
+	
+	/*******************************
+	 * static methods
+	 *******************************/
+
+	$.extend( $.fracs, {
+		
+	} );
 
 
 
 	/*******************************
-	 * jQuery.fracs static methods
+	 * methods
 	 *******************************/
 
-	$.fracs = {
-
-		// just for testing purposes
-		internal: {
-			
-			Rect: Rect,
-			FracsResult: FracsResult,
-			FracsElement: FracsElement,
-			FracsData: FracsData,
-			FracsGroup: FracsGroup,
-			Outline: Outline
-		},
-
-		document: function () {
-
-			var $document = $( document );
-			return new Rect( 0, 0, $document.width(), $document.height() );
-		},
-
-		viewport: function () {
-
-			var $window = $( window );
-			return new Rect( $window.scrollLeft(), $window.scrollTop(), $window.width(), $window.height() );
-		},
-
-		rect: function ( htmlElement ) {
-
-			var $target = $( htmlElement );
-			var offset = $target.offset();
-			return new Rect( offset.left, offset.top, $target.outerWidth(), $target.outerHeight() );
-		},
-		
-		fracs: function ( rect, viewport ) {
-
-			rect = rect instanceof HTMLElement ? $.fracs.rect( rect ) : rect;
-			viewport = viewport || $.fracs.viewport();
-
-			var intersection = rect.intersection( viewport );
-
-			if ( intersection === undefined ) {
-				return new FracsResult();
-			};
-
-			var intersectionElementSpace = new Rect( intersection.left - rect.left, intersection.top - rect.top, intersection.width, intersection.height );
-			var intersectionViewportSpace = new Rect( intersection.left - viewport.left, intersection.top - viewport.top, intersection.width, intersection.height );
-			var intersectionArea = intersection.area();
-			var possibleArea = Math.min( rect.width, viewport.width ) * Math.min( rect.height, viewport.height );
-
-			return new FracsResult(
-				intersection,
-				intersectionElementSpace,
-				intersectionViewportSpace,
-				1.0 * intersectionArea / rect.area(),
-				1.0 * intersectionArea / viewport.area(),
-				1.0 * intersectionArea / possibleArea
-			);
-		},
-
-		round: function ( value, decs ) {
-
-			if ( isNaN( decs ) || decs <= 0 ) {
-				return Math.round( value );
-			};
-			return Math.round( value * Math.pow( 10, decs ) ) / Math.pow( 10, decs );
-		},
-
-		scrollTo: function ( left, top, duration ) {
-
-			duration = duration !== undefined ? duration : 1000;
-			$( "html,body" ).stop( true ).animate( { scrollLeft: left, scrollTop: top }, duration );
-		},
-		
-		scroll: function ( left, top, duration ) {
-
-			duration = duration !== undefined ? duration : 1000;
-			var $window = $( window );
-			$( "html,body" ).stop( true ).animate( { scrollLeft: $window.scrollLeft() + left, scrollTop: $window.scrollTop() + top }, duration );
-		},
-		
-		scrollState: function () {
-			
-			var document = $.fracs.document();
-			var viewport = $.fracs.viewport();
-			
-			var width = document.width - viewport.width;
-			var height = document.height - viewport.height;
-			
-			return {
-				right: width <= 0 ? undefined : viewport.left / width,
-				bottom: height <= 0 ? undefined : viewport.top / height
-			};
-		}
-
-	};
-
-
-
-
-	/*******************************
-	 * jQuery.fracs methods
-	 *******************************/
-
-	var NAMESPACE = "fracs";
-
-	var methods = {
-
-		bind: function ( callback ) {
-
-			return this.each( function () {
-				
-				var $this = $( this );
-				var data = $this.data( NAMESPACE );
-				if ( data === undefined ) {
-					data = new FracsData( this );	
-					$this.data( NAMESPACE, data );
-					$( window )
-						.bind( "scroll", data.check )
-						.bind( "resize", data.check );
-				};
-				data.bind( callback );
-			} );
-		},
-
-		unbind: function ( callback ) {
-
-			return this.each( function () {
-				
-				var $this = $( this );
-				var data = $this.data( NAMESPACE );
-				if ( data !== undefined ) {
-					data.unbind( callback );
-					if ( data.callbacks.length === 0 ) {
-						$this.removeData( NAMESPACE );
-						$( window )
-							.unbind( "scroll", data.check )
-							.unbind( "resize", data.check );
-					};
-				};
-			} );
-		},
-
-		check: function () {
-
-			return this.each( function () {
-				
-				var data = $( this ).data( NAMESPACE );
-				if ( data ) {
-					data.check();
-				};
-			} );
-		},
-
-		fracs: function () {
-
-			return $.fracs.fracs( $.fracs.rect( this.get( 0 ) ), $.fracs.viewport() );
-		},
-
-		rect: function () {
-
-			return $.fracs.rect( this.get( 0 ) );
-		},
-
-		max: function ( property, callback ) {
-
-			if ( callback instanceof Function ) {
-				var data = new FracsGroup( this, property, callback );
-				$( window )
-					.bind( "scroll", data.check )
-					.bind( "resize", data.check );
-				data.check();
-				return this;
-			} else {
-				if ( $.inArray( property, [ "possible", "visible", "viewport" ] ) >= 0 ) {
-					var elements = [];
-					var maxValue = undefined;
-					this.each( function () {
-						var fracs = $.fracs.fracs( this );
-						if ( maxValue === undefined || fracs[property] > maxValue ) {
-							elements = [ this ];
-							maxValue = fracs[property];
-						} else if ( fracs[property] === maxValue ) {
-							elements.push( this );
-						};
-					} );
-					return $( elements );
-				};
-				if ( $.inArray( property, [ "width", "height", "left", "right", "top", "bottom" ] ) >= 0 ) {
-					var elements = [];
-					var maxValue = undefined;
-					this.each( function () {
-						var rect = $.fracs.rect( this );
-						if ( maxValue === undefined || rect[property] > maxValue ) {
-							elements = [ this ];
-							maxValue = rect[property];
-						} else if ( rect[property] === maxValue ) {
-							elements.push( this );
-						};
-					} );
-					return $( elements );
-				};
-				return this;
-			};
-		},
-
-		min: function ( property ) {
-
-			if ( $.inArray( property, [ "possible", "visible", "viewport" ] ) >= 0 ) {
-				var elements = [];
-				var minValue = undefined;
-				this.each( function () {
-					var fracs = $.fracs.fracs( this );
-					if ( minValue === undefined || fracs[property] < minValue ) {
-						elements = [ this ];
-						minValue = fracs[property];
-					} else if ( fracs[property] === minValue ) {
-						elements.push( this );
-					};
-				} );
-				return $( elements );
-			};
-			if ( $.inArray( property, [ "width", "height", "left", "right", "top", "bottom" ] ) >= 0 ) {
-				var elements = [];
-				var minValue = undefined;
-				this.each( function () {
-					var rect = $.fracs.rect( this );
-					if ( minValue === undefined || rect[property] < minValue ) {
-						elements = [ this ];
-						minValue = rect[property];
-					} else if ( rect[property] === minValue ) {
-						elements.push( this );
-					};
-				} );
-				return $( elements );
-			};
-			return this;
-		},
-
-		envelope: function () {
-
-			var envelope = undefined;
-			this.each( function () {
-				var rect = $.fracs.rect( this );
-				envelope = envelope === undefined ? rect : envelope.envelope( rect );
-			} );
-			return envelope;
-		},
-
-		scrollTo: function ( paddingLeft, paddingTop, duration ) {
-			
-			paddingLeft = paddingLeft || 0;
-			paddingTop = paddingTop || 0;
-
-			var rect = $.fracs.rect( this.get( 0 ) );
-			$.fracs.scrollTo( rect.left - paddingLeft, rect.top - paddingTop, duration );
-			return this;
-		},
-		
-		softLink: function ( paddingLeft, paddingTop, duration ) {
-			
-			return this.filter( "a[href^=#]" ).each( function () {
-
-				var $a = $( this );
-				var href = $a.attr( "href" );
-				$a.click( function () {
-					$( href ).fracs( "scrollTo", paddingLeft, paddingTop, duration );
-				} );
-			} );
-		},
+	$.extend( $.fracs.internal.methods, {
 
 		outline: function ( options ) {
 
@@ -721,24 +797,21 @@
 				};
 			} );
 		}
+	} );
+	
+	
+	
+	/*******************************
+	 * objects
+	 *******************************/
 
-	};
-
-
-	$.fn.fracs = function( method ) {
-
-		if ( methods[method] ) {
-			return methods[method].apply( this, Array.prototype.slice.call( arguments, 1 ) );
-		} else if ( method === undefined ) {
-			return methods.fracs.apply( this, arguments );
-		} else if ( method instanceof Function ) {
-			return methods.bind.apply( this, arguments );
-		} else {
-			$.error( "Method " +  method + " does not exist on jQuery.fracs" );
-		};
-	};
+	$.extend( $.fracs.internal.objects, {
+		
+		Outline: Outline
+	} );
 
 
 } )( jQuery );
+
 
 

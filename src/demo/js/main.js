@@ -144,20 +144,17 @@
 				.stop( true ).css( "background-color", "rgb(250,250,150)" ).animate( { "background-color": "#fff" }, 1000 );
 		} );
 
-		var prevState = undefined;
-		$( window ).bind( "scroll resize load", function () {
-			var state = $.fracs.scrollState();
-			if ( prevState === undefined || state.right !== prevState.right ) {
-				$( ".panel .scrollstate .right" )
-					.text( state.right !== undefined ? $.fracs.round( state.right * 100, 1 ) + "%" : "undef." )
+		$.fracs.scrollState( function ( state, prevState ) {
+			if ( state.width !== prevState.width ) {
+				$( ".panel .scrollstate .width" )
+					.text( state.width !== undefined ? $.fracs.round( state.width * 100, 1 ) + "%" : "undef." )
 					.stop( true ).css( "background-color", "rgb(250,250,150)" ).animate( { "background-color": "#fff" }, 1000 );
 			};
-			if ( prevState === undefined ||  state.bottom !== prevState.bottom ) {
-				$( ".panel .scrollstate .bottom" )
-					.text( state.bottom !== undefined ? $.fracs.round( state.bottom * 100, 1 ) + "%" : "undef." )
+			if ( state.height !== prevState.height ) {
+				$( ".panel .scrollstate .height" )
+					.text( state.height !== undefined ? $.fracs.round( state.height * 100, 1 ) + "%" : "undef." )
 					.stop( true ).css( "background-color", "rgb(250,250,150)" ).animate( { "background-color": "#fff" }, 1000 );
 			};
-			prevState = state;
 		} );
 	};
 

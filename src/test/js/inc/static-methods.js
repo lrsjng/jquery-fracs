@@ -14,7 +14,7 @@ test( "rect", function () {
 			height: "300px"
 		} );
 	var rect = $.fracs.rect( $ele );
-	var expected  = new $.fracs.internal.Rect( 30, 50, 400, 300 );
+	var expected  = new Rect( 30, 50, 400, 300 );
 	deepEqual( rect, expected, "rect" );
 } );
 

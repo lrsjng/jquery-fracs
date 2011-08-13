@@ -8,6 +8,14 @@ jQuery.fracs is provided under the terms of the [MIT License](http://github.com/
 
 ## Changelog
 
+### v0.9 · *2011-08-13*
+
+* now also provided: core lib without the large Outline feature (~66% in size)
+* shortcut for the static method fracs
+* static method scrollState and object ScrollState changed
+* refactorings, finally found my modular plugin style
+
+
 ### v0.8.1 · *2011-08-10*
 
 * added viewport styling to `OutlineOptions`
