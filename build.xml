@@ -1,103 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project
-	name="jQuery.fracs"
-	basedir="."
-	default="release"
-	xmlns:scripp="antlib:de.larsjung.scripp.ant"
+    name="jQuery.fracs"
+    basedir="."
+    default="release"
 >
-	<target name="init">
-		<property file="build.properties" />
-		<tstamp>
-			<format property="build.stamp" pattern="yyyy-MM-dd-HHmmss" />
-		</tstamp>
-		<property name="build.label" value="${project.name} ${project.version} b${build.stamp}" />
-		<echo>Build: ${build.label}</echo>
-        <taskdef
-        	resource="de/larsjung/scripp/ant/antlib.xml"
-        	uri="antlib:de.larsjung.scripp.ant"
-        	classpath="${lib.scripp.jar}"
-        />
-	</target>
+    <target name="init">
+        <property file="build.properties" />
+        <tstamp>
+            <format property="build.stamp" pattern="yyyy-MM-dd-HHmmss" />
+        </tstamp>
+        <property name="build.label" value="${project.name} ${project.version} b${build.stamp}" />
+        <echo>Build: ${build.label}</echo>
+    </target>
 
 
-	<target name="clean" depends="init">
-		<delete dir="${build.dir}" />
-		<delete dir="${release.dir}" />
-	</target>
+    <target name="clean" depends="init">
+        <delete dir="${build.dir}" />
+        <delete dir="${release.dir}" />
+    </target>
 
 
-	<target name="build-prepare" depends="clean">
-		<mkdir dir="${build.dir}" />
-		<copy todir="${build.dir}">
-		    <fileset dir="${src.dir}" />
-			<fileset file="LICENSE.txt" />
-			<fileset file="README.md" />
-		</copy>
-		<replace dir="${build.dir}">
-			<replacefilter token="%BUILD%" value="${build.label}" />
-			<replacefilter token="%BUILD_NAME%" value="${project.name}" />
-			<replacefilter token="%BUILD_VERSION%" value="${project.version}" />
-			<replacefilter token="%BUILD_STAMP%" value="${build.stamp}" />
-		</replace>
-		<scripp:js file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/jquery.fracs-${project.version}.js" />
-		<scripp:jsmin file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/jquery.fracs-${project.version}.min.js" />
-		<scripp:js file="${build.dir}/jquery.fracs-core.js" tofile="${build.dir}/jquery.fracs-core-${project.version}.js" />
-		<scripp:jsmin file="${build.dir}/jquery.fracs-core.js" tofile="${build.dir}/jquery.fracs-core-${project.version}.min.js" />
-		<delete dir="${build.dir}/inc" />		
-		<delete file="${build.dir}/jquery.fracs.js" />
-		<delete file="${build.dir}/jquery.fracs-core.js" />
-	</target>
+    <target name="build-prepare" depends="clean">
+        <mkdir dir="${build.dir}" />
+        <copy todir="${build.dir}">
+            <fileset dir="${src.dir}" />
+            <fileset file="LICENSE.txt" />
+            <fileset file="README.md" />
+        </copy>
+        <replace dir="${build.dir}">
+            <replacefilter token="%BUILD%" value="${build.label}" />
+            <replacefilter token="%BUILD_NAME%" value="${project.name}" />
+            <replacefilter token="%BUILD_VERSION%" value="${project.version}" />
+            <replacefilter token="%BUILD_STAMP%" value="${build.stamp}" />
+        </replace>
+
+        <wepp file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/${project.name}-${project.version}.js" args="--nc" />
+        <wepp file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/${project.name}-${project.version}.min.js" />
+        <wepp file="${build.dir}/jquery.fracs-core.js" tofile="${build.dir}/${project.name}-core-${project.version}.js" args="--nc" />
+        <wepp file="${build.dir}/jquery.fracs-core.js" tofile="${build.dir}/${project.name}-core-${project.version}.min.js" />
+    </target>
 
 
-	<target name="build" depends="build-prepare">
-		<!-- demo -->
-		<scripp.dir dir="${build.dir}/demo/css" />
-		<scripp.dir dir="${build.dir}/demo/js" />
-		<copy file="${build.dir}/jquery.fracs-${project.version}.min.js" tofile="${build.dir}/demo/jquery.fracs.js" />
+    <target name="build" depends="build-prepare">
+        <!-- demo -->
+        <wepp.dir dir="${build.dir}/demo/css" args="--nc" />
+        <wepp.dir dir="${build.dir}/demo/js" args="--nc" />
+        <copy file="${build.dir}/${project.name}-${project.version}.js" tofile="${build.dir}/demo/js/jquery.fracs.js" />
 
-		<!-- test -->
-		<scripp.dir dir="${build.dir}/test/js" />
-		<copy file="${build.dir}/jquery.fracs-${project.version}.min.js" tofile="${build.dir}/test/jquery.fracs.js" />
-	</target>
+        <!-- test -->
+        <wepp.dir dir="${build.dir}/test/js" args="--nc" />
+        <copy file="${build.dir}/${project.name}-${project.version}.js" tofile="${build.dir}/test/js/jquery.fracs.js" />
 
-
-	<target name="build-uncompressed" depends="build-prepare">
-		<!-- demo -->
-		<scripp.dir dir="${build.dir}/demo/css" compress="false" />
-		<scripp.dir dir="${build.dir}/demo/js" compress="false" />
-		<copy file="${build.dir}/jquery.fracs-${project.version}.js" tofile="${build.dir}/demo/jquery.fracs.js" />
-
-		<!-- test -->
-		<scripp.dir dir="${build.dir}/test/js" compress="false" />
-		<copy file="${build.dir}/jquery.fracs-${project.version}.js" tofile="${build.dir}/test/jquery.fracs.js" />
-	</target>
+        <delete dir="${build.dir}/inc" />
+        <delete file="${build.dir}/jquery.fracs.js" />
+        <delete file="${build.dir}/jquery.fracs-core.js" />
+    </target>
 
 
-	<target name="release" depends="build-uncompressed">
-		<mkdir dir="${release.dir}" />
-		<tar destfile="${release.dir}/${project.name}-${project.version}.tar" basedir="${build.dir}"/>
-		<gzip destfile="${release.dir}/${project.name}-${project.version}.tar.gz" src="${release.dir}/${project.name}-${project.version}.tar"/>
-		<delete file="${release.dir}/${project.name}-${project.version}.tar" />
-		<zip destfile="${release.dir}/${project.name}-${project.version}.zip" basedir="${build.dir}" />
-		<copy todir="${release.dir}">
-			<fileset file="${build.dir}/jquery.fracs-*.js" />
-		</copy>
-	</target>
+    <target name="release" depends="build">
+        <mkdir dir="${release.dir}" />
+        <tar destfile="${release.dir}/${project.name}-${project.version}.tar" basedir="${build.dir}"/>
+        <gzip destfile="${release.dir}/${project.name}-${project.version}.tar.gz" src="${release.dir}/${project.name}-${project.version}.tar"/>
+        <delete file="${release.dir}/${project.name}-${project.version}.tar" />
+        <zip destfile="${release.dir}/${project.name}-${project.version}.zip" basedir="${build.dir}" />
+        <copy todir="${release.dir}">
+            <fileset file="${build.dir}/jquery.fracs-*.js" />
+        </copy>
+    </target>
 
 
-	<macrodef name="scripp.dir">
-		<attribute name="dir" />
-		<attribute name="compress" default="true" />
-		<sequential>
-			<scripp:process compress="@{compress}">
-				<fileset dir="@{dir}" includes="**/*.less,**/*.css,**/*.js" excludes="inc/**/*,**/*.min.css,**/*.min.js" />
-				<globmapper from="*.less" to="*.css" />
-				<globmapper from="*.css" to="*.css" />
-				<globmapper from="*.js" to="*.js" />
-			</scripp:process>
-			<delete dir="@{dir}/inc">
-				<fileset dir="@{dir}" includes="**/*.less" />
-			</delete>
-		</sequential>
-	</macrodef>
+    <macrodef name="wepp">
+        <attribute name="file" />
+        <attribute name="toFile" />
+        <attribute name="args" default="" />
+        <sequential>
+            <exec executable="${lib.wepp}">
+                <arg line="@{args}" />
+                <arg value="--in" />
+                <arg value="@{file}" />
+                <arg value="--out" />
+                <arg value="@{toFile}" />
+            </exec>
+        </sequential>
+    </macrodef>
+
+
+    <macrodef name="wepp.dir">
+        <attribute name="dir" />
+        <attribute name="args" default="" />
+        <sequential>
+            <exec executable="${lib.wepp}">
+                <arg line="@{args}" />
+                <arg value="--inDir" />
+                <arg value="@{dir}" />
+                <arg value="--outDir" />
+                <arg value="@{dir}" />
+            </exec>
+            <delete dir="@{dir}/inc">
+                <fileset
+                    dir="."
+                    includes="@{dir}/**/*.less"
+                    excludes="@{dir}/inc/**,@{dir}/lib/**"
+                />
+            </delete>
+        </sequential>
+    </macrodef>
 </project>

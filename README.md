@@ -3,10 +3,19 @@
 * Website with download, docs and demo: <http://larsjung.de/fracs>
 * Sources: <http://github.com/lrsjng/jQuery.fracs>
 
-jQuery.fracs is provided under the terms of the [MIT License](http://github.com/lrsjng/jQuery.fracs/blob/master/LICENSE.txt).  
+jQuery.fracs is provided under the terms of the [MIT License](http://github.com/lrsjng/jQuery.fracs/blob/master/LICENSE.txt).
 
 
 ## Changelog
+
+### v0.10 · *2011-09-17*
+
+* refactored and redesigned
+* added `autoFocus` to `OutlineOptions` and changed default `duration` to `0`
+* added callbacks for the `max` and `min` methods
+* added some cursor related methods
+* added the corresponding objects `Element`, `Group` and `Cursor`
+
 
 ### v0.9 · *2011-08-13*
 
@@ -26,13 +35,13 @@ jQuery.fracs is provided under the terms of the [MIT License](http://github.com/
 
 * added `duration`, `focusWidth` and `focusHeight` to `OutlineOptions`
 * added static methods
-	* `jQuery.fracs.scroll`
-	* `jQuery.fracs.scrollState`
+    * `jQuery.fracs.scroll`
+    * `jQuery.fracs.scrollState`
 * added methods to `Rect`
-	* `bind`
-	* `unbind`
-	* `check`
-	* `fracs`
+    * `bind`
+    * `unbind`
+    * `check`
+    * `fracs`
 
 
 ### v0.7.1 · *2011-08-01*

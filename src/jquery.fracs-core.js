@@ -5,4 +5,5 @@
  * provided under the terms of the MIT License
  */
 
-// @include "inc/core.js"
+// @include "inc/modplug-0.4.js"
+// @include "inc/api-core.js"
