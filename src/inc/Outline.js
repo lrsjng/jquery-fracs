@@ -1,5 +1,6 @@
 
 (function (window, $, undefined) {
+    "use strict";
 
     var Fracs = window.Fracs = window.Fracs || {},
         $window = $(window),
@@ -15,22 +16,22 @@
                 fillStyle: "rgb(230,230,230)"
             }, {
                 selector: "h1",
-                fillStyle: "rgb(240,140,060)"
+                fillStyle: "rgb(255,144,55)"
             }, {
                 selector: "h2",
-                fillStyle: "rgb(200,100,100)"
+                fillStyle: "rgb(221,75,57)"
             }, {
                 selector: "h3",
-                fillStyle: "rgb(100,200,100)"
+                fillStyle: "rgb(108,196,46)"
             }, {
                 selector: "h4",
-                fillStyle: "rgb(100,100,200)"
+                fillStyle: "rgb(53,122,232)"
             }],
             viewportStyle: {
-                fillStyle: "rgba(228,77,38,0.3)"
+                fillStyle: "rgba(255,144,55,0.3)"
             },
             viewportDragStyle: {
-                fillStyle: "rgba(228,77,38,0.6)"
+                fillStyle: "rgba(255,144,55,0.5)"
             },
             invertViewport: false
         };

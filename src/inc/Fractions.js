@@ -1,5 +1,6 @@
 
 (function (window, $, undefined) {
+    "use strict";
 
     var Fracs = window.Fracs = window.Fracs || {};
 
@@ -75,7 +76,7 @@
             intersectionArea / rect.area(),
             intersectionArea / viewport.area(),
             intersectionArea / possibleArea
-       );
+        );
     };
 
     Fracs.Fractions.ofElement = function (element, viewport) {

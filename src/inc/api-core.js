@@ -11,6 +11,7 @@
 // @include "Group.js"
 
 (function (window, $, undefined) {
+    "use strict";
 
     var Fracs = window.Fracs = window.Fracs || {},
         scrollStateCallbacks,

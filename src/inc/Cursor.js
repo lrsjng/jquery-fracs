@@ -1,5 +1,6 @@
 
 (function (window, $, undefined) {
+    "use strict";
 
     var Fracs = window.Fracs = window.Fracs || {};
 

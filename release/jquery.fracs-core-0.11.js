@@ -1,5 +1,5 @@
 /*
- * jQuery.fracs-core 0.11-develop
+ * jQuery.fracs-core 0.11
  * http://larsjung.de/fracs
  * 
  * provided under the terms of the MIT License
@@ -108,6 +108,7 @@
 
 
 (function (window, $, undefined) {
+    "use strict";
 
     var Fracs = window.Fracs = window.Fracs || {},
         $window = $(window),
@@ -197,6 +198,7 @@
 
 
 (function (window, $, undefined) {
+    "use strict";
 
     var Fracs = window.Fracs = window.Fracs || {};
 
@@ -272,7 +274,7 @@
             intersectionArea / rect.area(),
             intersectionArea / viewport.area(),
             intersectionArea / possibleArea
-       );
+        );
     };
 
     Fracs.Fractions.ofElement = function (element, viewport) {
@@ -284,6 +286,7 @@
 
 
 (function (window, $, undefined) {
+    "use strict";
 
     var Fracs = window.Fracs = window.Fracs || {};
 
@@ -333,6 +336,7 @@
 
 
 (function (window, $, undefined) {
+    "use strict";
 
     var Fracs = window.Fracs = window.Fracs || {},
         $window = $(window);
@@ -551,6 +555,7 @@
 
 
 (function (window, $, undefined) {
+    "use strict";
 
     var Fracs = window.Fracs = window.Fracs || {},
         $window = $(window),
@@ -616,6 +621,7 @@
 
 
 (function (window, $, undefined) {
+    "use strict";
 
     var Fracs = window.Fracs = window.Fracs || {};
 
@@ -659,6 +665,7 @@
 
 
 (function (window, $, undefined) {
+    "use strict";
 
     var Fracs = window.Fracs = window.Fracs || {},
         fracsProps = ["possible", "visible", "viewport"],
@@ -751,6 +758,7 @@
 
 
 (function (window, $, undefined) {
+    "use strict";
 
     var Fracs = window.Fracs = window.Fracs || {},
         scrollStateCallbacks,

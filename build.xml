@@ -4,6 +4,9 @@
     basedir="."
     default="release"
 >
+
+    <import file="tools/wepp.ant.xml" />
+
     <target name="init">
         <property file="build.properties" />
         <tstamp>
@@ -13,14 +16,12 @@
         <echo>Build: ${build.label}</echo>
     </target>
 
-
     <target name="clean" depends="init">
         <delete dir="${build.dir}" />
         <delete dir="${release.dir}" />
     </target>
 
-
-    <target name="build-prepare" depends="clean">
+    <target name="build" depends="clean">
         <mkdir dir="${build.dir}" />
         <copy todir="${build.dir}">
             <fileset dir="${src.dir}" />
@@ -38,10 +39,7 @@
         <wepp file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/${project.name}-${project.version}.min.js" />
         <wepp file="${build.dir}/jquery.fracs-core.js" tofile="${build.dir}/${project.name}-core-${project.version}.js" args="--nc" />
         <wepp file="${build.dir}/jquery.fracs-core.js" tofile="${build.dir}/${project.name}-core-${project.version}.min.js" />
-    </target>
 
-
-    <target name="build" depends="build-prepare">
         <!-- demo -->
         <wepp.dir dir="${build.dir}/demo/css" args="--nc" />
         <wepp.dir dir="${build.dir}/demo/js" args="--nc" />
@@ -56,7 +54,6 @@
         <delete file="${build.dir}/jquery.fracs-core.js" />
     </target>
 
-
     <target name="release" depends="build">
         <mkdir dir="${release.dir}" />
         <tar destfile="${release.dir}/${project.name}-${project.version}.tar" basedir="${build.dir}"/>
@@ -68,41 +65,4 @@
         </copy>
     </target>
 
-
-    <macrodef name="wepp">
-        <attribute name="file" />
-        <attribute name="toFile" />
-        <attribute name="args" default="" />
-        <sequential>
-            <exec executable="${lib.wepp}">
-                <arg line="@{args}" />
-                <arg value="--in" />
-                <arg value="@{file}" />
-                <arg value="--out" />
-                <arg value="@{toFile}" />
-            </exec>
-        </sequential>
-    </macrodef>
-
-
-    <macrodef name="wepp.dir">
-        <attribute name="dir" />
-        <attribute name="args" default="" />
-        <sequential>
-            <exec executable="${lib.wepp}">
-                <arg line="@{args}" />
-                <arg value="--inDir" />
-                <arg value="@{dir}" />
-                <arg value="--outDir" />
-                <arg value="@{dir}" />
-            </exec>
-            <delete dir="@{dir}/inc">
-                <fileset
-                    dir="."
-                    includes="@{dir}/**/*.less"
-                    excludes="@{dir}/inc/**,@{dir}/lib/**"
-                />
-            </delete>
-        </sequential>
-    </macrodef>
 </project>
