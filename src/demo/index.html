@@ -27,7 +27,6 @@
             <h2>Group Maximums (#4 .. #8)</h2>
             <ul class="groups">
                 <li><span>possible:</span><span class='possible'>undef.</span></li>
-                <!--<li><span>visible:</span><span class='visible'>undef.</span></li>-->
                 <li><span>viewport:</span><span class='viewport'>undef.</span></li>
             </ul>
             <h2>ScrollState</h2>
@@ -35,9 +34,19 @@
                 <li><span>width:</span><span class='width'>undef.</span></li>
                 <li><span>height:</span><span class='height'>undef.</span></li>
             </ul>
+            <ul class="scrollstate">
+                <li><span>left:</span><span class='left'>undef.</span></li>
+                <li><span>top:</span><span class='top'>undef.</span></li>
+            </ul>
+            <ul class="scrollstate">
+                <li><span>right:</span><span class='right'>undef.</span></li>
+                <li><span>bottom:</span><span class='bottom'>undef.</span></li>
+            </ul>
         </section>
         <section>
-            <h2 id="outlineHeader">Document</h2>
+            <h2 id="outlineHeader">Outline</h2>
+            <span id="docDims">Document: ?x?</span>
+            <span id="vpDims">Viewport: ?x?</span>
             <canvas id="outline" width="300" height="300"></canvas>
         </section>
     </aside>

@@ -1,4 +1,4 @@
-(function($) {
+(function(window, $) {
     "use strict";
 
     var generateContent = function () {
@@ -122,13 +122,32 @@
                         .text(isNaN(state.height) ? "undef." : $.fracs.round(state.height * 100, 1) + "%")
                         .stop(true).css("background-color", "rgb(250,250,150)").animate({"background-color": "#fff"}, 1000);
                 }
+                $.each(["left", "top", "right", "bottom"], function (idx, value) {
+
+                    if (!prevState || state[value] !== prevState[value]) {
+                        $(".panel .scrollstate ." + value)
+                            .text(isNaN(state[value]) ? "undef." : state[value] + "px")
+                            .stop(true).css("background-color", "rgb(250,250,150)").animate({"background-color": "#fff"}, 1000);
+                    }
+                });
             });
+        },
+        initDimsDemo = function () {
+
+            var onResize = function () {
+
+                var doc = $.fracs.document(),
+                    vp = $.fracs.viewport();
+
+                $("#docDims").text("Document: " + doc.width + "x" + doc.height);
+                $("#vpDims").text("Viewport: " + vp.width + "x" + vp.height);
+            };
+
+            $(window).bind("resize", onResize);
+            onResize();
         },
         initOutlineDemo = function () {
 
-            var doc = $.fracs.document();
-
-            $("#outlineHeader").text("Document " + doc.width + "x" + doc.height);
             $("#outline").fracs("outline", {
                 crop: true,
                 styles: [{
@@ -138,8 +157,14 @@
                     fillStyle: "auto"
                 }, {
                     selector: "body > h1",
-                    fillStyle: "rgb(200,200,200)"
-                }]
+                    fillStyle: "rgb(190,190,190)"
+                }],
+                viewportStyle: {
+                    fillStyle: "rgba(104,169,255,0.3)"
+                },
+                viewportDragStyle: {
+                    fillStyle: "rgba(104,169,255,0.5)"
+                }
             });
         };
 
@@ -150,7 +175,8 @@
         initGroupDemo();
         initFracsDemo();
         initScrollStateDemo();
+        initDimsDemo();
         initOutlineDemo();
     });
 
-}(jQuery));
+}(window, jQuery));

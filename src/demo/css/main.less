@@ -10,6 +10,16 @@ body {
     font-size: 16px;
     color: #333;
 
+    a, a:visited, a:active {
+        color: #2080ff;
+        text-decoration: none;
+        .transition(all 0.2s ease-in-out);
+
+        &:hover {
+            color: #68A9ff;
+        }
+    }
+
     > h1 {
         display: inline-block;
         margin: 30px;
@@ -69,82 +79,51 @@ body {
             }
         }
     }
-}
 
-a, a:active, a:visited {
-    color: #e44d26;
-    text-decoration: none;
-    .transition(all 0.2s ease-in-out);
+    aside.panel {
+        font-size: 0.85em;
+        position: fixed;
+        bottom: 8px;
+        right: 8px;
+        background-color: #fff;
+        z-index: 1;
+        border: 2px solid #555;
 
-    &:hover {
-        color: #ff8d38;
-    }
-}
-
-
-.panel {
-    font-size: 0.85em;
-    position: fixed;
-    bottom: 8px;
-    right: 8px;
-    background-color: #fff;
-    z-index: 1;
-    border: 2px solid #555;
-
-    h1 {
-        font-size: 1.2em;
-        text-align: center;
-        margin: 8px 0 0 0;
-    }
-    > section {
-        float: right;
-        margin: 8px;
-
-        h2 {
-            font-size: 1em;
-            text-align: left;
-            margin: 1em 0 0.6em 0;
+        h1 {
+            font-size: 1.2em;
+            text-align: center;
+            margin: 8px 0 0 0;
         }
-        .fracs {
-            list-style: none;
-            margin: 0;
-            padding: 0;
+        > section {
+            float: right;
+            margin: 8px;
 
-            li {
+            h2 {
+                font-size: 1em;
+                text-align: left;
+                margin: 1em 0 0.6em 0;
+            }
+            .fracs {
+                list-style: none;
                 margin: 0;
                 padding: 0;
-                cursor: pointer;
-                border: 1px solid rgba(0,0,0,0);
-                .border-radius(4px);
 
-                &.header {
-                    font-weight: bold;
-                    margin-bottom: 4px;
+                li {
+                    margin: 0;
+                    padding: 0;
+                    cursor: pointer;
+                    border: 1px solid rgba(0,0,0,0);
+                    .border-radius(4px);
+
+                    &.header {
+                        font-weight: bold;
+                        margin-bottom: 4px;
+                    }
+                    &.section:hover {
+                        border-color: #ddd;
+                    }
                 }
-                &.section:hover {
-                    border-color: #ddd;
-                }
-            }
 
-            span {
-                display: inline-block;
-                margin: 0 4px;
-                padding: 0 4px 2px 4px;
-                width: 65px;
-                overflow: hidden;
-            }
-            span.idx {
-                width: 30px;
-                text-align: center;
-            }
-        }
-        .groups, .scrollstate {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-
-            li {
-                display: inline-block;
                 span {
                     display: inline-block;
                     margin: 0 4px;
@@ -152,14 +131,40 @@ a, a:active, a:visited {
                     width: 65px;
                     overflow: hidden;
                 }
-                span:nth-child(2) {
-                    width: 40px;
+                span.idx {
+                    width: 30px;
+                    text-align: center;
                 }
             }
-        }
-        #outline {
-            border: 1px solid #ccc;
-            background-color: #fff;
+            .groups, .scrollstate {
+                list-style: none;
+                margin: 0;
+                padding: 0;
+
+                li {
+                    display: inline-block;
+                    span {
+                        display: inline-block;
+                        margin: 0 4px;
+                        padding: 0 4px 2px 4px;
+                        width: 55px;
+                        overflow: hidden;
+                    }
+                    span:nth-child(2) {
+                        width: 50px;
+                    }
+                }
+            }
+            #docDims, #vpDims {
+                display: block;
+                margin: 3px 0;
+            }
+            #outline {
+                margin: 8px 0 0 0;
+                border: 1px solid #ccc;
+                background-color: #fff;
+            }
         }
     }
+
 }
