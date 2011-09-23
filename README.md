@@ -12,7 +12,8 @@ jQuery.fracs is provided under the terms of the [MIT License](http://github.com/
 
 * added some "use strict"'s
 * cleaned demo
-* 
+* cleaned tests
+* removed `release` folder
 
 
 ### v0.10 · *2011-09-17*
