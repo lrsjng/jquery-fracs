@@ -10,14 +10,11 @@ jQuery.fracs is provided under the terms of the [MIT License](http://github.com/
 
 ### v0.11 · *2011-09-??*
 
-* cleaned demo
-* cleaned tests
 * removed `release` folder
 * fixed `ScrollState`
 * updated to ModPlug 0.5
-* added some "use strict"'s,  
-  minor refactorings,  
-  no JSLint issus when called with: --browser --confusion --predef jQuery --white
+* minor refactorings, cleaned code, demo and test  
+  no JSLint issues when called with: --browser --confusion --predef jQuery --white
 
 
 ### v0.10 · *2011-09-17*

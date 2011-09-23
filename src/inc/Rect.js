@@ -1,27 +1,25 @@
 
-(function (window, document, $) {
-    "use strict";
 
-    var Fracs = window.Fracs = window.Fracs || {},
-        $window = $(window),
-        $document = $(document);
+/******************
+ * Rect
+ ******************/
 
+Fracs.Rect = function (left, top, width, height) {
 
-    Fracs.Rect = function (left, top, width, height) {
+    if (!(this instanceof Fracs.Rect)) {
+        return new Fracs.Rect(left, top, width, height);
+    }
 
-        if (!(this instanceof Fracs.Rect)) {
-            return new Fracs.Rect(left, top, width, height);
-        }
+    this.left = Math.round(left);
+    this.top = Math.round(top);
+    this.width = Math.round(width);
+    this.height = Math.round(height);
+    this.right = this.left + this.width;
+    this.bottom = this.top + this.height;
+};
 
-        this.left = Math.round(left);
-        this.top = Math.round(top);
-        this.width = Math.round(width);
-        this.height = Math.round(height);
-        this.right = this.left + this.width;
-        this.bottom = this.top + this.height;
-    };
-
-    Fracs.Rect.prototype = {
+$.extend(Fracs.Rect, {
+    prototype: {
         equals: function (that) {
 
             return this.left === that.left && this.top === that.top && this.width === that.width && this.height === that.height;
@@ -56,24 +54,16 @@
 
             return Fracs.Fractions.ofRect(this);
         }
-    };
-
-
-    /**
-     * Special constructors
-     */
-
-    Fracs.Rect.ofDocument = function () {
+    },
+    ofDocument: function () {
 
         return Fracs.Rect(0, 0, $document.width(), $document.height());
-    };
-
-    Fracs.Rect.ofViewport = function () {
+    },
+    ofViewport: function () {
 
         return Fracs.Rect($window.scrollLeft(), $window.scrollTop(), $window.width(), $window.height());
-    };
-
-    Fracs.Rect.ofElement = function (element) {
+    },
+    ofElement: function (element) {
 
         var $element = $(element),
             offset;
@@ -84,6 +74,5 @@
 
         offset = $element.offset();
         return Fracs.Rect(offset.left, offset.top, $element.outerWidth(), $element.outerHeight());
-    };
-
-}(window, document, jQuery));
+    }
+});

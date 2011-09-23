@@ -1,9 +1,12 @@
 
-(function (window, $) {
-    "use strict";
 
-    var Fracs = window.Fracs = window.Fracs || {},
-        fracsProps = ["possible", "visible", "viewport"],
+/******************
+ * Group
+ ******************/
+
+(function ($, Fracs) {
+
+    var fracsProps = ["possible", "visible", "viewport"],
         rectProps = ["width", "height", "left", "right", "top", "bottom"],
         propertyType = function (property) {
 
@@ -49,21 +52,15 @@
         },
         htmlElementsToElements = function (htmlElements) {
 
-            var elements = [];
-
-            $.each(htmlElements, function (idx, htmlElement) {
-                elements.push(Fracs.Element(htmlElement));
+            return $.map(htmlElements, function (htmlElement) {
+                return Fracs.Element(htmlElement);
             });
-            return elements;
         },
         elementsToHtmlElements = function (elements) {
 
-            var htmlElements = [];
-
-            $.each(elements, function (idx, element) {
-                htmlElements.push(element.element);
+            return $.map(elements, function (element) {
+                return element.element;
             });
-            return htmlElements;
         };
 
 
@@ -89,4 +86,4 @@
         }
     };
 
-}(window, jQuery));
+}(jQuery, Fracs));

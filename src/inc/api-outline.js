@@ -2,14 +2,18 @@
  * jQuery.fracs - Outline API
  */
 
-// @include "Outline.js"
-
-(function (window, $) {
+(function ($) {
     "use strict";
 
     var Fracs = window.Fracs = window.Fracs || {},
-        dataNs = "outline",
-        methods = {
+        $window = $(window),
+        $htmlBody = $("html,body"),
+        dataNs = "outline";
+
+    // @include "Outline.js"
+
+    $.ModPlug.module("fracs", {
+        methods: {
             outline: function (options) {
 
                 return this.each(function () {
@@ -29,10 +33,7 @@
                     }
                 });
             }
-        };
-
-    $.ModPlug.module("fracs", {
-        methods: methods
+        }
     });
 
-}(window, jQuery));
+}(jQuery));

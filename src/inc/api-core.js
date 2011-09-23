@@ -2,21 +2,26 @@
  * jQuery.fracs - Core API
  */
 
-// @include "Rect.js"
-// @include "Fractions.js"
-// @include "Cursor.js"
-// @include "Callbacks.js"
-// @include "ScrollState.js"
-// @include "Element.js"
-// @include "Group.js"
-
-(function (window, $) {
+(function ($) {
     "use strict";
 
     var Fracs = window.Fracs = window.Fracs || {},
-        scrollStateCallbacks,
+        $window = $(window),
+        $document = $(document),
+        $htmlBody = $("html,body"),
         dataNs = "fracs",
-        statics = {
+        scrollStateCallbacks;
+
+    // @include "Rect.js"
+    // @include "Fractions.js"
+    // @include "Cursor.js"
+    // @include "Callbacks.js"
+    // @include "ScrollState.js"
+    // @include "Element.js"
+    // @include "Group.js"
+
+    $.ModPlug.plugin("fracs", {
+        statics: {
             document: function () {
 
                 return Fracs.Rect.ofDocument();
@@ -64,7 +69,7 @@
                 return Fracs.Rect.ofViewport();
             }
         },
-        methods = {
+        methods: {
             bind: function (callback) {
 
                 return this.each(function () {
@@ -164,24 +169,18 @@
                 });
             }
         },
-        defaultStatic = function () {
+        defaultStatic: function () {
 
             return "fracs";
         },
-        defaultMethod = function (arg) {
+        defaultMethod: function (arg) {
 
             if (arguments.length === 0) {
                 return "fracs";
             } else if (arg instanceof Function) {
                 return "bind";
             }
-        };
-
-    $.ModPlug.plugin("fracs", {
-        statics: statics,
-        methods: methods,
-        defaultStatic: defaultStatic,
-        defaultMethod: defaultMethod
+        }
     });
 
-}(window, jQuery));
+}(jQuery));
