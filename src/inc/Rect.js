@@ -1,5 +1,5 @@
 
-(function (window, $, undefined) {
+(function (window, document, $) {
     "use strict";
 
     var Fracs = window.Fracs = window.Fracs || {},
@@ -86,4 +86,4 @@
         return Fracs.Rect(offset.left, offset.top, $element.outerWidth(), $element.outerHeight());
     };
 
-}(window, jQuery));
+}(window, document, jQuery));

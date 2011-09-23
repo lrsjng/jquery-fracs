@@ -40,6 +40,10 @@
         <wepp file="${build.dir}/jquery.fracs-core.js" tofile="${build.dir}/${project.name}-core-${project.version}.js" args="--nc" />
         <wepp file="${build.dir}/jquery.fracs-core.js" tofile="${build.dir}/${project.name}-core-${project.version}.min.js" />
 
+        <delete dir="${build.dir}/inc" />
+        <delete file="${build.dir}/jquery.fracs.js" />
+        <delete file="${build.dir}/jquery.fracs-core.js" />
+
         <!-- demo -->
         <wepp.dir dir="${build.dir}/demo/css" args="--nc" />
         <wepp.dir dir="${build.dir}/demo/js" args="--nc" />
@@ -48,10 +52,6 @@
         <!-- test -->
         <wepp.dir dir="${build.dir}/test/js" args="--nc" />
         <copy file="${build.dir}/${project.name}-${project.version}.js" tofile="${build.dir}/test/js/jquery.fracs.js" />
-
-        <delete dir="${build.dir}/inc" />
-        <delete file="${build.dir}/jquery.fracs.js" />
-        <delete file="${build.dir}/jquery.fracs-core.js" />
     </target>
 
     <target name="release" depends="build">

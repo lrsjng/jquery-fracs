@@ -10,7 +10,7 @@
 // @include "Element.js"
 // @include "Group.js"
 
-(function (window, $, undefined) {
+(function (window, $) {
     "use strict";
 
     var Fracs = window.Fracs = window.Fracs || {},
@@ -168,11 +168,11 @@
 
             return "fracs";
         },
-        defaultMethod = function () {
+        defaultMethod = function (arg) {
 
             if (arguments.length === 0) {
                 return "fracs";
-            } else if (arguments[0] instanceof Function) {
+            } else if (arg instanceof Function) {
                 return "bind";
             }
         };

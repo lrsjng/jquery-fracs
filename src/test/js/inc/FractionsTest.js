@@ -75,7 +75,6 @@
         $$.ok(fr1.rectsEqual(fr2), "rects equal");
         $$.ok(!fr1.rectsEqual(fr3), "rects unequal");
         $$.ok(fr1.rectsEqual(fr4), "rects equal");
-
     });
 
 }(QUnit, Fracs));

@@ -4,7 +4,7 @@
 
 // @include "Outline.js"
 
-(function (window, $, undefined) {
+(function (window, $) {
     "use strict";
 
     var Fracs = window.Fracs = window.Fracs || {},
