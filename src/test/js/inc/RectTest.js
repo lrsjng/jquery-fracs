@@ -1,4 +1,4 @@
-
+/*globals QUnit, Fracs */
 (function ($$, Fracs) {
     "use strict";
 

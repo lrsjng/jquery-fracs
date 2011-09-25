@@ -1,8 +1,7 @@
-
-
 /******************
  * Fractions
  ******************/
+/*globals $, Fracs */
 
 Fracs.Fractions = function (rectDocument, rectElement, rectViewport, visible, viewport, possible) {
 

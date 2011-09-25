@@ -1,8 +1,7 @@
-
-
 /******************
  * Group
  ******************/
+/*globals jQuery, Fracs */
 
 (function ($, Fracs) {
 

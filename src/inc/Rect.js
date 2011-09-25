@@ -1,8 +1,7 @@
-
-
 /******************
  * Rect
  ******************/
+/*globals $, Fracs, $window, $document, $htmlBody */
 
 Fracs.Rect = function (left, top, width, height) {
 

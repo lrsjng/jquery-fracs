@@ -1,8 +1,7 @@
-
-
 /******************
  * Cursor
  ******************/
+/*globals $, Fracs */
 
 Fracs.Cursor = function (distX, distY) {
 

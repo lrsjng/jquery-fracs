@@ -1,8 +1,7 @@
-
-
 /******************
  * Element
  ******************/
+/*globals Fracs */
 
 Fracs.Element = function (element) {
 

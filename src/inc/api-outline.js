@@ -1,6 +1,7 @@
 /*
  * jQuery.fracs - Outline API
  */
+/*globals window, jQuery */
 
 (function ($) {
     "use strict";

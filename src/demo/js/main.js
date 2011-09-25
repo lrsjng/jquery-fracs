@@ -1,4 +1,5 @@
-(function(window, $) {
+/*globals window, jQuery */
+(function($) {
     "use strict";
 
     var generateContent = function () {
@@ -179,4 +180,4 @@
         initOutlineDemo();
     });
 
-}(window, jQuery));
+}(jQuery));

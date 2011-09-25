@@ -1,4 +1,4 @@
-
+/*globals jQuery, QUnit, Fracs */
 (function ($, $$, Fracs) {
     "use strict";
 

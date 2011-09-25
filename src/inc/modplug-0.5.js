@@ -4,8 +4,9 @@
  *
  * provided under the terms of the MIT License
  */
+/*globals window, jQuery */
 
-(function (window, $) {
+(function ($) {
     "use strict";
 
     var reference = "_ModPlug_0.5_API",
@@ -94,4 +95,4 @@
 
     window.ModPlug = $.ModPlug = ModPlug;
 
-}(window, jQuery));
+}(jQuery));

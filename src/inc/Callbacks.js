@@ -1,8 +1,7 @@
-
-
 /******************
  * Callbacks
  ******************/
+/*globals window, $, Fracs, $window */
 
 Fracs.Callbacks = function () {
 

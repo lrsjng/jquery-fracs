@@ -1,8 +1,7 @@
-
-
 /******************
  * Outline
  ******************/
+/*globals $, Fracs, $window, $htmlBody */
 
 Fracs.Outline = function (canvas, options) {
 

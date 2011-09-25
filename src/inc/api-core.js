@@ -1,6 +1,7 @@
 /*
  * jQuery.fracs - Core API
  */
+/*globals window, jQuery */
 
 (function ($) {
     "use strict";

@@ -1,8 +1,7 @@
-
-
 /******************
  * ScrollState
  ******************/
+/*globals $, Fracs, $window, $htmlBody */
 
 Fracs.ScrollState = function (width, height, left, top, right, bottom) {
 
