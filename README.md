@@ -12,8 +12,9 @@ jQuery.fracs is provided under the terms of the [MIT License](http://github.com/
 
 * removes `release` folder
 * fixes `ScrollState`
-* updates to modplug 0.6
-* minor refactorings, cleanes code, demo and test  
+* updates to modplug 0.7
+* minor refactorings, cleanes code, demo and test
+* moves all js code into one file
 
 
 ### v0.10 · *2011-09-17*

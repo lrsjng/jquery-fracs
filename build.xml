@@ -5,7 +5,7 @@
     default="release"
 >
 
-    <import file="tools/wepp.ant.xml" />
+    <import file="wepp.ant.xml" />
 
     <target name="init">
         <property file="build.properties" />
