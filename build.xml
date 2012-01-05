@@ -21,7 +21,7 @@
         <delete dir="${release.dir}" />
     </target>
 
-    <target name="build" depends="clean">
+    <target name="build-prepare" depends="clean">
         <mkdir dir="${build.dir}" />
         <copy todir="${build.dir}">
             <fileset dir="${src.dir}" />
@@ -34,15 +34,16 @@
             <replacefilter token="%BUILD_VERSION%" value="${project.version}" />
             <replacefilter token="%BUILD_STAMP%" value="${build.stamp}" />
         </replace>
+    </target>
 
-        <wepp file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/${project.name}-${project.version}.js" args="--nc" />
+    <target name="build" depends="build-prepare">
+        <copy file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/${project.name}-${project.version}.js" />
         <wepp file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/${project.name}-${project.version}.min.js" />
-        <wepp file="${build.dir}/jquery.fracs-core.js" tofile="${build.dir}/${project.name}-core-${project.version}.js" args="--nc" />
-        <wepp file="${build.dir}/jquery.fracs-core.js" tofile="${build.dir}/${project.name}-core-${project.version}.min.js" />
-
-        <delete dir="${build.dir}/inc" />
         <delete file="${build.dir}/jquery.fracs.js" />
-        <delete file="${build.dir}/jquery.fracs-core.js" />
+
+        <exec executable="${tool.docco}" dir="${build.dir}" failonerror="true">
+            <arg value="${project.name}-${project.version}.js" />
+        </exec>
 
         <!-- demo -->
         <wepp.dir dir="${build.dir}/demo/css" args="--nc" />
@@ -50,19 +51,32 @@
         <copy file="${build.dir}/${project.name}-${project.version}.js" tofile="${build.dir}/demo/js/jquery.fracs.js" />
 
         <!-- test -->
-        <wepp.dir dir="${build.dir}/test/js" args="--nc" />
-        <copy file="${build.dir}/${project.name}-${project.version}.js" tofile="${build.dir}/test/js/jquery.fracs.js" />
+        <copy file="${build.dir}/${project.name}-${project.version}.js" tofile="${build.dir}/test/jquery.fracs.js" />
     </target>
 
     <target name="release" depends="build">
         <mkdir dir="${release.dir}" />
-        <tar destfile="${release.dir}/${project.name}-${project.version}.tar" basedir="${build.dir}"/>
-        <gzip destfile="${release.dir}/${project.name}-${project.version}.tar.gz" src="${release.dir}/${project.name}-${project.version}.tar"/>
-        <delete file="${release.dir}/${project.name}-${project.version}.tar" />
         <zip destfile="${release.dir}/${project.name}-${project.version}.zip" basedir="${build.dir}" />
         <copy todir="${release.dir}">
             <fileset file="${build.dir}/jquery.fracs-*.js" />
         </copy>
+    </target>
+
+    <target name="lint" depends="init">
+        <echo>JSLint "${tool.jsxint.file}"</echo>
+        <exec executable="${tool.jslint}" failonerror="false">
+            <arg value="${tool.jsxint.file}" />
+        </exec>
+    </target>
+
+    <target name="hint" depends="init">
+        <echo>JSHint "${tool.jsxint.file}"</echo>
+        <exec executable="${tool.jshint}" failonerror="false">
+            <arg value="${tool.jsxint.file}" />
+        </exec>
+    </target>
+
+    <target name="xint" depends="lint,hint">
     </target>
 
 </project>
