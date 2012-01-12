@@ -1,8 +1,18 @@
-/*globals window, jQuery */
 (function($) {
     'use strict';
+    /*globals window, jQuery */
 
-    var generateContent = function () {
+    var round = function (value, decs) {
+
+            var pow;
+
+            if (isNaN(decs) || decs <= 0) {
+                return Math.round(value);
+            }
+            pow = Math.pow(10, decs);
+            return Math.round(value * pow) / pow;
+        },
+        generateContent = function () {
 
             var $body = $('body'),
                 $panelFracs = $('.panel .fracs'),
@@ -62,15 +72,15 @@
                     .css('background-color', 'rgba(32,128,255,' + fracs.possible + ')');
 
                 $panel
-                    .find('.visible').text($.fracs.round(fracs.visible, 4)).end()
-                    .find('.viewport').text($.fracs.round(fracs.viewport, 4)).end()
-                    .find('.possible').text($.fracs.round(fracs.possible, 4)).end()
+                    .find('.visible').text(round(fracs.visible, 4)).end()
+                    .find('.viewport').text(round(fracs.viewport, 4)).end()
+                    .find('.possible').text(round(fracs.possible, 4)).end()
                     .highlight();
 
                 $label
-                    .find('.visible').text($.fracs.round(fracs.visible * 100, 1) + '%').end()
-                    .find('.viewport').text($.fracs.round(fracs.viewport * 100, 1) + '%').end()
-                    .find('.possible').text($.fracs.round(fracs.possible * 100, 1) + '%');
+                    .find('.visible').text(round(fracs.visible * 100, 1) + '%').end()
+                    .find('.viewport').text(round(fracs.viewport * 100, 1) + '%').end()
+                    .find('.possible').text(round(fracs.possible * 100, 1) + '%');
 
                 if (!fracs.rects) {
                     $label
@@ -111,7 +121,7 @@
                 $group.fracs('max', value, function (best) {
 
                     $('.panel .groups .' + value)
-                        .text(best ? $(best.el).find('.idx').text() : 'undef.')
+                        .text(best ? $(best).find('.idx').text() : 'undef.')
                         .highlight();
                 });
             });
@@ -127,7 +137,7 @@
 
                     if (!prevState || val !== prevState[value]) {
 
-                        pval = isNaN(val) ? 'undef.' : ((value === 'width' || value === 'height') ? $.fracs.round(val * 100, 1) + '%' : val + 'px');
+                        pval = isNaN(val) ? 'undef.' : ((value === 'width' || value === 'height') ? round(val * 100, 1) + '%' : val + 'px');
 
                         $('.panel .scrollstate .' + value)
                             .text(pval)
@@ -139,10 +149,10 @@
         initDimsDemo = function () {
 
             var onResize = function () {
-    
+
                     var doc = $.fracs.document(),
                         vp = $.fracs.viewport();
-    
+
                     $('#docDims').text('Document: ' + doc.width + 'x' + doc.height);
                     $('#vpDims').text('Viewport: ' + vp.width + 'x' + vp.height);
                 };

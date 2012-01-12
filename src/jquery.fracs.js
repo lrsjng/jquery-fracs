@@ -1,114 +1,49 @@
 /*!
  * jQuery.fracs %BUILD_VERSION%
  * http://larsjung.de/fracs
- *
- * provided under the terms of the MIT License
+ * MIT License
  */
 
+(function (window, document, $) {
+'use strict';
 /*jslint browser: true, confusion: true, nomen: true, regexp: true, white: true */
 /*jshint browser: true, confusion: true, nomen: false, regexp: false, white: false */
 /*global jQuery */
 
-(function (window, document, $) {
-    'use strict';
-
-    // Initial setup
-    // =============
-
-        // The top-level namespace. All public classes will be attached to this.
-    var Fracs = window.Fracs = {},
-
         // Some often used references.
-        $window = $(window),
+    var $window = $(window),
         $document = $(document),
         $htmlBody = $('html,body'),
+        extend = $.extend,
+        isFn = $.isFunction,
+        slice = [].slice,
+        mathMax = Math.max,
+        mathMin = Math.min,
+        mathRound = Math.round,
+        isInstanceOf = function (obj, type) {
 
-        // The namespace used to attach data to elements.
-        dataNs = 'fracs',
-
-        // Single reference to the window scroll state callback functions.
-        scrollStateCallbacks,
-
-        // Returns `true` if any of its arguments are undefined otherwise `false`.
-        isAnyUndefined = function () {
-
-            return $.inArray(undefined, arguments) >= 0;
+            return obj instanceof type;
         },
+        equal = function (obj1, obj2, props) {
 
-        // ### modplug 0.7
-        //      http://larsjung.de/modplug
-        //      MIT License
-        modplug = function (namespace, options) {
+            var i, l, prop;
 
-                // Some references to enhance minification.
-            var extend = $.extend,
-                isFn = $.isFunction,
-                slice = [].slice,
-
-                // Save the initial settings.
-                settings = extend({}, options),
-
-                // Helper function to apply default methods.
-                applyMethod = function (obj, args, methodName, methods) {
-
-                    // If `methodName` is a function apply it to get the actual
-                    // method name.
-                    methodName = isFn(methodName) ? methodName.apply(obj, args) : methodName;
-
-                    // If method exists then apply it and return the result ...
-                    if (isFn(methods[methodName])) {
-                        return methods[methodName].apply(obj, args);
-                    }
-
-                    // ... otherwise raise an error.
-                    $.error('Method "' + methodName + '" does not exist on jQuery.' + namespace);
-                },
-
-                // This function gets exposed as `$.<namespace>`.
-                statics = function () {
-
-                    // Try to apply a default method.
-                    return applyMethod(this, slice.call(arguments), settings.defaultStatic, statics);
-                },
-
-                // This function gets exposed as `$(selector).<namespace>`.
-                methods = function (method) {
-
-                    // If `method` exists then apply it ...
-                    if (isFn(methods[method])) {
-                        return methods[method].apply(this, slice.call(arguments, 1));
-                    }
-
-                    // ... otherwise try to apply a default method.
-                    return applyMethod(this, slice.call(arguments), settings.defaultMethod, methods);
-                },
-
-                // Adds/overwrites plugin methods.
-                // This function gets exposed as `$.<namespace>.modplug` to make the plugin extendable.
-                plug = function (options) {
-
-                    if (options) {
-                        extend(statics, options.statics);
-                        extend(methods, options.methods);
-                    }
-
-                    // Make sure that `$.<namespace>.modplug` points to this function after adding new methods.
-                    statics.modplug = plug;
-                };
-
-            // Save objects or methods previously registered to the desired namespace.
-            // They are available via `$.<namespace>.modplug.prev`.
-            plug.prev = {
-                statics: $[namespace],
-                methods: $.fn[namespace]
-            };
-
-            // Init the plugin by adding the specified statics and methods.
-            plug(options);
-
-            // Register the plugin.
-            $[namespace] = statics;
-            $.fn[namespace] = methods;
+            if (obj1 === obj2) {
+                return true;
+            }
+            if (!obj1 || !obj2 || obj1.constructor !== obj2.constructor) {
+                return false;
+            }
+            for (i = 0, l = props.length; i < l; i += 1) {
+                prop = props[i];
+                if (obj1[prop] && isFn(obj1[prop].equals) && !obj1[prop].equals(obj2[prop])) {
+                    return false;
+                }
+                if (obj1[prop] !== obj2[prop]) {
+                    return false;
+                }
+            }
+            return true;
         };
 
 
@@ -118,37 +53,32 @@
     // Objects
     // =======
 
-    // Fracs.Rect
-    // ----------
-    // A simple object that holds the position and dimensions of a rectangle.
+    // Rect
+    // ----
+    // Holds the position and dimensions of a rectangle.
     // The position might be relative to document, viewport or element space.
-
-    // Creates a new instance for the given position and dimensions.
-    Fracs.Rect = function (left, top, width, height) {
+    var Rect = function (left, top, width, height) {
 
         // Top left corner of the rectangle rounded to integers.
-        this.left = Math.round(left);
-        this.top = Math.round(top);
+        this.left = mathRound(left);
+        this.top = mathRound(top);
 
         // Dimensions rounded to integers.
-        this.width = Math.round(width);
-        this.height = Math.round(height);
+        this.width = mathRound(width);
+        this.height = mathRound(height);
 
         // Bottom right corner of the rectangle.
         this.right = this.left + this.width;
         this.bottom = this.top + this.height;
     };
 
-    Fracs.Rect.prototype = {
+    // ### Prototype
+    extend(Rect.prototype, {
 
         // Checks if this instance equals `that` in position and dimensions.
         equals: function (that) {
 
-            if (!(that instanceof Fracs.Rect)) {
-                return false;
-            }
-
-            return this.left === that.left && this.top === that.top && this.width === that.width && this.height === that.height;
+            return equal(this, that, ['left', 'top', 'width', 'height']);
         },
 
         // Returns the area of this rectangle.
@@ -157,89 +87,97 @@
             return this.width * this.height;
         },
 
+        // Returns a new `Rect` representig this rect relative to `rect`.
+        relativeTo: function (rect) {
+
+            return new Rect(this.left - rect.left, this.top - rect.top, this.width, this.height);
+        },
+
         // Returns a new rectangle representing the intersection of this instance and `rect`.
         // If there is no intersection the return value is `null`.
         intersection: function (rect) {
 
-            if (!(rect instanceof Fracs.Rect)) {
+            if (!isInstanceOf(rect, Rect)) {
                 return null;
             }
 
-            var left = Math.max(this.left, rect.left),
-                right = Math.min(this.right, rect.right),
-                top = Math.max(this.top, rect.top),
-                bottom = Math.min(this.bottom, rect.bottom),
+            var left = mathMax(this.left, rect.left),
+                right = mathMin(this.right, rect.right),
+                top = mathMax(this.top, rect.top),
+                bottom = mathMin(this.bottom, rect.bottom),
                 width = right - left,
                 height = bottom - top;
 
-            return (width >= 0 && height >= 0) ? new Fracs.Rect(left, top, width, height) : null;
+            return (width >= 0 && height >= 0) ? new Rect(left, top, width, height) : null;
         },
 
-        // Returns a new rectangle representing the smallesr rectangle containing this instance and `rect`.
+        // Returns a new rectangle representing the smallest rectangle containing this instance and `rect`.
         envelope: function (rect) {
 
-            if (!(rect instanceof Fracs.Rect)) {
+            if (!isInstanceOf(rect, Rect)) {
                 return this;
             }
 
-            var left = Math.min(this.left, rect.left),
-                right = Math.max(this.right, rect.right),
-                top = Math.min(this.top, rect.top),
-                bottom = Math.max(this.bottom, rect.bottom),
+            var left = mathMin(this.left, rect.left),
+                right = mathMax(this.right, rect.right),
+                top = mathMin(this.top, rect.top),
+                bottom = mathMax(this.bottom, rect.bottom),
                 width = right - left,
                 height = bottom - top;
 
-            return new Fracs.Rect(left, top, width, height);
+            return new Rect(left, top, width, height);
+        }
+    });
+
+    // ### Static methods
+    extend(Rect, {
+
+        // Returns a new instance of `Rect` representing the document.
+        // Since the coordinates are in document space the `left` and `top` values
+        // are always set to `0`.
+        ofDocument: function (element) {
+
+            if (!element || element === document || element === window) {
+                return new Rect(0, 0, $document.width(), $document.height());
+            }
+
+            return new Rect(0, 0, element.scrollWidth, element.scrollHeight);
         },
 
-        // Returns the fractions for this instance. This is just a shortcut method; might be removed.
-        fracs: function () {
+        // Returns a new instance of `Rect` representing the viewport.
+        ofViewport: function (element) {
 
-            return Fracs.Fractions.ofRect(this);
+            if (!element || element === document || element === window) {
+                return new Rect($window.scrollLeft(), $window.scrollTop(), $window.width(), $window.height());
+            }
+
+            return new Rect(element.scrollLeft, element.scrollTop, element.clientWidth, element.clientHeight);
+        },
+
+        // Returns a new instance of `Rect` representing a given `HTMLElement`.
+        // The dimensions respect padding and border widths.
+        // If the element is invisible (as determined by jQuery) the return value is
+        // null.
+        ofElement: function (element) {
+
+            var $element = $(element);
+            if (!$element.is(':visible')) {
+                return null;
+            }
+
+            var offset = $element.offset();
+            return new Rect(offset.left, offset.top, $element.outerWidth(), $element.outerHeight());
         }
-    };
-
-    // Returns a new instance of `Fracs.Rect` representing the document.
-    // Since the coordinates are in document space the `left` and `top` values
-    // are always set to `0`.
-    Fracs.Rect.ofDocument = function () {
-
-        return new Fracs.Rect(0, 0, $document.width(), $document.height());
-    };
-
-    // Returns a new instance of `Fracs.Rect` representing the viewport.
-    Fracs.Rect.ofViewport = function () {
-
-        return new Fracs.Rect($window.scrollLeft(), $window.scrollTop(), $window.width(), $window.height());
-    };
-
-    // Returns a new instance of `Fracs.Rect` representing a given `HTMLElement`.
-    // The dimensions respect padding and border widths.
-    // If the element is invisible (as determined by jQuery) the return value is
-    // null.
-    Fracs.Rect.ofElement = function (element) {
-
-        var $element = $(element),
-            offset;
-
-        if (!$element.is(':visible')) {
-            return null;
-        }
-
-        offset = $element.offset();
-        return new Fracs.Rect(offset.left, offset.top, $element.outerWidth(), $element.outerHeight());
-    };
+    });
 
 
 
-    // Fracs.Fractions
-    // ---------------
-    // The heart of the library. An object that holds the fractions data.
-    // There are two constructors to create this data for a given instance of `Fracs.Rect`
-    // or an HTMLElement.
-
-    // Creates a new instance.
-    Fracs.Fractions = function (rectDocument, rectElement, rectViewport, visible, viewport, possible) {
+    // Fractions
+    // ---------
+    // The heart of the library. Holds the fractions data.
+    // There are two constructors to create this data for a given instance of `Rect`
+    // or an `HTMLElement`.
+    var Fractions = function (rectDocument, rectElement, rectViewport, visible, viewport, possible) {
 
         if (rectDocument && rectElement && rectViewport && visible && viewport && possible) {
             this.rects = {
@@ -258,7 +196,8 @@
         }
     };
 
-    Fracs.Fractions.prototype = {
+    // ### Prototype
+    extend(Fractions.prototype, {
 
         // Checks if this instance equals `that` in all attributes.
         equals: function (that) {
@@ -269,327 +208,192 @@
         // Checks if this instance equals `that` in all fraction attributes.
         fracsEqual: function (that) {
 
-            if (!(that instanceof Fracs.Fractions)) {
-                return false;
-            }
-
-            return this.visible === that.visible && this.viewport === that.viewport && this.possible === that.possible;
+            return equal(this, that, ['visible', 'viewport', 'possible']);
         },
 
         // Checks if this instance equals `that` in all rectangle attributes.
         rectsEqual: function (that) {
 
-            if (!(that instanceof Fracs.Fractions)) {
-                return false;
-            }
-
-            if (!this.rects || !that.rects) {
-                return this.rects === that.rects;
-            }
-            return this.rects.document.equals(that.rects.document) &&
-                this.rects.element.equals(that.rects.element) &&
-                this.rects.viewport.equals(that.rects.viewport);
+            return equal(this.rects, that.rects, ['document', 'element', 'viewport']);
         }
-    };
+    });
 
-    Fracs.Fractions.ofRect = function (rect, viewport) {
+    // ### Static methods
+    extend(Fractions, {
 
-        var intersection, intersectionElementSpace, intersectionViewportSpace, intersectionArea, possibleArea;
+        // Returns a new instance of `Fractions` for the given `rect: Rect`
+        // and `viewport: Rect`.
+        // `viewport` defaults to `Rect.ofViewport()`.
+        ofRect: function (rect, viewport) {
 
-        viewport = viewport || Fracs.Rect.ofViewport();
-        intersection = rect && rect.intersection(viewport);
+            var intersection, intersectionArea, possibleArea;
 
-        if (!intersection) {
-            return new Fracs.Fractions();
-        }
+            viewport = viewport || Rect.ofViewport();
+            intersection = rect && rect.intersection(viewport);
 
-        intersectionElementSpace = new Fracs.Rect(intersection.left - rect.left, intersection.top - rect.top, intersection.width, intersection.height);
-        intersectionViewportSpace = new Fracs.Rect(intersection.left - viewport.left, intersection.top - viewport.top, intersection.width, intersection.height);
-        intersectionArea = intersection.area();
-        possibleArea = Math.min(rect.width, viewport.width) * Math.min(rect.height, viewport.height);
-
-        return new Fracs.Fractions(
-            intersection,
-            intersectionElementSpace,
-            intersectionViewportSpace,
-            intersectionArea / rect.area(),
-            intersectionArea / viewport.area(),
-            intersectionArea / possibleArea
-       );
-    };
-
-    Fracs.Fractions.ofElement = function (element, viewport) {
-
-        return Fracs.Fractions.ofRect(Fracs.Rect.ofElement(element), viewport);
-    };
-
-
-
-    // Fracs.Element
-    // ------------
-
-    // Creates a new instance.
-    Fracs.Element = function (element) {
-
-        this.el = element;
-
-        this.fracs = null;
-        this.prevFracs = null;
-        this.rect = null;
-        this.prevRect = null;
-
-        // Init the attributes.
-        this.update();
-    };
-
-    Fracs.Element.prototype = {
-
-        // Checks if this instance equals `that` in the represented HTML element.
-        equals: function (that) {
-
-            if (!(that instanceof Fracs.Element)) {
-                return false;
+            if (!intersection) {
+                return new Fractions();
             }
 
-            return this.el === that.el;
+            intersectionArea = intersection.area();
+            possibleArea = mathMin(rect.width, viewport.width) * mathMin(rect.height, viewport.height);
+
+            return new Fractions(
+                intersection,
+                intersection.relativeTo(rect),
+                intersection.relativeTo(viewport),
+                intersectionArea / rect.area(),
+                intersectionArea / viewport.area(),
+                intersectionArea / possibleArea
+           );
         },
 
-        update: function (viewport) {
+        // Returns a new instance of `Fractions` for the given `element: HTMLElement`
+        // and `viewport: Rect`.
+        ofElement: function (element, viewport) {
 
-            var fracs = Fracs.Fractions.ofElement(this.el, viewport),
-                rect = Fracs.Rect.ofElement(this.el),
-                changed = false;
-
-            if (!this.fracs || !this.fracs.equals(fracs)) {
-                this.prevFracs = this.fracs;
-                this.fracs = fracs;
-                changed = true;
-            }
-            if (!this.rect || !this.rect.equals(rect)) {
-                this.prevRect = this.rect;
-                this.rect = rect;
-                changed = true;
-            }
-            return changed;
+            return Fractions.ofRect(Rect.ofElement(element), viewport);
         }
+    });
+
+
+
+    // Group
+    // -----
+    var Group = function (htmlElements) {
+
+        this.els = htmlElements;
     };
 
+    // ### Helpers
+
+        // Accepted values for `property` parameters below.
+    var rectProps = ['width', 'height', 'left', 'right', 'top', 'bottom'],
+        fracsProps = ['possible', 'visible', 'viewport'],
+
+        // Returns the specified `property` for `HTMLElement element` or `0`
+        // if `property` is invalid.
+        getValue = function (element, property) {
+
+            if ($.inArray(property, rectProps) >= 0) {
+                return Rect.ofElement(element)[property];
+            } else if ($.inArray(property, fracsProps) >= 0) {
+                return Fractions.ofElement(element)[property];
+            }
+            return 0;
+        },
+
+        // Sorting functions.
+        sortAscending = function (entry1, entry2) {
+
+            return entry1.val - entry2.val;
+        },
+        sortDescending = function (entry1, entry2) {
+
+            return entry2.val - entry1.val;
+        };
+
+    // ### Prototype
+    extend(Group.prototype, {
+
+        // Returns a sorted list of objects `{el: HTMLElement, val: Number}`
+        // for the specified `property`. `descending` defaults to `false`.
+        sorted: function (property, descending) {
+
+            return $.map(this.els, function (element) {
+
+                        return {
+                            el: element,
+                            val: getValue(element, property)
+                        };
+                    })
+                    .sort(descending ? sortDescending : sortAscending);
+        },
+
+        // Returns the first element of the sorted list returned by `sorted` above,
+        // or `null` if this list is empty.
+        best: function (property, descending) {
+
+            return this.els.length ? this.sorted(property, descending)[0] : null;
+        }
+    });
 
 
-    // Fracs.Group
+
+    // ScrollState
     // -----------
+    var ScrollState = function (element) {
 
-    // Creates a new instance.
-    Fracs.Group = function (htmlElements) {
+        var doc = Rect.ofDocument(element),
+            vp = Rect.ofViewport(element),
+            w = doc.width - vp.width,
+            h = doc.height - vp.height;
 
-        this.elements = this._htmlElementsToElements(htmlElements);
+        this.el = element || window;
+        this.content = doc;
+        this.viewport = vp;
+        this.width = w <= 0 ? null : vp.left / w;
+        this.height = h <= 0 ? null : vp.top / h;
+        this.left = vp.left;
+        this.top = vp.top;
+        this.right = doc.right - vp.right;
+        this.bottom = doc.bottom - vp.bottom;
     };
 
-    Fracs.Group.prototype = {
-        _fracsProps: ['possible', 'visible', 'viewport'],
-        _rectProps: ['width', 'height', 'left', 'right', 'top', 'bottom'],
-        _propertyType: function (property) {
-
-            if ($.inArray(property, this._fracsProps) >= 0) {
-                return 'fracs';
-            } else if ($.inArray(property, this._rectProps) >= 0) {
-                return 'rect';
-            }
-        },
-        _betterMax: function (value, bestValue) {
-
-            return value > bestValue;
-        },
-        _betterMin: function (value, bestValue) {
-
-            return value < bestValue;
-        },
-        _best: function (property, betterFn) {
-
-            var bestElements,
-                bestValue = null,
-                type = this._propertyType(property);
-
-            if (!type) {
-                return {elements: [], value: null};
-            }
-
-            $.each(this.elements, function (idx, element) {
-
-                var value;
-
-                element.update();
-                value = type === 'fracs' ? element.fracs[property] : element.rect[property];
-
-                if (bestValue === null || betterFn(value, bestValue)) {
-                    bestElements = [element];
-                    bestValue = value;
-                } else if (value === bestValue) {
-                    bestElements.push(element);
-                }
-            });
-
-            return {elements: bestElements, value: bestValue};
-        },
-        _htmlElementsToElements: function (htmlElements) {
-
-            return $.map(htmlElements, function (htmlElement) {
-                return new Fracs.Element(htmlElement);
-            });
-        },
-        _elementsToHtmlElements: function (elements) {
-
-            return $.map(elements, function (element) {
-                return element.element;
-            });
-        },
-        max: function (property, asHTMLElements) {
-
-            var result = this._best(property, this._betterMax);
-
-            return asHTMLElements === true ? this._elementsToHtmlElements(result.elements) : result;
-        },
-        min: function (property, asHTMLElements) {
-
-            var result = this._best(property, this._betterMin);
-
-            return asHTMLElements === true ? this._elementsToHtmlElements(result.elements) : result;
-        }
-    };
-
-
-
-    // Fracs.Cursor
-    // ------------
-
-    // Creates a new instance of `Fracs.Cursor`.
-    Fracs.Cursor = function (distX, distY) {
-
-        this.distX = distX;
-        this.distY = distY;
-        this.distMin = Math.min(distX, distY);
-        this.distMax = Math.max(distX, distY);
-    };
-
-    Fracs.Cursor.prototype = {
+    // ### Prototype
+    extend(ScrollState.prototype, {
 
         // Checks if this instance equals `that`.
         equals: function (that) {
 
-            if (!(that instanceof Fracs.Cursor)) {
-                return false;
-            }
+            return equal(this, that, ['el', 'width', 'height', 'left', 'top', 'right', 'bottom', 'content', 'viewport']);
+        }
+    });
 
-            return this.distX === that.distX && this.distY === that.distY;
+    // ### Static methods
+    extend(ScrollState, {
+
+        scrollTo: function (left, top, duration) {
+
+            left = left || 0;
+            top = top || 0;
+            duration = isNaN(duration) ? 1000 : duration;
+
+            $htmlBody.stop(true).animate({scrollLeft: left, scrollTop: top}, duration);
         },
-        dist: function () {
 
-            return Math.sqrt(this.distX * this.distX + this.distY * this.distY);
+        scroll: function (left, top, duration) {
+
+            left = left || 0;
+            top = top || 0;
+
+            ScrollState.scrollTo($window.scrollLeft() + left, $window.scrollTop() + top, duration);
+        },
+
+        scrollToRect: function (rect, paddingLeft, paddingTop, duration) {
+
+            paddingLeft = paddingLeft || 0;
+            paddingTop = paddingTop || 0;
+
+            ScrollState.scrollTo(rect.left - paddingLeft, rect.top - paddingTop, duration);
+        },
+
+        scrollToElement: function (element, paddingLeft, paddingTop, duration) {
+
+            var rect = Rect.ofElement(element);
+
+            ScrollState.scrollToRect(rect, paddingLeft, paddingTop, duration);
         }
-    };
-
-    Fracs.Cursor.ofRect = function (cursorX, cursorY, rect) {
-
-        var x = cursorX < rect.left ? rect.left - cursorX : (cursorX > rect.right ? cursorX - rect.right : 0),
-            y = cursorY < rect.top ? rect.top - cursorY : (cursorY > rect.bottom ? cursorY - rect.bottom : 0);
-
-        return new Fracs.Cursor(x, y);
-    };
-
-    Fracs.Cursor.ofElement = function (cursorX, cursorY, element) {
-
-        return Fracs.Cursor.ofRect(cursorX, cursorY, Fracs.Rect.ofElement(element));
-    };
+    });
 
 
 
-    // Fracs.ScrollState
-    // -----------------
-
-    // Creates a new instance of `Fracs.ScrollState`.
-    Fracs.ScrollState = function (width, height, left, top, right, bottom) {
-
-        if (isAnyUndefined(width, height, left, top, right, bottom)) {
-            var doc = Fracs.Rect.ofDocument(),
-                vp = Fracs.Rect.ofViewport(),
-                w = doc.width - vp.width,
-                h = doc.height - vp.height;
-
-            this.width = w <= 0 ? null : vp.left / w;
-            this.height = h <= 0 ? null : vp.top / h;
-            this.left = vp.left;
-            this.top = vp.top;
-            this.right = doc.right - vp.right;
-            this.bottom = doc.bottom - vp.bottom;
-        } else {
-            this.width = width;
-            this.height = height;
-            this.left = left;
-            this.top = top;
-            this.right = right;
-            this.bottom = bottom;
-        }
-    };
-
-    Fracs.ScrollState.prototype = {
-
-        // Checks if this instance equals `that`.
-        equals: function (that) {
-
-            if (!(that instanceof Fracs.ScrollState)) {
-                return false;
-            }
-
-            return this.width === that.width && this.height === that.height &&
-                this.left === that.left && this.top === that.top &&
-                this.right === that.right && this.bottom === that.bottom;
-        }
-    };
-
-    Fracs.ScrollState.scrollTo = function (left, top, duration) {
-
-        left = left || 0;
-        top = top || 0;
-        duration = isNaN(duration) ? 1000 : duration;
-
-        $htmlBody.stop(true).animate({scrollLeft: left, scrollTop: top}, duration);
-    };
-
-    Fracs.ScrollState.scroll = function (left, top, duration) {
-
-        left = left || 0;
-        top = top || 0;
-
-        Fracs.ScrollState.scrollTo($window.scrollLeft() + left, $window.scrollTop() + top, duration);
-    };
-
-    Fracs.ScrollState.scrollToRect = function (rect, paddingLeft, paddingTop, duration) {
-
-        paddingLeft = paddingLeft || 0;
-        paddingTop = paddingTop || 0;
-
-        Fracs.ScrollState.scrollTo(rect.left - paddingLeft, rect.top - paddingTop, duration);
-    };
-
-    Fracs.ScrollState.scrollToElement = function (element, paddingLeft, paddingTop, duration) {
-
-        var rect = Fracs.Rect.ofElement(element);
-
-        Fracs.ScrollState.scrollToRect(rect, paddingLeft, paddingTop, duration);
-    };
-
-
-
-
-
-    // Fracs.Outline
-    // -------------
+    // Outline
+    // -------
     // Quick and dirty.
+    var Outline = function (canvas, options) {
 
-    // Constructor.
-    Fracs.Outline = function (canvas, options) {
-
-        if (!canvas.nodeName || canvas.nodeName.toLowerCase() !== 'canvas') {
+        if (!canvas || canvas.nodeName !== 'CANVAS') {
             return null;
         }
 
@@ -603,17 +407,8 @@
                     selector: 'header,footer,section,article',
                     fillStyle: 'rgb(230,230,230)'
                 }, {
-                    selector: 'h1',
+                    selector: 'h1,h2,h3,h4',
                     fillStyle: 'rgb(255,144,55)'
-                }, {
-                    selector: 'h2',
-                    fillStyle: 'rgb(221,75,57)'
-                }, {
-                    selector: 'h3',
-                    fillStyle: 'rgb(108,196,46)'
-                }, {
-                    selector: 'h4',
-                    fillStyle: 'rgb(53,122,232)'
                 }],
                 viewportStyle: {
                     fillStyle: 'rgba(255,144,55,0.3)'
@@ -623,7 +418,7 @@
                 },
                 invertViewport: false
             },
-            settings = $.extend({}, defaults, options),
+            settings = extend({}, defaults, options),
             $canvas = $(canvas),
             width = $canvas.attr('width'),
             height = $canvas.attr('height'),
@@ -652,7 +447,7 @@
                 if (strokeStyle) {
                     context.beginPath();
                     context.rect(rect.left, rect.top, rect.width, rect.height);
-                    context.lineWidth = scale ? Math.max(strokeWidth, 0.2 / scale) : strokeWidth;
+                    context.lineWidth = scale ? mathMax(strokeWidth, 0.2 / scale) : strokeWidth;
                     context.strokeStyle = strokeStyle;
                     context.stroke();
                 }
@@ -660,7 +455,7 @@
             drawElement = function (element, strokeWidth, strokeStyle, fillStyle) {
 
                 var $element = $(element),
-                    rect = Fracs.Rect.ofElement(element);
+                    rect = Rect.ofElement(element);
 
                 if (!rect || rect.width === 0 || rect.height === 0 || $element.css('visibility') === 'hidden') {
                     return;
@@ -687,9 +482,9 @@
             },
             draw = function () {
 
-                docRect = Fracs.Rect.ofDocument();
-                vpRect = Fracs.Rect.ofViewport();
-                scale = Math.min(width / docRect.width, height / docRect.height);
+                docRect = Rect.ofDocument();
+                vpRect = Rect.ofViewport();
+                scale = mathMin(width / docRect.width, height / docRect.height);
 
                 if (settings.crop) {
                     $canvas.attr('width', docRect.width * scale).attr('height', docRect.height * scale);
@@ -704,11 +499,11 @@
             },
             onDrag = function (event) {
 
-                var r = $canvas.fracs('rect'),
+                var r = Rect.ofElement(canvas),
                     x = event.pageX - r.left,
                     y = event.pageY - r.top;
 
-                Fracs.ScrollState.scrollTo(x / scale - vpRect.width * focusWidth, y / scale - vpRect.height * focusHeight, settings.duration);
+                ScrollState.scrollTo(x / scale - vpRect.width * focusWidth, y / scale - vpRect.height * focusHeight, settings.duration);
             },
             onDragEnd = function (event) {
 
@@ -724,7 +519,7 @@
 
                 var r;
                 if (settings.autoFocus) {
-                    r = $canvas.fracs('rect');
+                    r = Rect.ofElement(canvas);
                     focusWidth = (((event.pageX - r.left) / scale) - vpRect.left) / vpRect.width;
                     focusHeight = (((event.pageY - r.top) / scale) - vpRect.top) / vpRect.height;
                 }
@@ -760,30 +555,31 @@
     // Callbacks
     // =========
 
-    // Fracs.FracsCallbacks
-    // --------------------
+    // callbacks mix-in
+    // ----------------
+    // Expects `context: HTMLElement` and `updatedValue: function`.
+    var callbacksMixIn = {
 
-    // Constructor.
-    Fracs.FracsCallbacks = function (element) {
+        // Initial setup.
+        init: function () {
 
-        this.callbacks = $.Callbacks('memory unique');
+            this.callbacks = $.Callbacks('memory unique');
+            this.currVal = null;
+            this.prevVal = null;
 
-        this.el = element;
-        this.currVal = null;
-        this.prevVal = null;
+            // A proxy to make `check` bindable to events.
+            this.checkProxy = $.proxy(this.check, this);
 
-        // A proxy to make `check` bindable to events.
-        this.checkProxy = $.proxy(this.check, this);
+            this.autoCheck();
+        },
 
-        // Start automated checking for changes.
-        this.autoCheck();
-    };
-
-    Fracs.FracsCallbacks.prototype = {
+        // Adds a new callback function.
         bind: function (callback) {
 
             this.callbacks.add(callback);
         },
+
+        // Removes a previously added callback function.
         unbind: function (callback) {
 
             if (callback) {
@@ -792,138 +588,11 @@
                 this.callbacks.empty();
             }
         },
+
+        // Triggers all callbacks with the current values.
         trigger: function () {
 
-            this.callbacks.fireWith(this.el, [this.currVal, this.prevVal]);
-        },
-
-        // Checks if value changed, updates attributes `currVal` and
-        // `prevVal` accordingly and triggers the callbacks. Returns
-        // `true` if value changed, otherwise `false`.
-        check: function () {
-
-            var value = this.el instanceof Fracs.Rect ? Fracs.Fractions.ofRect(this.el) : Fracs.Fractions.ofElement(this.el);
-
-            if (this.currVal && this.currVal.equals(value)) {
-                return false;
-            }
-
-            this.prevVal = this.currVal;
-            this.currVal = value;
-            this.trigger();
-            return true;
-        },
-
-        // Enables/disables automated checking for changes on `window`
-        // `load`, `resize` and `scroll` events.
-        autoCheck: function (on) {
-
-            $window[on === false ? 'off' : 'on']('resize scroll load', this.checkProxy);
-        }
-    };
-
-
-
-    // Fracs.GroupCallbacks
-    // --------------------
-
-    // Constructor.
-    Fracs.GroupCallbacks = function (htmlElements, type, property) {
-
-        this.callbacks = $.Callbacks('memory unique');
-
-        this.group = new Fracs.Group(htmlElements);
-        this.type = type;
-        this.property = property;
-
-        this.currVal = null;
-        this.prevVal = null;
-
-        this.checkProxy = $.proxy(this.check, this);
-        this.autoCheck();
-    };
-
-    Fracs.GroupCallbacks.prototype = {
-        bind: function (callback) {
-
-            this.callbacks.add(callback);
-        },
-        unbind: function (callback) {
-
-            if (callback) {
-                this.callbacks.remove(callback);
-            } else {
-                this.callbacks.empty();
-            }
-        },
-        trigger: function () {
-
-            this.callbacks.fireWith(this.group, [this.currVal, this.prevVal]);
-        },
-
-        // Checks if value changed, updates attributes `currVal` and
-        // `prevVal` accordingly and triggers the callbacks. Returns
-        // `true` if value changed, otherwise `false`.
-        check: function () {
-
-            var result = this.group[this.type](this.property),
-                value = result.elements.length === 0 || result.value === 0 ? null : result.elements[0];
-
-            if (this.currVal === value) {
-                return false;
-            }
-
-            this.prevVal = this.currVal;
-            this.currVal = value;
-            this.trigger();
-            return true;
-        },
-
-        // Enables/disables automated checking for changes on `window`
-        // `load`, `resize` and `scroll` events.
-        autoCheck: function (on) {
-
-            $window[on === false ? 'off' : 'on']('resize scroll load', this.checkProxy);
-        }
-    };
-
-
-
-    // Fracs.CursorCallbacks
-    // ---------------------
-
-    // Constructor.
-    Fracs.CursorCallbacks = function (element) {
-
-        this.callbacks = $.Callbacks('memory unique');
-
-        this.el = element || window;
-        this.currVal = null;
-        this.prevVal = null;
-
-        // A proxy to make `check` bindable to events.
-        this.checkProxy = $.proxy(this.check, this);
-
-        // Start automated checking for changes.
-        this.autoCheck();
-    };
-
-    Fracs.CursorCallbacks.prototype = {
-        bind: function (callback) {
-
-            this.callbacks.add(callback);
-        },
-        unbind: function (callback) {
-
-            if (callback) {
-                this.callbacks.remove(callback);
-            } else {
-                this.callbacks.empty();
-            }
-        },
-        trigger: function () {
-
-            this.callbacks.fireWith(this.el, [this.currVal, this.prevVal]);
+            this.callbacks.fireWith(this.context, [this.currVal, this.prevVal]);
         },
 
         // Checks if value changed, updates attributes `currVal` and
@@ -931,9 +600,9 @@
         // `true` if value changed, otherwise `false`.
         check: function (event) {
 
-            var value = Fracs.Cursor.ofElement(event.pageX, event.pageY, this.el);
+            var value = this.updatedValue(event);
 
-            if (this.currVal && this.currVal.equals(value)) {
+            if (value === undefined) {
                 return false;
             }
 
@@ -943,281 +612,593 @@
             return true;
         },
 
-        // Enables/disables automated checking for changes on `window`
-        // `cursormove` events.
+        // Auto-check configuration.
+        $autoTarget: $window,
+        autoEvents: 'load resize scroll',
+
+        // Enables/disables automated checking for changes on the specified `window`
+        // events.
         autoCheck: function (on) {
 
-            $window[on === false ? 'off' : 'on']('cursormove', this.checkProxy);
+            this.$autoTarget[on === false ? 'off' : 'on'](this.autoEvents, this.checkProxy);
         }
     };
 
 
 
-    // Fracs.ScrollStateCallbacks
-    // --------------------------
+    // FracsCallbacks
+    // --------------
+    var FracsCallbacks = function (element) {
 
-    // Constructor.
-    Fracs.ScrollStateCallbacks = function (element) {
-
-        this.callbacks = $.Callbacks('memory unique');
-
-        this.el = element || window;
-        this.currVal = null;
-        this.prevVal = null;
-
-        // A proxy to make `check` bindable to events.
-        this.checkProxy = $.proxy(this.check, this);
-
-        // Start automated checking for changes.
-        this.autoCheck();
+        this.context = element;
+        this.init();
     };
 
-    Fracs.ScrollStateCallbacks.prototype = {
-        bind: function (callback) {
+    // ### Prototype
+    extend(FracsCallbacks.prototype, callbacksMixIn, {
+        updatedValue: function () {
 
-            this.callbacks.add(callback);
-        },
-        unbind: function (callback) {
+            var value = isInstanceOf(this.context, Rect) ? Fractions.ofRect(this.context) : Fractions.ofElement(this.context);
 
-            if (callback) {
-                this.callbacks.remove(callback);
-            } else {
-                this.callbacks.empty();
+            if (!this.currVal || !this.currVal.equals(value)) {
+                return value;
             }
-        },
-        trigger: function () {
-
-            this.callbacks.fireWith(this.el, [this.currVal, this.prevVal]);
-        },
-
-        // Checks if value changed, updates attributes `currVal` and
-        // `prevVal` accordingly and triggers the callbacks. Returns
-        // `true` if value changed, otherwise `false`.
-        check: function () {
-
-            var value = new Fracs.ScrollState();
-
-            if (this.currVal && this.currVal.equals(value)) {
-                return false;
-            }
-
-            this.prevVal = this.currVal;
-            this.currVal = value;
-            this.trigger();
-            return true;
-        },
-
-        // Enables/disables automated checking for changes on `window`
-        // `load`, `resize` and `scroll` events.
-        autoCheck: function (on) {
-
-            $window[on === false ? 'off' : 'on']('resize scroll load', this.checkProxy);
         }
+    });
+
+
+
+    // GroupCallbacks
+    // --------------
+    var GroupCallbacks = function (htmlElements, property, descending) {
+
+        this.context = new Group(htmlElements);
+        this.property = property;
+        this.descending = descending;
+        this.init();
+    };
+
+    // ### Prototype
+    extend(GroupCallbacks.prototype, callbacksMixIn, {
+        updatedValue: function () {
+
+            var best = this.context.best(this.property, this.descending);
+
+            if (best) {
+                best = best.val > 0 ? best.el : null;
+                if (this.currVal !== best) {
+                    return best;
+                }
+            }
+        }
+    });
+
+
+
+    // ScrollStateCallbacks
+    // --------------------
+    var ScrollStateCallbacks = function (element) {
+
+        if (!element || element === window || element === document) {
+            this.context = window;
+        } else {
+            this.context = element;
+            this.$autoTarget = $(element);
+        }
+        this.init();
+    };
+
+    // ### Prototype
+    extend(ScrollStateCallbacks.prototype, callbacksMixIn, {
+        updatedValue: function () {
+
+            var value = new ScrollState(this.context);
+
+            if (!this.currVal || !this.currVal.equals(value)) {
+                return value;
+            }
+        }
+    });
+
+
+
+
+
+    // modplug 0.7
+    // ===========
+
+    // Use <http://larsjung.de/modplug> to attach the plug-in to jQuery.
+    var modplug = function (namespace, options) {
+
+            // Save the initial settings.
+        var settings = extend({}, options),
+
+            // Helper function to apply default methods.
+            applyMethod = function (obj, args, methodName, methods) {
+
+                // If `methodName` is a function apply it to get the actual
+                // method name.
+                methodName = isFn(methodName) ? methodName.apply(obj, args) : methodName;
+
+                // If method exists then apply it and return the result ...
+                if (isFn(methods[methodName])) {
+                    return methods[methodName].apply(obj, args);
+                }
+
+                // ... otherwise raise an error.
+                $.error('Method "' + methodName + '" does not exist on jQuery.' + namespace);
+            },
+
+            // This function gets exposed as `$.<namespace>`.
+            statics = function () {
+
+                // Try to apply a default method.
+                return applyMethod(this, slice.call(arguments), settings.defaultStatic, statics);
+            },
+
+            // This function gets exposed as `$(selector).<namespace>`.
+            methods = function (method) {
+
+                // If `method` exists then apply it ...
+                if (isFn(methods[method])) {
+                    return methods[method].apply(this, slice.call(arguments, 1));
+                }
+
+                // ... otherwise try to apply a default method.
+                return applyMethod(this, slice.call(arguments), settings.defaultMethod, methods);
+            },
+
+            // Adds/overwrites plug-in methods.
+            // This function gets exposed as `$.<namespace>.modplug` to make the plug-in extendable.
+            plug = function (options) {
+
+                if (options) {
+                    extend(statics, options.statics);
+                    extend(methods, options.methods);
+                }
+
+                // Make sure that `$.<namespace>.modplug` points to this function after adding new methods.
+                statics.modplug = plug;
+            };
+
+        // Save objects or methods previously registered to the desired namespace.
+        // They are available via `$.<namespace>.modplug.prev`.
+        plug.prev = {
+            statics: $[namespace],
+            methods: $.fn[namespace]
+        };
+
+        // Init the plug-in by adding the specified statics and methods.
+        plug(options);
+
+        // Register the plug-in.
+        $[namespace] = statics;
+        $.fn[namespace] = methods;
     };
 
 
 
 
 
-    // Register the plugin
+    // Register the plug-in
     // ===================
 
-    // Use <http://larsjung.de/modplug> to attach the plugin to jQuery.
-    //
+        // The namespace used to register the plug-in and to attach
+        // data to elements.
+    var namespace = 'fracs',
+
+        // Single reference to the window scroll state callback functions.
+        scrollStateCbs = new ScrollStateCallbacks();
+
     // The methods are sorted in alphabetical order. All methods that do
     // not provide a return value will return `this` to enable method chaining.
-    modplug('fracs', {
+    modplug(namespace, {
 
-        // These methods will be accessible via `$.fracs.<methodname>`
+        // Static methods
+        // --------------
+        // These methods are accessible via `$.fracs.<methodname>`.
         statics: {
+
+            // Build version.
+            version: '%BUILD_VERSION%',
+
+            // Publish object constructors (for testing).
+            Rect: Rect,
+            Fractions: Fractions,
+            Group: Group,
+            ScrollState: ScrollState,
+            Outline: Outline,
+            FracsCallbacks: FracsCallbacks,
+            GroupCallbacks: GroupCallbacks,
+            ScrollStateCallbacks: ScrollStateCallbacks,
+
+            // ### document
+            // Returns the dimension of the whole document.
+            //
+            //      $.fracs.document(): Rect
             document: function () {
 
-                return Fracs.Rect.ofDocument();
+                return Rect.ofDocument();
             },
+
+            // ### fracs
+            // This is the **default method**. So instead of calling `$.fracs.fracs(...)`
+            // simply call `$.fracs(...)`.
+            //
+            // Returns the fractions for an `Rect` or `HTMLElement` and `viewport`,
+            // viewport defaults to `$.fracs.viewport()`.
+            //
+            //      $.fracs(rect: Rect, [viewport: Rect]): Fractions
+            //      $.fracs(element: HTMLElement, [viewport: Rect]): Fractions
             fracs: function (rect, viewport) {
 
-                return Fracs.Fractions.ofRect(rect, viewport);
+                return isInstanceOf(rect, Rect) ? Fractions.ofRect(rect, viewport) : Fractions.ofElement(rect, viewport);
             },
+
+            // ### rect
+            // Returns the element's dimensions in document space.
+            //
+            //      $.Rect(element: HTMLElement): Rect
             rect: function (element) {
 
-                return Fracs.Rect.ofElement(element);
+                return Rect.ofElement(element);
             },
-            round: function (value, decs) {
 
-                var pow;
-
-                if (isNaN(decs) || decs <= 0) {
-                    return Math.round(value);
-                }
-                pow = Math.pow(10, decs);
-                return Math.round(value * pow) / pow;
-            },
+            // ### scroll
+            // Scrolls the viewport relative to the current position, `duration`
+            // defaults to `1000`.
+            //
+            //      $.fracs.scroll(left: int, top: int, [duration: int])
             scroll: function (left, top, duration) {
 
-                Fracs.ScrollState.scroll(left, top, duration);
+                ScrollState.scroll(left, top, duration);
                 return this;
             },
-            scrollState: function (callback) {
 
-                if (!callback) {
-                    return new Fracs.ScrollState();
+            // ### scrollState
+            // Returns the current scroll state.
+            //
+            //      $.ScrollState(): ScrollState
+            //
+            // Binds a callback function that will be invoked if scroll state has changed
+            // after a `window resize` or `window scroll` event.
+            //
+            //      $.ScrollState(callback(state: ScrollState, prevState: ScrollState)): jQuery
+            //
+            // Unbinds the specified callback function.
+            //
+            //      $.ScrollState('unbind', callback): jQuery
+            //
+            // Unbinds all callback functions.
+            //
+            //      $.ScrollState('unbind'): jQuery
+            scrollState: function (unbind, callback) {
+
+                if (isFn(unbind)) {
+                    callback = unbind;
+                    unbind = null;
                 }
 
-                scrollStateCallbacks = scrollStateCallbacks || new Fracs.ScrollStateCallbacks();
-                scrollStateCallbacks.bind(callback);
-                return this;
+                if (unbind === 'unbind') {
+                    scrollStateCbs.unbind(callback);
+                    return this;
+                } else if (isFn(callback)) {
+                    scrollStateCbs.bind(callback);
+                    return this;
+                }
+
+                return new ScrollState();
             },
+
+            // ### scrollTo
+            // Scrolls the viewport, `duration` defaults to `1000`.
+            //
+            //      $.fracs.scrollTo(left: int, top: int, [duration: int])
             scrollTo: function (left, top, duration) {
 
-                Fracs.ScrollState.scrollTo(left, top, duration);
+                ScrollState.scrollTo(left, top, duration);
                 return this;
             },
+
+            // ### viewport
+            // Returns the current viewport in document space.
+            //
+            //      $.fracs.viewport(): Rect
             viewport: function () {
 
-                return Fracs.Rect.ofViewport();
+                return Rect.ofViewport();
             }
         },
 
-        // These methods will be accessible via `$(selector).fracs('<methodname>', ...)`.
+        // Instance methods
+        // ----------------
+        // These methods are accessible via `$(selector).fracs('<methodname>', ...)`.
         methods: {
-            bind: function (callback) {
 
-                return this.each(function () {
-
-                    var $this = $(this),
-                        fracsCbs = $this.data(dataNs);
-
-                    if (!fracsCbs) {
-                        fracsCbs = new Fracs.FracsCallbacks(this);
-                        $this.data(dataNs, fracsCbs);
-                    }
-                    fracsCbs.bind(callback);
-                });
-            },
-            check: function () {
-
-                return this.each(function () {
-
-                    var fracsCbs = $(this).data(dataNs);
-
-                    if (fracsCbs) {
-                        fracsCbs.check();
-                    }
-                });
-            },
-            cursor: function (callbackOrX, y) {
-
-                if (callbackOrX instanceof Function) {
-                    return this.each(function () {
-
-                        (new Fracs.CursorCallbacks(this)).bind(callbackOrX);
-                    });
-                }
-
-                return Fracs.Cursor.ofElement(callbackOrX, y, this.get(0));
-            },
+            // ### 'envelope'
+            // Returns the smallest rectangle that containes all selected elements.
+            //
+            //      .fracs('envelope'): Rect
             envelope: function () {
 
-                var envelope, rect;
+                var envelope = null,
+                    rect;
 
                 this.each(function () {
-                    rect = Fracs.Rect.ofElement(this);
+                    rect = Rect.ofElement(this);
                     envelope = envelope ? envelope.envelope(rect) : rect;
                 });
                 return envelope;
             },
-            fracs: function () {
 
-                return Fracs.Fractions.ofElement(this.get(0));
+            // ### 'fracs'
+            // This is the **default method**. So the first parameter `'fracs'`
+            // can be omitted.
+            //
+            // Returns the fractions for the first selected element.
+            //
+            //      .fracs(): Fractions
+            //
+            // Binds a callback function that will be invoked if fractions have changed
+            // after a `window resize` or `window scroll` event.
+            //
+            //      .fracs(callback(fracs: Fractions, prevFracs: Fractions)): jQuery
+            //
+            // Unbinds the specified callback function.
+            //
+            //      .fracs('unbind', callback): jQuery
+            //
+            // Unbinds all callback functions.
+            //
+            //      .fracs('unbind'): jQuery
+            //
+            // Checks if fractions changed and if so invokes all bound callback functions.
+            //
+            //      .fracs('check'): jQuery
+            fracs: function (action, callback) {
+
+                var ns = namespace + '.fracs';
+
+                if (isFn(action)) {
+                    callback = action;
+                    action = null;
+                }
+
+                if (action === 'unbind') {
+                    return this.each(function () {
+
+                        var cbs = $(this).data(ns);
+
+                        if (cbs) {
+                            cbs.unbind(callback);
+                        }
+                    });
+                } else if (action === 'check') {
+                    return this.each(function () {
+
+                        var cbs = $(this).data(ns);
+
+                        if (cbs) {
+                            cbs.check();
+                        }
+                    });
+                } else if (isFn(callback)) {
+                    return this.each(function () {
+
+                        var $this = $(this),
+                            cbs = $this.data(ns);
+
+                        if (!cbs) {
+                            cbs = new FracsCallbacks(this);
+                            $this.data(ns, cbs);
+                        }
+                        cbs.bind(callback);
+                    });
+                }
+
+                return Fractions.ofElement(this[0]);
             },
+
+            // ### 'max'
+            // Reduces the set of selected elements to those with the maximum value
+            // of the specified property.
+            // Valid values for property are `possible`, `visible`, `viewport`,
+            // `width`, `height`, `left`, `right`, `top`, `bottom`.
+            //
+            //      .fracs('max', property: String): jQuery
+            //
+            // Binds a callback function to the set of selected elements that gets
+            // triggert whenever the element with the highest value of the specified
+            // property changes.
+            //
+            //      .fracs('max', property: String, callback(best: Element, prevBest: Element)): jQuery
             max: function (property, callback) {
 
                 if (callback) {
-                    (new Fracs.GroupCallbacks(this, 'max', property)).bind(callback);
+                    new GroupCallbacks(this, property, true).bind(callback);
                     return this;
                 }
 
-                return $((new Fracs.Group(this)).maxHtmlElements(property));
+                return $(new Group(this).best(property, true).el);
             },
+
+            // ### 'min'
+            // Reduces the set of selected elements to those with the minimum value
+            // of the specified property.
+            // Valid values for property are `possible`, `visible`, `viewport`,
+            // `width`, `height`, `left`, `right`, `top`, `bottom`.
+            //
+            //      .fracs('min', property: String): jQuery
+            //
+            // Binds a callback function to the set of selected elements that gets
+            // triggert whenever the element with the lowest value of the specified
+            // property changes.
+            //
+            //      .fracs('min', property: String, callback(best: Element, prevBest: Element)): jQuery
             min: function (property, callback) {
 
                 if (callback) {
-                    (new Fracs.GroupCallbacks(this, 'min', property)).bind(callback);
+                    new GroupCallbacks(this, property).bind(callback);
                     return this;
                 }
 
-                return $(new Fracs.Group(this).minHtmlElements(property));
+                return $(new Group(this).best(property).el);
             },
-            outline: function (options) {
 
-                return this.each(function () {
+            // ### 'outline'
+            // Generates a document outline in a selected canvas. Will be redrawn on every window
+            // resize and scroll event.
+            //
+            //      .fracs('outline', [options: OutlineOptions]): jQuery
+            //
+            // Manually trigger a redraw
+            //
+            //      .fracs('outline', 'redraw'): jQuery
+            outline: function (action) {
 
-                    var outline;
+                var ns = namespace + '.outline';
 
-                    if (options === 'redraw') {
-                        outline = $(this).data(dataNs + '.outline');
+                if (action === 'redraw') {
+                    return this.each(function () {
+
+                        var outline = $(this).data(ns);
                         if (outline) {
                             outline.redraw();
                         }
-                    } else {
-                        outline = new Fracs.Outline(this, options);
-                        if (outline) {
-                            $(this).data(dataNs + '.outline', outline);
+                    });
+                } else {
+                    return this.each(function () {
+
+                        var outline = $(this).data(ns);
+                        if (!outline) {
+                            outline = new Outline(this, action);
+                            if (outline) {
+                                $(this).data(ns, outline);
+                            }
                         }
-                    }
-                });
+                    });
+                }
             },
+
+            // ### 'rect'
+            // Returns the dimensions for the first selected element in document space.
+            //
+            //      .fracs('rect'): Rect
             rect: function () {
 
-                return Fracs.Rect.ofElement(this.get(0));
+                return Rect.ofElement(this[0]);
             },
+
+            // ### 'scrollState'
+            // Returns the current scroll state for the first selected element.
+            //
+            //      .fracs('scrollState'): ScrollState
+            //
+            // Binds a callback function that will be invoked if scroll state has changed
+            // after a `resize` or `scroll` event.
+            //
+            //      .fracs('scrollState', callback(scrollState: scrollState, prevScrollState: scrollState)): jQuery
+            //
+            // Unbinds the specified callback function.
+            //
+            //      .fracs('scrollState', 'unbind', callback): jQuery
+            //
+            // Unbinds all callback functions.
+            //
+            //      .fracs('scrollState', 'unbind'): jQuery
+            //
+            // Checks if scroll state changed and if so invokes all bound callback functions.
+            //
+            //      .fracs('scrollState', 'check'): jQuery
+            scrollState: function (action, callback) {
+
+                var ns = namespace + '.scrollState';
+
+                if (isFn(action)) {
+                    callback = action;
+                    action = null;
+                }
+
+                if (action === 'unbind') {
+                    return this.each(function () {
+
+                        var cbs = $(this).data(ns);
+
+                        if (cbs) {
+                            cbs.unbind(callback);
+                        }
+                    });
+                } else if (action === 'check') {
+                    return this.each(function () {
+
+                        var cbs = $(this).data(ns);
+
+                        if (cbs) {
+                            cbs.check();
+                        }
+                    });
+                } else if (isFn(callback)) {
+                    return this.each(function () {
+
+                        var $this = $(this),
+                            cbs = $this.data(ns);
+
+                        if (!cbs) {
+                            cbs = new ScrollStateCallbacks(this);
+                            $this.data(ns, cbs);
+                        }
+                        cbs.bind(callback);
+                    });
+                }
+
+                return new ScrollState(this[0]);
+            },
+
+            // ### 'scrollTo'
+            // Scrolls the viewport (window) to the first selected element in the specified time,
+            // `padding` defaults to `0`, `duration` to `1000`.
+            //
+            //      .fracs('scrollTo', [paddingLeft: int,] [paddingTop: int,] [duration: int]): jQuery
+            scrollTo: function (paddingLeft, paddingTop, duration) {
+
+                ScrollState.scrollToElement(this[0], paddingLeft, paddingTop, duration);
+                return this;
+            },
+
+            // ### 'softLink'
+            // Converts all selected page intern links `<a href="#...">` into soft links.
+            // Uses `scrollTo` to scroll to the location.
+            //
+            //      .fracs('softLink', [paddingLeft: int,] [paddingTop: int,] [duration: int]): jQuery
             softLink: function (paddingLeft, paddingTop, duration) {
 
                 return this.filter('a[href^=#]').each(function () {
                     var $a = $(this);
                     $a.click(function () {
-                        Fracs.ScrollState.scrollToElement($($a.attr('href')).get(0), paddingLeft, paddingTop, duration);
+                        ScrollState.scrollToElement($($a.attr('href'))[0], paddingLeft, paddingTop, duration);
                     });
                 });
             },
-            scrollTo: function (paddingLeft, paddingTop, duration) {
 
-                Fracs.ScrollState.scrollToElement(this.get(0), paddingLeft, paddingTop, duration);
-                return this;
-            },
-            unbind: function (callback) {
+            // ### 'sort'
+            // Sorts the set of selected elements by the specified property.
+            // Valid values for property are `possible`, `visible`, `viewport`,
+            // `width`, `height`, `left`, `right`, `top`, `bottom`. The default
+            // sort order is descending.
+            //
+            //      .fracs('sort', property: String, [ascending: boolean]): jQuery
+            sort: function (property, ascending) {
 
-                return this.each(function () {
-
-                    var $this = $(this),
-                        fracsCbs = $this.data(dataNs);
-
-                    if (fracsCbs) {
-                        fracsCbs.unbind(callback);
-                    }
-                });
+                return $($.map(new Group(this).sorted(property, !ascending), function (entry) {
+                    return entry.el;
+                }));
             }
         },
 
-        defaultStatic: function () {
-
-            // `$.fracs(...)` gets mapped to `$.fracs.fracs(...)`.
-            return 'fracs';
-        },
-
-        defaultMethod: function (arg) {
-
-            // `$(selector).fracs()` gets mapped to `$(selector).fracs('fracs')`.
-            if (arguments.length === 0) {
-                return 'fracs';
-            }
-
-            // `$(selector).fracs(function)` gets mapped to `$(selector).fracs('bind', function)`.
-            if (arg instanceof Function) {
-                return 'bind';
-            }
-        }
+        // Defaults
+        // --------
+        defaultStatic: 'fracs',
+        defaultMethod: 'fracs'
     });
-
 
 })(window, document, jQuery);

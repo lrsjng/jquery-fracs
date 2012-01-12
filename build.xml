@@ -5,8 +5,6 @@
     default="release"
 >
 
-    <import file="wepp.ant.xml" />
-
     <target name="init">
         <property file="build.properties" />
         <tstamp>
@@ -21,7 +19,7 @@
         <delete dir="${release.dir}" />
     </target>
 
-    <target name="build-prepare" depends="clean">
+    <target name="build" depends="clean">
         <mkdir dir="${build.dir}" />
         <copy todir="${build.dir}">
             <fileset dir="${src.dir}" />
@@ -34,49 +32,47 @@
             <replacefilter token="%BUILD_VERSION%" value="${project.version}" />
             <replacefilter token="%BUILD_STAMP%" value="${build.stamp}" />
         </replace>
-    </target>
 
-    <target name="build" depends="build-prepare">
         <copy file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/${project.name}-${project.version}.js" />
-        <wepp file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/${project.name}-${project.version}.min.js" />
-        <delete file="${build.dir}/jquery.fracs.js" />
+        <uglifyjs file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/${project.name}-${project.version}.min.js" />
 
         <exec executable="${tool.docco}" dir="${build.dir}" failonerror="true">
             <arg value="${project.name}-${project.version}.js" />
         </exec>
-
-        <!-- demo -->
-        <wepp.dir dir="${build.dir}/demo/css" args="--nc" />
-        <wepp.dir dir="${build.dir}/demo/js" args="--nc" />
-        <copy file="${build.dir}/${project.name}-${project.version}.js" tofile="${build.dir}/demo/js/jquery.fracs.js" />
-
-        <!-- test -->
-        <copy file="${build.dir}/${project.name}-${project.version}.js" tofile="${build.dir}/test/jquery.fracs.js" />
     </target>
 
     <target name="release" depends="build">
         <mkdir dir="${release.dir}" />
         <zip destfile="${release.dir}/${project.name}-${project.version}.zip" basedir="${build.dir}" />
-        <copy todir="${release.dir}">
-            <fileset file="${build.dir}/jquery.fracs-*.js" />
-        </copy>
     </target>
 
     <target name="lint" depends="init">
         <echo>JSLint "${tool.jsxint.file}"</echo>
         <exec executable="${tool.jslint}" failonerror="false">
-            <arg value="${tool.jsxint.file}" />
+            <arg value="${src.dir}/jquery.fracs.js" />
         </exec>
     </target>
 
     <target name="hint" depends="init">
         <echo>JSHint "${tool.jsxint.file}"</echo>
         <exec executable="${tool.jshint}" failonerror="false">
-            <arg value="${tool.jsxint.file}" />
+            <arg value="${src.dir}/jquery.fracs.js" />
         </exec>
     </target>
 
     <target name="xint" depends="lint,hint">
     </target>
+
+    <macrodef name="uglifyjs">
+        <attribute name="file" />
+        <attribute name="toFile" />
+        <sequential>
+            <exec executable="${tool.uglifyjs}" failonerror="true">
+                <arg value="-o" />
+                <arg value="@{toFile}" />
+                <arg value="@{file}" />
+            </exec>
+        </sequential>
+    </macrodef>
 
 </project>

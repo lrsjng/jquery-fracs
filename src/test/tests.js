@@ -1,15 +1,67 @@
-/*
- * Tests for jQuery.fracs %BUILD_VERSION%
- * http://larsjung.de/fracs
- *
- * provided under the terms of the MIT License
- */
-
-/*globals jQuery, QUnit, Fracs */
-
-
-(function ($, $$, Fracs) {
+(function (window, document, $, $$) {
     'use strict';
+    /*globals window, jQuery, QUnit */
+
+    var $window = $(window),
+        $document = $(document),
+        byId = function (id) {
+
+            return document.getElementById(id);
+        },
+        membersCount = function (obj) {
+
+            var count = 0;
+
+            $.each(obj, function (idx, member) {
+                count += 1;
+            });
+            return count;
+        },
+        idx = 0,
+        createElement = function (css) {
+
+            idx += 1;
+            $('<div id="el-' + idx + '"/>')
+                .addClass('box')
+                .css(css)
+                .text(idx)
+                .appendTo($('#test-elements'));
+
+            return $.fracs.Rect.ofElement(byId('el-' + idx));
+        };
+
+    $$.module('Plug-in');
+
+    $$.test('access', 20, function () {
+
+        $$.strictEqual($.isFunction($.fracs), true, '$.fracs is function');
+        $$.strictEqual(membersCount($.fracs), 17, '$.fracs has right number of members');
+
+        $$.strictEqual($.isFunction($.fracs.modplug), true, '$.fracs.modplug is function');
+
+        $$.strictEqual($.fracs.version, '%BUILD_VERSION%', 'version matches');
+
+        $$.strictEqual($.isFunction($.fracs.Rect), true, '$.fracs.Rect is function');
+        $$.strictEqual($.isFunction($.fracs.Fractions), true, '$.fracs.Fractions is function');
+        $$.strictEqual($.isFunction($.fracs.Group), true, '$.fracs.Group is function');
+        $$.strictEqual($.isFunction($.fracs.ScrollState), true, '$.fracs.ScrollState is function');
+        $$.strictEqual($.isFunction($.fracs.Outline), true, '$.fracs.Outline is function');
+        $$.strictEqual($.isFunction($.fracs.FracsCallbacks), true, '$.fracs.FracsCallbacks is function');
+        $$.strictEqual($.isFunction($.fracs.GroupCallbacks), true, '$.fracs.GroupCallbacks is function');
+        $$.strictEqual($.isFunction($.fracs.ScrollStateCallbacks), true, '$.fracs.ScrollStateCallbacks is function');
+
+        $$.strictEqual($.isFunction($.fracs.document), true, '$.fracs.document is function');
+        $$.strictEqual($.isFunction($.fracs.fracs), true, '$.fracs.fracs is function');
+        $$.strictEqual($.isFunction($.fracs.rect), true, '$.fracs.rect is function');
+        $$.strictEqual($.isFunction($.fracs.scroll), true, '$.fracs.scroll is function');
+        $$.strictEqual($.isFunction($.fracs.scrollState), true, '$.fracs.scrollState is function');
+        $$.strictEqual($.isFunction($.fracs.scrollTo), true, '$.fracs.scrollTo is function');
+        $$.strictEqual($.isFunction($.fracs.viewport), true, '$.fracs.viewport is function');
+
+        $$.strictEqual($.isFunction($().fracs), true, '$().fracs is function');
+    });
+
+
 
     // Objects
     // =======
@@ -18,12 +70,12 @@
     // ----
     $$.module('Rect');
 
-    $$.test('constructor', function () {
+    $$.test('constructor', 13, function () {
 
-        var rect1 = new Fracs.Rect(30, 50, 400, 300),
-            rect2 = new Fracs.Rect(30.1, 50.4, 400.3, 299.5);
+        var rect1 = new $.fracs.Rect(30, 50, 400, 300),
+            rect2 = new $.fracs.Rect(30.1, 50.4, 400.3, 299.5);
 
-        $$.strictEqual(rect1 instanceof Fracs.Rect, true, 'instanceof Fracs.Rect');
+        $$.strictEqual(rect1 instanceof $.fracs.Rect, true, 'instanceof Rect');
 
         $$.strictEqual(rect1.left, 30, 'left');
         $$.strictEqual(rect1.top, 50, 'top');
@@ -40,64 +92,153 @@
         $$.strictEqual(rect2.bottom, 350, 'bottom');
     });
 
-    $$.test('equals', function () {
+    $$.test('equals', 5, function () {
 
-        var rect1 = new Fracs.Rect(30, 50, 400, 300),
-            rect2 = new Fracs.Rect(30.1, 50.4, 400.3, 299.5),
-            rect3 = new Fracs.Rect(100, 200, 400, 300);
+        var rect1 = new $.fracs.Rect(30, 50, 400, 300),
+            rect2 = new $.fracs.Rect(30.1, 50.4, 400.3, 299.5),
+            rect3 = new $.fracs.Rect(100, 200, 400, 300);
+
+        $$.strictEqual(rect1.equals(), false, 'unequal to undefined');
+        $$.strictEqual(rect1.equals(null), false, 'unequal to null');
+        $$.strictEqual(rect1.equals({}), false, 'unequal to {}');
 
         $$.strictEqual(rect1.equals(rect2), true, 'equal rects');
         $$.strictEqual(rect1.equals(rect3), false, 'unequal rects');
     });
 
-    $$.test('area', function () {
+    $$.test('area', 1, function () {
 
-        var rect1 = new Fracs.Rect(30, 50, 400, 300);
+        var rect1 = new $.fracs.Rect(30, 50, 400, 300);
 
         $$.strictEqual(rect1.area(), 400 * 300, 'area');
     });
 
-    $$.test('intersection', function () {
+    $$.test('relativeTo', 1, function () {
 
-        var rect1 = new Fracs.Rect(30, 50, 400, 300),
-            rect2 = new Fracs.Rect(100, 200, 400, 300),
-            rect3 = new Fracs.Rect(500, 200, 400, 300),
-            intersection = new Fracs.Rect(100, 200, 330, 150);
+        var rect1 = new $.fracs.Rect(30, 50, 400, 300),
+            rect2 = new $.fracs.Rect(10, 10, 10, 10),
+            rect3 = new $.fracs.Rect(20, 40, 400, 300);
+
+        $$.deepEqual(rect1.relativeTo(rect2), rect3, 'relativeTo');
+    });
+
+    $$.test('intersection', 3, function () {
+
+        var rect1 = new $.fracs.Rect(30, 50, 400, 300),
+            rect2 = new $.fracs.Rect(100, 200, 400, 300),
+            rect3 = new $.fracs.Rect(500, 200, 400, 300),
+            intersection = new $.fracs.Rect(100, 200, 330, 150);
 
         $$.deepEqual(rect1.intersection(rect2), intersection, 'intersection');
         $$.deepEqual(rect1.intersection(rect3), null, 'no intersection');
         $$.deepEqual(rect1.intersection(null), null, 'no second rect');
     });
 
-    $$.test('envelope', function () {
+    $$.test('envelope', 2, function () {
 
-        var rect1 = new Fracs.Rect(30, 50, 400, 300),
-            rect2 = new Fracs.Rect(100, 200, 400, 300),
-            envelope = new Fracs.Rect(30, 50, 470, 450);
+        var rect1 = new $.fracs.Rect(30, 50, 400, 300),
+            rect2 = new $.fracs.Rect(100, 200, 400, 300),
+            envelope = new $.fracs.Rect(30, 50, 470, 450);
 
         $$.deepEqual(rect1.envelope(rect2), envelope, 'envelope');
         $$.deepEqual(rect1.envelope(null), rect1, 'no second rect');
     });
 
-    $$.test('ofDocument', function () {
+    $$.test('ofDocument', 1, function () {
 
-        var rect1 = Fracs.Rect.ofDocument();
+        var rect1 = $.fracs.Rect.ofDocument(),
+            w = $document.width(),
+            h = $document.height();
 
-        $$.strictEqual(rect1 instanceof Fracs.Rect, true, 'instanceof Fracs.Rect');
+        $$.deepEqual(rect1, new $.fracs.Rect(0, 0, w, h), 'dims');
     });
 
-    $$.test('ofViewport', function () {
+    $$.test('ofViewport', 1, function () {
 
-        var rect1 = Fracs.Rect.ofViewport();
+        var rect1 = $.fracs.Rect.ofViewport(),
+            l = $window.scrollLeft(),
+            t = $window.scrollTop(),
+            w = $window.width(),
+            h = $window.height();
 
-        $$.strictEqual(rect1 instanceof Fracs.Rect, true, 'instanceof Fracs.Rect');
+        $$.deepEqual(rect1, new $.fracs.Rect(l, t, w, h), 'dims');
     });
 
-    $$.test('ofElement', function () {
+    $$.test('ofElement', 7, function () {
 
-        var rect1 = Fracs.Rect.ofElement($('body').get(0));
+        var left = -100,
+            top = 0,
+            rect1;
 
-        $$.strictEqual(rect1 instanceof Fracs.Rect, true, 'instanceof Fracs.Rect');
+        top += 100;
+        rect1 = createElement({
+            left: left,
+            top: top,
+            width: 20,
+            height: 30
+        });
+        $$.deepEqual(rect1, new $.fracs.Rect(left, top, 20, 30), 'dims');
+
+        top += 100;
+        rect1 = createElement({
+            left: left,
+            top: top,
+            width: 20,
+            height: 30,
+            padding: 1
+        });
+        $$.deepEqual(rect1, new $.fracs.Rect(left, top, 22, 32), 'padding');
+
+        top += 100;
+        rect1 = createElement({
+            left: left,
+            top: top,
+            width: 20,
+            height: 30,
+            paddingLeft: 1
+        });
+        $$.deepEqual(rect1, new $.fracs.Rect(left, top, 21, 30), 'one sided padding');
+
+        top += 100;
+        rect1 = createElement({
+            left: left,
+            top: top,
+            width: 20,
+            height: 30,
+            borderWidth: 2
+        });
+        $$.deepEqual(rect1, new $.fracs.Rect(left, top, 24, 34), 'border');
+
+        top += 100;
+        rect1 = createElement({
+            left: left,
+            top: top,
+            width: 20,
+            height: 30,
+            borderLeftWidth: 2
+        });
+        $$.deepEqual(rect1, new $.fracs.Rect(left, top, 22, 30), 'one sided border');
+
+        top += 100;
+        rect1 = createElement({
+            left: left,
+            top: top,
+            width: 20,
+            height: 30,
+            padding: 1,
+            borderWidth: 2
+        });
+        $$.deepEqual(rect1, new $.fracs.Rect(left, top, 26, 36), 'padding and border');
+
+        top += 100;
+        rect1 = createElement({
+            left: left,
+            top: top,
+            width: 20,
+            height: 30,
+            display: 'none'
+        });
+        $$.strictEqual(rect1, null, 'invisible element returns null');
     });
 
 
@@ -106,49 +247,49 @@
     // ---------
     $$.module('Fractions');
 
-    $$.test('constructor', function () {
+    $$.test('constructor', 32, function () {
 
-        var rect1 = new Fracs.Rect(30, 50, 400, 300),
-            rect2 = new Fracs.Rect(100, 200, 400, 300),
-            rect3 = new Fracs.Rect(10, 20, 40, 30),
-            fr = new Fracs.Fractions();
+        var rect1 = new $.fracs.Rect(30, 50, 400, 300),
+            rect2 = new $.fracs.Rect(100, 200, 400, 300),
+            rect3 = new $.fracs.Rect(10, 20, 40, 30),
+            fr = new $.fracs.Fractions();
 
-        $$.strictEqual(fr instanceof Fracs.Fractions, true, 'instanceof Fracs.Fractions');
+        $$.strictEqual(fr instanceof $.fracs.Fractions, true, 'instanceof Fractions');
         $$.strictEqual(fr.rects, null, 'rects');
         $$.strictEqual(fr.visible, 0, 'visible');
         $$.strictEqual(fr.viewport, 0, 'viewport');
         $$.strictEqual(fr.possible, 0, 'possible');
 
-        fr = new Fracs.Fractions(undefined, undefined, undefined, 1, 1, 1);
-        $$.strictEqual(fr instanceof Fracs.Fractions, true, 'instanceof Fracs.Fractions');
+        fr = new $.fracs.Fractions(undefined, undefined, undefined, 1, 1, 1);
+        $$.strictEqual(fr instanceof $.fracs.Fractions, true, 'instanceof Fractions');
         $$.strictEqual(fr.rects, null, 'rects');
         $$.strictEqual(fr.visible, 0, 'visible');
         $$.strictEqual(fr.viewport, 0, 'viewport');
         $$.strictEqual(fr.possible, 0, 'possible');
 
-        fr = new Fracs.Fractions(undefined, undefined, undefined, 0, 0, 1);
-        $$.strictEqual(fr instanceof Fracs.Fractions, true, 'instanceof Fracs.Fractions');
+        fr = new $.fracs.Fractions(undefined, undefined, undefined, 0, 0, 1);
+        $$.strictEqual(fr instanceof $.fracs.Fractions, true, 'instanceof Fractions');
         $$.strictEqual(fr.rects, null, 'rects');
         $$.strictEqual(fr.visible, 0, 'visible');
         $$.strictEqual(fr.viewport, 0, 'viewport');
         $$.strictEqual(fr.possible, 0, 'possible');
 
-        fr = new Fracs.Fractions(undefined, undefined, undefined, 1, 1);
-        $$.strictEqual(fr instanceof Fracs.Fractions, true, 'instanceof Fracs.Fractions');
+        fr = new $.fracs.Fractions(undefined, undefined, undefined, 1, 1);
+        $$.strictEqual(fr instanceof $.fracs.Fractions, true, 'instanceof Fractions');
         $$.strictEqual(fr.rects, null, 'rects');
         $$.strictEqual(fr.visible, 0, 'visible');
         $$.strictEqual(fr.viewport, 0, 'viewport');
         $$.strictEqual(fr.possible, 0, 'possible');
 
-        fr = new Fracs.Fractions(rect1, rect2, rect3, 1, 1);
-        $$.strictEqual(fr instanceof Fracs.Fractions, true, 'instanceof Fracs.Fractions');
+        fr = new $.fracs.Fractions(rect1, rect2, rect3, 1, 1);
+        $$.strictEqual(fr instanceof $.fracs.Fractions, true, 'instanceof Fractions');
         $$.strictEqual(fr.rects, null, 'rects');
         $$.strictEqual(fr.visible, 0, 'visible');
         $$.strictEqual(fr.viewport, 0, 'viewport');
         $$.strictEqual(fr.possible, 0, 'possible');
 
-        fr = new Fracs.Fractions(rect1, rect2, rect3, 0.1, 0.2, 0.3);
-        $$.strictEqual(fr instanceof Fracs.Fractions, true, 'instanceof Fracs.Fractions');
+        fr = new $.fracs.Fractions(rect1, rect2, rect3, 0.1, 0.2, 0.3);
+        $$.strictEqual(fr instanceof $.fracs.Fractions, true, 'instanceof Fractions');
         $$.strictEqual(fr.rects.document, rect1, 'rects.document');
         $$.strictEqual(fr.rects.element, rect2, 'rects.element');
         $$.strictEqual(fr.rects.viewport, rect3, 'rects.viewport');
@@ -157,18 +298,22 @@
         $$.strictEqual(fr.possible, 0.3, 'possible');
     });
 
-    $$.test('equals', function () {
+    $$.test('equals', 12, function () {
 
-        var rect1 = new Fracs.Rect(30, 50, 400, 300),
-            rect2 = new Fracs.Rect(100, 200, 400, 300),
-            rect3 = new Fracs.Rect(10, 20, 40, 30),
-            rect4 = new Fracs.Rect(130, 150, 1400, 1300),
-            rect5 = new Fracs.Rect(100, 20, 40, 30),
-            rect6 = new Fracs.Rect(123, 20, 40, 30),
-            fr1 = new Fracs.Fractions(rect1, rect2, rect3, 0.1, 0.2, 0.3),
-            fr2 = new Fracs.Fractions(rect1, rect2, rect3, 0.1, 0.2, 0.3),
-            fr3 = new Fracs.Fractions(rect3, rect2, rect1, 0.1, 0.2, 0.3),
-            fr4 = new Fracs.Fractions(rect1, rect2, rect3, 0.2, 0.2, 0.3);
+        var rect1 = new $.fracs.Rect(30, 50, 400, 300),
+            rect2 = new $.fracs.Rect(100, 200, 400, 300),
+            rect3 = new $.fracs.Rect(10, 20, 40, 30),
+            rect4 = new $.fracs.Rect(130, 150, 1400, 1300),
+            rect5 = new $.fracs.Rect(100, 20, 40, 30),
+            rect6 = new $.fracs.Rect(123, 20, 40, 30),
+            fr1 = new $.fracs.Fractions(rect1, rect2, rect3, 0.1, 0.2, 0.3),
+            fr2 = new $.fracs.Fractions(rect1, rect2, rect3, 0.1, 0.2, 0.3),
+            fr3 = new $.fracs.Fractions(rect3, rect2, rect1, 0.1, 0.2, 0.3),
+            fr4 = new $.fracs.Fractions(rect1, rect2, rect3, 0.2, 0.2, 0.3);
+
+        $$.strictEqual(fr1.equals(), false, 'unequal to undefined');
+        $$.strictEqual(fr1.equals(null), false, 'unequal to null');
+        $$.strictEqual(fr1.equals({}), false, 'unequal to {}');
 
         $$.strictEqual(fr1.equals(fr2), true, 'equal');
         $$.strictEqual(fr1.equals(fr3), false, 'unequal');
@@ -185,33 +330,49 @@
 
 
 
+    // ScrollState
+    // -----------
+    $$.module('ScrollState');
 
+    $$.test('tests', function () {
 
-    // Plug-In API
-    // ===========
+        $('<div id="scr"/>')
+            .addClass('box')
+            .css({
+                overflow: 'auto'
+            })
+            .text('scr')
+            .appendTo($('#test-elements'));
 
-    // Static Methods
-    // --------------
-    $$.module('static methods');
+        var $scr = $('#scr');
 
-    $$.test('round', function () {
+        $('<div id="cnt"/>')
+            .addClass('box')
+            .css({
+                left: 10,
+                top: 10,
+                width: 100,
+                height: 300,
+                backgroundColor: 'rgba(255,0,0,0.5)'
+            })
+            .text('cnt')
+            .appendTo($scr);
 
-        $$.strictEqual($.fracs.round(1.234567), 1, 'round 1.234567 with no precision');
-        $$.strictEqual($.fracs.round(1.234567, -1), 1, 'round 1.234567 to precision -1');
-        $$.strictEqual($.fracs.round(1.234567, 0), 1, 'round 1.234567 to precision 0');
-        $$.strictEqual($.fracs.round(1.234567, 1), 1.2, 'round 1.234567 to precision 1');
-        $$.strictEqual($.fracs.round(1.234567, 2), 1.23, 'round 1.234567 to precision 2');
-        $$.strictEqual($.fracs.round(1.234567, 3), 1.235, 'round 1.234567 to precision 3');
-        $$.strictEqual($.fracs.round(1.234567, 4), 1.2346, 'round 1.234567 to precision 4');
     });
 
 
 
+    // Plug-In
+    // =======
+
+    // Static Methods
+    // --------------
+    $$.module('static plug-in methods');
+
     // Methods
     // -------
-    $$.module('methods');
+    $$.module('plug-in methods');
 
 
-
-}(jQuery, QUnit, Fracs));
+}(window, document, jQuery, QUnit));
 
