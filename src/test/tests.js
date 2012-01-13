@@ -32,10 +32,10 @@
 
     $$.module('Plug-in');
 
-    $$.test('access', 20, function () {
+    $$.test('access', 19, function () {
 
         $$.strictEqual($.isFunction($.fracs), true, '$.fracs is function');
-        $$.strictEqual(membersCount($.fracs), 17, '$.fracs has right number of members');
+        $$.strictEqual(membersCount($.fracs), 16, '$.fracs has right number of members');
 
         $$.strictEqual($.isFunction($.fracs.modplug), true, '$.fracs.modplug is function');
 
@@ -45,7 +45,6 @@
         $$.strictEqual($.isFunction($.fracs.Fractions), true, '$.fracs.Fractions is function');
         $$.strictEqual($.isFunction($.fracs.Group), true, '$.fracs.Group is function');
         $$.strictEqual($.isFunction($.fracs.ScrollState), true, '$.fracs.ScrollState is function');
-        $$.strictEqual($.isFunction($.fracs.Outline), true, '$.fracs.Outline is function');
         $$.strictEqual($.isFunction($.fracs.FracsCallbacks), true, '$.fracs.FracsCallbacks is function');
         $$.strictEqual($.isFunction($.fracs.GroupCallbacks), true, '$.fracs.GroupCallbacks is function');
         $$.strictEqual($.isFunction($.fracs.ScrollStateCallbacks), true, '$.fracs.ScrollStateCallbacks is function');

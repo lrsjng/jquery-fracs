@@ -8,7 +8,7 @@ jQuery.fracs is provided under the terms of the [MIT License](http://github.com/
 
 ## Changelog
 
-### v0.11.0 - *2012-01-??*
+### v0.11 - *2012-01-??*
 
 * now depends on jQuery 1.7
 * fixes `ScrollState`

@@ -6,8 +6,8 @@
 
 (function (window, document, $) {
 'use strict';
-/*jslint browser: true, confusion: true, nomen: true, regexp: true, white: true */
-/*jshint browser: true, confusion: true, nomen: false, regexp: false, white: false */
+/*jslint browser: true, confusion: true, nomen: true, regexp: true, vars: true, white: true */
+/*jshint browser: true, confusion: true, nomen: false, regexp: false, vars: false, white: false */
 /*global jQuery */
 
         // Some often used references.
@@ -388,168 +388,6 @@
 
 
 
-    // Outline
-    // -------
-    // Quick and dirty.
-    var Outline = function (canvas, options) {
-
-        if (!canvas || canvas.nodeName !== 'CANVAS') {
-            return null;
-        }
-
-        var defaults = {
-                crop: false,
-                duration: 0,
-                focusWidth: 0.5,
-                focusHeight: 0.5,
-                autoFocus: true,
-                styles: [{
-                    selector: 'header,footer,section,article',
-                    fillStyle: 'rgb(230,230,230)'
-                }, {
-                    selector: 'h1,h2,h3,h4',
-                    fillStyle: 'rgb(255,144,55)'
-                }],
-                viewportStyle: {
-                    fillStyle: 'rgba(255,144,55,0.3)'
-                },
-                viewportDragStyle: {
-                    fillStyle: 'rgba(255,144,55,0.5)'
-                },
-                invertViewport: false
-            },
-            settings = extend({}, defaults, options),
-            $canvas = $(canvas),
-            width = $canvas.attr('width'),
-            height = $canvas.attr('height'),
-            context = canvas.getContext('2d'),
-            drag = false,
-            docRect, vpRect, scale, focusWidth, focusHeight,
-            drawRect = function (rect, strokeWidth, strokeStyle, fillStyle, invert) {
-
-                if (!rect || (!strokeStyle && !fillStyle)) {
-                    return;
-                }
-
-                if (fillStyle) {
-                    context.beginPath();
-                    if (invert) {
-                        context.rect(0, 0, docRect.width, rect.top);
-                        context.rect(0, rect.top, rect.left, rect.height);
-                        context.rect(rect.right, rect.top, docRect.right - rect.right, rect.height);
-                        context.rect(0, rect.bottom, docRect.width, docRect.bottom - rect.bottom);
-                    } else {
-                        context.rect(rect.left, rect.top, rect.width, rect.height);
-                    }
-                    context.fillStyle = fillStyle;
-                    context.fill();
-                }
-                if (strokeStyle) {
-                    context.beginPath();
-                    context.rect(rect.left, rect.top, rect.width, rect.height);
-                    context.lineWidth = scale ? mathMax(strokeWidth, 0.2 / scale) : strokeWidth;
-                    context.strokeStyle = strokeStyle;
-                    context.stroke();
-                }
-            },
-            drawElement = function (element, strokeWidth, strokeStyle, fillStyle) {
-
-                var $element = $(element),
-                    rect = Rect.ofElement(element);
-
-                if (!rect || rect.width === 0 || rect.height === 0 || $element.css('visibility') === 'hidden') {
-                    return;
-                }
-
-                strokeWidth = strokeWidth === 'auto' ? parseInt($element.css('border-top-width'), 10) : strokeWidth;
-                strokeStyle = strokeStyle === 'auto' ? $element.css('border-top-color') : strokeStyle;
-                fillStyle = fillStyle === 'auto' ? $element.css('background-color') : fillStyle;
-                drawRect(rect, strokeWidth, strokeStyle, fillStyle);
-            },
-            applyStyles = function () {
-
-                $.each(settings.styles, function (idx, style) {
-                    $(style.selector).each(function () {
-                        drawElement(this, style.strokeWidth, style.strokeStyle, style.fillStyle);
-                    });
-                });
-            },
-            drawViewport = function () {
-
-                var style = drag && settings.viewportDragStyle ? settings.viewportDragStyle : settings.viewportStyle;
-
-                drawRect(vpRect, style.strokeWidth, style.strokeStyle, style.fillStyle, settings.invertViewport);
-            },
-            draw = function () {
-
-                docRect = Rect.ofDocument();
-                vpRect = Rect.ofViewport();
-                scale = mathMin(width / docRect.width, height / docRect.height);
-
-                if (settings.crop) {
-                    $canvas.attr('width', docRect.width * scale).attr('height', docRect.height * scale);
-                }
-
-                context.setTransform(1, 0, 0, 1, 0, 0);
-                context.clearRect(0, 0, $canvas.width(), $canvas.height());
-
-                context.scale(scale, scale);
-                applyStyles();
-                drawViewport();
-            },
-            onDrag = function (event) {
-
-                var r = Rect.ofElement(canvas),
-                    x = event.pageX - r.left,
-                    y = event.pageY - r.top;
-
-                ScrollState.scrollTo(x / scale - vpRect.width * focusWidth, y / scale - vpRect.height * focusHeight, settings.duration);
-            },
-            onDragEnd = function (event) {
-
-                drag = false;
-                event.preventDefault();
-
-                $canvas.css('cursor', 'pointer').removeClass('dragOn');
-                $htmlBody.css('cursor', 'auto');
-                $window.off('mousemove', onDrag);
-                draw();
-            },
-            onDragStart = function (event) {
-
-                var r;
-                if (settings.autoFocus) {
-                    r = Rect.ofElement(canvas);
-                    focusWidth = (((event.pageX - r.left) / scale) - vpRect.left) / vpRect.width;
-                    focusHeight = (((event.pageY - r.top) / scale) - vpRect.top) / vpRect.height;
-                }
-                if (!settings.autoFocus || focusWidth < 0 || focusWidth > 1 || focusHeight < 0 || focusHeight > 1) {
-                    focusWidth = settings.focusWidth;
-                    focusHeight = settings.focusHeight;
-                }
-
-                drag = true;
-                event.preventDefault();
-
-                $canvas.css('cursor', 'crosshair').addClass('dragOn');
-                $htmlBody.css('cursor', 'crosshair');
-                $window.on('mousemove', onDrag).one('mouseup', onDragEnd);
-                onDrag(event);
-            },
-            init = function () {
-
-                $canvas.css('cursor', 'pointer').mousedown(onDragStart);
-                $window.on('load resize scroll', draw);
-                draw();
-            };
-
-        init();
-
-        this.redraw = draw;
-    };
-
-
-
 
 
     // Callbacks
@@ -807,7 +645,6 @@
             Fractions: Fractions,
             Group: Group,
             ScrollState: ScrollState,
-            Outline: Outline,
             FracsCallbacks: FracsCallbacks,
             GroupCallbacks: GroupCallbacks,
             ScrollStateCallbacks: ScrollStateCallbacks,
@@ -1043,41 +880,6 @@
                 }
 
                 return $(new Group(this).best(property).el);
-            },
-
-            // ### 'outline'
-            // Generates a document outline in a selected canvas. Will be redrawn on every window
-            // resize and scroll event.
-            //
-            //      .fracs('outline', [options: OutlineOptions]): jQuery
-            //
-            // Manually trigger a redraw
-            //
-            //      .fracs('outline', 'redraw'): jQuery
-            outline: function (action) {
-
-                var ns = namespace + '.outline';
-
-                if (action === 'redraw') {
-                    return this.each(function () {
-
-                        var outline = $(this).data(ns);
-                        if (outline) {
-                            outline.redraw();
-                        }
-                    });
-                } else {
-                    return this.each(function () {
-
-                        var outline = $(this).data(ns);
-                        if (!outline) {
-                            outline = new Outline(this, action);
-                            if (outline) {
-                                $(this).data(ns, outline);
-                            }
-                        }
-                    });
-                }
             },
 
             // ### 'rect'

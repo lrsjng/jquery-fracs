@@ -162,7 +162,7 @@
         },
         initOutlineDemo = function () {
 
-            $('#outline').fracs('outline', {
+            $('#outline').outline({
                 crop: true,
                 styles: [{
                     selector: '.box',

@@ -5,6 +5,8 @@
     default="release"
 >
 
+    <import file="build.macros.xml" />
+
     <target name="init">
         <property file="build.properties" />
         <tstamp>
@@ -33,12 +35,13 @@
             <replacefilter token="%BUILD_STAMP%" value="${build.stamp}" />
         </replace>
 
-        <copy file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/${project.name}-${project.version}.js" />
-        <uglifyjs file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/${project.name}-${project.version}.min.js" />
+        <copy file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/jquery.fracs-${project.version}.js" />
+        <uglifyjs file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/jquery.fracs-${project.version}.min.js" />
 
-        <exec executable="${tool.docco}" dir="${build.dir}" failonerror="true">
-            <arg value="${project.name}-${project.version}.js" />
-        </exec>
+        <copy file="${build.dir}/jquery.outline.js" tofile="${build.dir}/jquery.outline-${project.version}.js" />
+        <uglifyjs file="${build.dir}/jquery.outline.js" tofile="${build.dir}/jquery.outline-${project.version}.min.js" />
+
+        <docco dir="${build.dir}" files="jquery.fracs-${project.version}.js jquery.outline-${project.version}.js" />
     </target>
 
     <target name="release" depends="build">
@@ -47,32 +50,10 @@
     </target>
 
     <target name="lint" depends="init">
-        <echo>JSLint "${tool.jsxint.file}"</echo>
-        <exec executable="${tool.jslint}" failonerror="false">
-            <arg value="${src.dir}/jquery.fracs.js" />
-        </exec>
+        <jslint file="${src.dir}/jquery.fracs.js" />
+        <jshint file="${src.dir}/jquery.fracs.js" />
+        <jslint file="${src.dir}/jquery.outline.js" />
+        <jshint file="${src.dir}/jquery.outline.js" />
     </target>
-
-    <target name="hint" depends="init">
-        <echo>JSHint "${tool.jsxint.file}"</echo>
-        <exec executable="${tool.jshint}" failonerror="false">
-            <arg value="${src.dir}/jquery.fracs.js" />
-        </exec>
-    </target>
-
-    <target name="xint" depends="lint,hint">
-    </target>
-
-    <macrodef name="uglifyjs">
-        <attribute name="file" />
-        <attribute name="toFile" />
-        <sequential>
-            <exec executable="${tool.uglifyjs}" failonerror="true">
-                <arg value="-o" />
-                <arg value="@{toFile}" />
-                <arg value="@{file}" />
-            </exec>
-        </sequential>
-    </macrodef>
 
 </project>

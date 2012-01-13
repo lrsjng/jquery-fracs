@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="build.macros" basedir=".">
+
+    <macrodef name="uglifyjs">
+        <attribute name="file" />
+        <attribute name="tofile" />
+        <sequential>
+            <echo>uglifyjs @{file} -> @{tofile}</echo>
+            <exec executable="${tool.uglifyjs}" failonerror="true">
+                <arg value="-o" />
+                <arg value="@{tofile}" />
+                <arg value="@{file}" />
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="docco">
+        <attribute name="dir" />
+        <attribute name="files" />
+        <sequential>
+            <exec executable="${tool.docco}" dir="@{dir}" failonerror="true">
+                <arg line="@{files}" />
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="jslint">
+        <attribute name="file" />
+        <sequential>
+            <echo>JSLint @{file}</echo>
+            <exec executable="${tool.jslint}" failonerror="false">
+                <arg value="@{file}" />
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="jshint">
+        <attribute name="file" />
+        <sequential>
+            <echo>JSHint @{file}</echo>
+            <exec executable="${tool.jshint}" failonerror="false">
+                <arg value="@{file}" />
+            </exec>
+        </sequential>
+    </macrodef>
+
+</project>
