@@ -30,7 +30,7 @@
 
 			return isHTMLElement(obj) ? obj : (isInstanceOf(obj, $) ? obj[0] : undefined);
 		},
-		fold = function (elements, fn, current) {
+		reduce = function (elements, fn, current) {
 
 			$.each(elements, function (idx, element) {
 
@@ -763,7 +763,7 @@
 			//      .fracs('envelope'): Rect
 			envelope: function () {
 
-				return fold(this, function (current) {
+				return reduce(this, function (current) {
 
 					var rect = Rect.ofElement(this);
 					return current ? current.envelope(rect) : rect;
@@ -850,7 +850,7 @@
 			//      .fracs('intersection'): Rect
 			intersection: function () {
 
-				return fold(this, function (current) {
+				return reduce(this, function (current) {
 
 					var rect = Rect.ofElement(this);
 					return current ? current.intersection(rect) : rect;
