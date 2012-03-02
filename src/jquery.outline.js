@@ -45,7 +45,7 @@
 	// Quick and dirty.
 	var Outline = function (canvas, options, viewport) {
 
-		if (!canvas || !canvas.nodeName || canvas.nodeName.toLowerCase() !== 'canvas' || !$.isFunction(canvas.getContext)) {
+		if (!canvas || !$.isFunction(canvas.getContext)) {
 			return null;
 		}
 
