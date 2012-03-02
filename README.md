@@ -14,15 +14,13 @@ jQuery.fracs is provided under the terms of the [MIT License](http://github.com/
 * fixes `ScrollState`
 * `ScrollState` is now available for all elements
 * removes `Cursor`
-* removes `$.fracs.round()`
+* removes most `$.fracs.*` methods
 * moves all js code into one file
 * completely refactored
 * adds tests
 * adds comments
 * updates to `modplug 0.7`
 * removes `release` folder
-* removes `wepp` build dependency
-* adds `uglifyjs` build dependency to compress
 * adds `docco` build dependency for docs
 
 

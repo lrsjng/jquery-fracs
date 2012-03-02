@@ -4,58 +4,58 @@
 <!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>jQuery.fracs %BUILD_VERSION% Demo</title>
-    <meta name="description" content="Test and demo page for jQuery.fracs">
-    <meta name="author" content="Lars Jung">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Ubuntu:regular,italic,bold">
-    <link rel="stylesheet/less" type="text/css" href="main.less">
-    <script src="../lib/less-1.2.0.min.js"></script>
-    <script src="../lib/modernizr.min.js"></script>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>jQuery.fracs %BUILD_VERSION% Demo</title>
+	<meta name="description" content="Test and demo page for jQuery.fracs">
+	<meta name="author" content="Lars Jung">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Ubuntu:regular,italic,bold">
+	<link rel="stylesheet/less" type="text/css" href="main.less">
+	<script src="../lib/less-1.2.0.min.js"></script>
+	<script src="../lib/modernizr.min.js"></script>
 </head>
 <body>
-    <h1><a href="http://larsjung.de/fracs" title="jQuery.fracs project page">jQuery.fracs</a> %BUILD_VERSION% Demo</h1>
-    <aside class="panel">
-        <h1><a href="http://larsjung.de/fracs" title="jQuery.fracs project page">jQuery.fracs</a> %BUILD_VERSION% Demo</h1>
-        <section>
-            <h2>Fractions</h2>
-            <ul class="fracs">
-                <li class='header'>
-                    <span class='idx'>#</span><span class='info' title="fraction of the element that is visible compared to the maximal possible area that might be visible">possible</span><span class='info' title="fraction of the element that is visible">visible</span><span class='info' title="fraction of the viewport (window) that is taken by this element">viewport</span>
-                </li>
-            </ul>
-            <h2>Group Maximums (#4 .. #8)</h2>
-            <ul class="groups">
-                <li><span>possible:</span><span class='possible'>undef.</span></li>
-                <li><span>viewport:</span><span class='viewport'>undef.</span></li>
-            </ul>
-            <h2>ScrollState</h2>
-            <ul class="scrollstate">
-                <li><span>width:</span><span class='width'>undef.</span></li>
-                <li><span>height:</span><span class='height'>undef.</span></li>
-            </ul>
-            <ul class="scrollstate">
-                <li><span>left:</span><span class='left'>undef.</span></li>
-                <li><span>top:</span><span class='top'>undef.</span></li>
-            </ul>
-            <ul class="scrollstate">
-                <li><span>right:</span><span class='right'>undef.</span></li>
-                <li><span>bottom:</span><span class='bottom'>undef.</span></li>
-            </ul>
-        </section>
-        <section>
-            <h2 id="outlineHeader">Outline</h2>
-            <span id="docDims">Document: ?x?</span>
-            <span id="vpDims">Viewport: ?x?</span>
-            <canvas id="outline" width="300" height="300"></canvas>
-        </section>
-    </aside>
-    <script src="../lib/jquery-1.7.js"></script>
-    <script src="../lib/jquery-ui-core-effects.min.js"></script>
-    <script src="../jquery.fracs.js"></script>
-    <script src="../jquery.outline.js"></script>
-    <script src="main.js"></script>
+	<h1><a href="http://larsjung.de/fracs" title="jQuery.fracs project page">jQuery.fracs</a> %BUILD_VERSION% Demo</h1>
+	<aside class="panel">
+		<h1><a href="http://larsjung.de/fracs" title="jQuery.fracs project page">jQuery.fracs</a> %BUILD_VERSION% Demo</h1>
+		<section>
+			<h2>Fractions</h2>
+			<ul class="fracs">
+				<li class='header'>
+					<span class='idx'>#</span><span class='info' title="fraction of the element that is visible compared to the maximal possible area that might be visible">possible</span><span class='info' title="fraction of the element that is visible">visible</span><span class='info' title="fraction of the viewport (window) that is taken by this element">viewport</span>
+				</li>
+			</ul>
+			<h2>Group Maximums (#4 .. #8)</h2>
+			<ul class="groups">
+				<li><span>possible:</span><span class='possible'>undef.</span></li>
+				<li><span>viewport:</span><span class='viewport'>undef.</span></li>
+			</ul>
+			<h2>ScrollState</h2>
+			<ul class="scrollstate">
+				<li><span>width:</span><span class='width'>undef.</span></li>
+				<li><span>height:</span><span class='height'>undef.</span></li>
+			</ul>
+			<ul class="scrollstate">
+				<li><span>left:</span><span class='left'>undef.</span></li>
+				<li><span>top:</span><span class='top'>undef.</span></li>
+			</ul>
+			<ul class="scrollstate">
+				<li><span>right:</span><span class='right'>undef.</span></li>
+				<li><span>bottom:</span><span class='bottom'>undef.</span></li>
+			</ul>
+		</section>
+		<section>
+			<h2 id="outlineHeader">Outline</h2>
+			<span id="docDims">Document: ?x?</span>
+			<span id="vpDims">Viewport: ?x?</span>
+			<canvas id="outline" width="300" height="300"></canvas>
+		</section>
+	</aside>
+	<script src="../lib/jquery-1.7.js"></script>
+	<script src="../lib/jquery-ui-core-effects.min.js"></script>
+	<script src="../jquery.fracs.js"></script>
+	<script src="../jquery.outline.js"></script>
+	<script src="main.js"></script>
 </body>
 </html>

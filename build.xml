@@ -5,13 +5,9 @@
     default="release"
 >
 
-    <import file="build.macros.xml" />
-
     <target name="init">
         <property file="build.properties" />
-        <tstamp>
-            <format property="build.stamp" pattern="yyyy-MM-dd-HHmmss" />
-        </tstamp>
+        <tstamp><format property="build.stamp" pattern="yyyy-MM-dd-HHmmss" /></tstamp>
         <property name="build.label" value="${project.name} ${project.version} b${build.stamp}" />
         <echo>Build: ${build.label}</echo>
     </target>
@@ -35,11 +31,11 @@
             <replacefilter token="%BUILD_STAMP%" value="${build.stamp}" />
         </replace>
 
-        <copy file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/jquery.fracs-${project.version}.js" />
-        <uglifyjs file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/jquery.fracs-${project.version}.min.js" />
+        <wepp file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/jquery.fracs-${project.version}.js" />
+        <wepp-min file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/jquery.fracs-${project.version}.min.js" />
 
-        <copy file="${build.dir}/jquery.outline.js" tofile="${build.dir}/jquery.outline-${project.version}.js" />
-        <uglifyjs file="${build.dir}/jquery.outline.js" tofile="${build.dir}/jquery.outline-${project.version}.min.js" />
+        <wepp file="${build.dir}/jquery.outline.js" tofile="${build.dir}/jquery.outline-${project.version}.js" />
+        <wepp-min file="${build.dir}/jquery.outline.js" tofile="${build.dir}/jquery.outline-${project.version}.min.js" />
 
         <docco dir="${build.dir}" files="jquery.fracs-${project.version}.js jquery.outline-${project.version}.js" />
     </target>
@@ -50,10 +46,81 @@
     </target>
 
     <target name="lint" depends="init">
-        <jslint file="${src.dir}/jquery.fracs.js" />
-        <jshint file="${src.dir}/jquery.fracs.js" />
-        <jslint file="${src.dir}/jquery.outline.js" />
-        <jshint file="${src.dir}/jquery.outline.js" />
+        <jslint files="${src.dir}/jquery.fracs.js ${src.dir}/jquery.outline.js ${src.dir}/test/tests.js" />
     </target>
+
+
+    <macrodef name="bytes">
+        <attribute name="file" />
+        <attribute name="tofile" />
+        <sequential>
+            <length file="@{file}" property="@{file}-length" />
+            <length file="@{tofile}" property="@{tofile}-length" />
+            <echo>  bytes ${@{file}-length} -> ${@{tofile}-length}</echo>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="wepp-args">
+        <attribute name="args" default="" />
+        <sequential>
+            <exec executable="${tool.wepp}" failonerror="true">
+                <arg line="@{args}" />
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="wepp">
+        <attribute name="file" />
+        <attribute name="tofile" />
+        <sequential>
+            <wepp-args args="--nc --inFile '@{file}' --outFile '@{toFile}'" />
+        </sequential>
+    </macrodef>
+
+    <macrodef name="wepp-min">
+        <attribute name="file" />
+        <attribute name="tofile" />
+        <sequential>
+            <wepp-args args="--inFile '@{file}' --outFile '@{toFile}'" />
+            <bytes file="@{file}" toFile="@{toFile}" />
+        </sequential>
+    </macrodef>
+
+    <macrodef name="wepp-dir">
+        <attribute name="dir" />
+        <attribute name="todir" />
+        <sequential>
+            <wepp-args args="--nc --inDir '@{dir}' --outDir '@{todir}'" />
+        </sequential>
+    </macrodef>
+
+    <macrodef name="wepp-dir-min">
+        <attribute name="dir" />
+        <attribute name="todir" />
+        <sequential>
+            <wepp-args args="--inDir '@{dir}' --outDir '@{todir}'" />
+        </sequential>
+    </macrodef>
+
+    <macrodef name="docco">
+        <attribute name="dir" />
+        <attribute name="files" />
+        <sequential>
+            <exec executable="${tool.docco}" dir="@{dir}" failonerror="true">
+                <arg line="@{files}" />
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="jslint">
+        <attribute name="files" />
+        <sequential>
+            <echo>JSLint @{files}</echo>
+            <exec executable="${tool.jslint}" failonerror="false">
+                <arg line="@{files}" />
+            </exec>
+        </sequential>
+    </macrodef>
+
 
 </project>
