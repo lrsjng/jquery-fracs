@@ -8,7 +8,7 @@ jQuery.fracs is provided under the terms of the [MIT License](http://github.com/
 
 ## Changelog
 
-### v0.11 - *2012-01-??*
+### v0.11 - *2012-03-03*
 
 * completely refactored and !not! compatible with previous versions
 * now depends on jQuery 1.7
