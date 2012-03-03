@@ -80,7 +80,7 @@
 
 			drawRect = function (rect, strokeWidth, strokeStyle, fillStyle, invert) {
 
-				if (!rect || (!strokeStyle && !fillStyle)) {
+				if (!rect || !(strokeStyle || fillStyle)) {
 					return;
 				}
 

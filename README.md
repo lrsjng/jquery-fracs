@@ -10,13 +10,13 @@ jQuery.fracs is provided under the terms of the [MIT License](http://github.com/
 
 ### v0.11 - *2012-01-??*
 
+* completely refactored and !not! compatible with previous versions
 * now depends on jQuery 1.7
 * fixes `ScrollState`
 * `ScrollState` is now available for all elements
 * removes `Cursor`
 * removes most `$.fracs.*` methods
 * moves all js code into one file
-* completely refactored
 * adds tests
 * adds comments
 * updates to `modplug 0.7`

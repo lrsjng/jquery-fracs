@@ -989,11 +989,51 @@
 				return this.length ? new ScrollState(this[0]) : null;
 			},
 
+			// ### 'scroll'
+			// Scrolls the selected elements relative to its current position,
+			// `padding` defaults to `0`, `duration` to `1000`.
+			//
+			//      .fracs('scroll', element: HTMLElement/jQuery, [paddingLeft: int,] [paddingTop: int,] [duration: int]): jQuery
+			scroll: function (left, top, duration) {
+
+				return this.each(function () {
+
+					new Viewport(this).scroll(left, top, duration);
+				});
+			},
+
+			// ### 'scrollTo'
+			// Scrolls the selected elements to the specified element or an absolute position,
+			// `padding` defaults to `0`, `duration` to `1000`.
+			//
+			//      .fracs('scrollTo', element: HTMLElement/jQuery, [paddingLeft: int,] [paddingTop: int,] [duration: int]): jQuery
+			//      .fracs('scrollTo', [left: int,] [top: int,] [duration: int]): jQuery
+			scrollTo: function (element, paddingLeft, paddingTop, duration) {
+
+				if ($.isNumeric(element)) {
+					duration = paddingTop;
+					paddingTop = paddingLeft;
+					paddingLeft = element;
+					element = null;
+				}
+
+				element = getHTMLElement(element);
+
+				return this.each(function () {
+
+					if (element) {
+						new Viewport(this).scrollToElement(element, paddingLeft, paddingTop, duration);
+					} else {
+						new Viewport(this).scrollTo(paddingLeft, paddingTop, duration);
+					}
+				});
+			},
+
 			// ### 'scrollToThis'
 			// Scrolls the viewport (window) to the first selected element in the specified time,
 			// `padding` defaults to `0`, `duration` to `1000`.
 			//
-			//      .fracs('scrollTo', [paddingLeft: int,] [paddingTop: int,] [duration: int,] [viewport: HTMLElement/jQuery]): jQuery
+			//      .fracs('scrollToThis', [paddingLeft: int,] [paddingTop: int,] [duration: int,] [viewport: HTMLElement/jQuery]): jQuery
 			scrollToThis: function (paddingLeft, paddingTop, duration, viewport) {
 
 				viewport = new Viewport(getHTMLElement(viewport));
