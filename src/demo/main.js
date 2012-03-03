@@ -1,3 +1,9 @@
+
+// @include "../inc/jquery-1.7.js"
+// @include "../inc/jquery-ui-core-effects.min.js"
+// @include "../jquery.fracs-%BUILD_VERSION%.js"
+// @include "../jquery.outline-%BUILD_VERSION%.js"
+
 (function(window, $) {
 	'use strict';
 

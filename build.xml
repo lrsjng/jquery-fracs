@@ -31,13 +31,23 @@
 			<replacefilter token="%BUILD_STAMP%" value="${build.stamp}" />
 		</replace>
 
+		<!-- fracs -->
 		<wepp file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/jquery.fracs-${project.version}.js" />
 		<wepp-min file="${build.dir}/jquery.fracs.js" tofile="${build.dir}/jquery.fracs-${project.version}.min.js" />
+		<delete file="${build.dir}/jquery.fracs.js" />
 
+		<!-- outline -->
 		<wepp file="${build.dir}/jquery.outline.js" tofile="${build.dir}/jquery.outline-${project.version}.js" />
 		<wepp-min file="${build.dir}/jquery.outline.js" tofile="${build.dir}/jquery.outline-${project.version}.min.js" />
+		<delete file="${build.dir}/jquery.outline.js" />
 
+		<!-- docs -->
 		<docco dir="${build.dir}" files="jquery.fracs-${project.version}.js jquery.outline-${project.version}.js" />
+
+		<!-- test + demo -->
+		<wepp-dir dir="${build.dir}/test" toDir="${build.dir}/test" />
+		<wepp-dir dir="${build.dir}/demo" toDir="${build.dir}/demo" />
+		<delete dir="${build.dir}/inc" />
 	</target>
 
 	<target name="release" depends="build">
@@ -49,16 +59,6 @@
 		<jslint files="${src.dir}/jquery.fracs.js ${src.dir}/jquery.outline.js ${src.dir}/test/tests.js" />
 	</target>
 
-
-	<macrodef name="bytes">
-		<attribute name="file" />
-		<attribute name="tofile" />
-		<sequential>
-			<length file="@{file}" property="@{file}-length" />
-			<length file="@{tofile}" property="@{tofile}-length" />
-			<echo>  bytes ${@{file}-length} -> ${@{tofile}-length}</echo>
-		</sequential>
-	</macrodef>
 
 	<macrodef name="wepp-args">
 		<attribute name="args" default="" />
@@ -81,8 +81,7 @@
 		<attribute name="file" />
 		<attribute name="tofile" />
 		<sequential>
-			<wepp-args args="--inFile '@{file}' --outFile '@{toFile}'" />
-			<bytes file="@{file}" toFile="@{toFile}" />
+			<wepp-args args="--zs --inFile '@{file}' --outFile '@{toFile}'" />
 		</sequential>
 	</macrodef>
 
@@ -91,6 +90,9 @@
 		<attribute name="todir" />
 		<sequential>
 			<wepp-args args="--nc --inDir '@{dir}' --outDir '@{todir}'" />
+			<delete dir="@{todir}/inc" >
+				<fileset dir="." includes="@{todir}/**/*.less" />
+			</delete>
 		</sequential>
 	</macrodef>
 
@@ -99,6 +101,9 @@
 		<attribute name="todir" />
 		<sequential>
 			<wepp-args args="--inDir '@{dir}' --outDir '@{todir}'" />
+			<delete dir="@{todir}/inc" >
+				<fileset dir="." includes="@{todir}/**/*.less" />
+			</delete>
 		</sequential>
 	</macrodef>
 
@@ -121,6 +126,5 @@
 			</exec>
 		</sequential>
 	</macrodef>
-
 
 </project>
