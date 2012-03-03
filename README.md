@@ -8,6 +8,11 @@ jQuery.fracs is provided under the terms of the [MIT License](http://github.com/
 
 ## Changelog
 
+### v0.12 - *2012-??-??*
+
+* 
+
+
 ### v0.11 - *2012-03-03*
 
 * completely refactored and !not! compatible with previous versions
