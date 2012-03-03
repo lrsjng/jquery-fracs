@@ -24,10 +24,10 @@
 
 	$$.module('Plug-in');
 
-	$$.test('access', 17, function () {
+	$$.test('access', 15, function () {
 
 		$$.strictEqual(isFn($.fracs), true, '$.fracs is function');
-		$$.strictEqual(membersCount($.fracs), 14, '$.fracs has right number of members');
+		$$.strictEqual(membersCount($.fracs), 12, '$.fracs has right number of members');
 
 		$$.strictEqual(isFn($.fracs.modplug), true, '$.fracs.modplug is function');
 
@@ -44,8 +44,6 @@
 		$$.strictEqual(isFn($.fracs.Outline), true, '$.fracs.Outline is function');
 
 		$$.strictEqual(isFn($.fracs.fracs), true, '$.fracs.fracs is function');
-		$$.strictEqual(isFn($.fracs.scroll), true, '$.fracs.scroll is function');
-		$$.strictEqual(isFn($.fracs.scrollTo), true, '$.fracs.scrollTo is function');
 
 		$$.strictEqual(isFn($().fracs), true, '$().fracs is function');
 	});

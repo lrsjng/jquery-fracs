@@ -706,39 +706,13 @@
 			// This is the **default method**. So instead of calling
 			// `$.fracs.fracs(...)` simply call `$.fracs(...)`.
 			//
-			// Returns the fractions for an `Rect` or `HTMLElement` and
-			// `viewport`, viewport defaults to `$.fracs.viewport()`.
+			// Returns the fractions for a given `Rect` and `viewport`,
+			// viewport defaults to `$.fracs.viewport()`.
 			//
 			//      $.fracs(rect: Rect, [viewport: Rect]): Fractions
-			//      $.fracs(element: HTMLElement, [viewport: Rect]): Fractions
 			fracs: function (rect, viewport) {
 
 				return Fractions.of(rect, viewport);
-			},
-
-			// ### scroll
-			// Scrolls the viewport relative to the current position,
-			// `duration` defaults to `1000`.
-			//
-			//      $.fracs.scroll(left: int, top: int, [duration: int])
-			scroll: function (left, top, duration, viewport) {
-
-				viewport = new Viewport(getHTMLElement(viewport));
-
-				viewport.scroll(left, top, duration);
-				return $;
-			},
-
-			// ### scrollTo
-			// Scrolls the viewport, `duration` defaults to `1000`.
-			//
-			//      $.fracs.scrollTo(left: int, top: int, [duration: int])
-			scrollTo: function (left, top, duration, viewport) {
-
-				viewport = new Viewport(getHTMLElement(viewport));
-
-				viewport.scrollTo(left, top, duration);
-				return $;
 			}
 		},
 
