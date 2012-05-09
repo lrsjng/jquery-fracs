@@ -55,8 +55,14 @@
 		<zip destfile="${release.dir}/${project.name}-${project.version}.zip" basedir="${build.dir}" />
 	</target>
 
-	<target name="lint" depends="init">
-		<jslint files="${src.dir}/jquery.fracs.js ${src.dir}/jquery.outline.js ${src.dir}/test/tests.js" />
+	<target name="jshint" depends="init">
+		<exec executable="${tool.jshint}">
+			<arg line="${src.dir}/jquery.fracs.js" />
+			<arg line="${src.dir}/jquery.outline.js" />
+			<arg line="${src.dir}/test/tests.js" />
+			<arg line="--config jshint.json" />
+			<arg line="--show-non-errors" />
+		</exec>
 	</target>
 
 
@@ -112,16 +118,6 @@
 		<attribute name="files" />
 		<sequential>
 			<exec executable="${tool.docco}" dir="@{dir}" failonerror="true">
-				<arg line="@{files}" />
-			</exec>
-		</sequential>
-	</macrodef>
-
-	<macrodef name="jslint">
-		<attribute name="files" />
-		<sequential>
-			<echo>JSLint @{files}</echo>
-			<exec executable="${tool.jslint}" failonerror="false">
 				<arg line="@{files}" />
 			</exec>
 		</sequential>

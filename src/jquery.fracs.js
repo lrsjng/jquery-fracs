@@ -1,9 +1,7 @@
 /*! jQuery.fracs %BUILD_VERSION% - //larsjung.de/fracs - MIT License */
 
 (function (window, document, $) {
-'use strict';
-/*jslint browser: true, confusion: true, nomen: true, regexp: true, vars: true, white: true */
-/*global jQuery */
+	'use strict';
 
 		// Some often used references.
 	var $window = $(window),

@@ -1,9 +1,7 @@
 /*! jQuery.outline %BUILD_VERSION% - //larsjung.de/fracs - MIT License */
 
 (function (window, $) {
-'use strict';
-/*jslint browser: true, confusion: true, vars: true, white: true */
-/*global jQuery */
+	'use strict';
 
 		// Some often used references.
 	var $window = $(window),
