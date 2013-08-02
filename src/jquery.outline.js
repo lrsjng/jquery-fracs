@@ -1,4 +1,4 @@
-/*! jQuery.outline %BUILD_VERSION% - //larsjung.de/fracs - MIT License */
+/*! jQuery.outline {{pkg.version}} - //larsjung.de/fracs - MIT License */
 
 (function (window, $) {
 	'use strict';

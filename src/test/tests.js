@@ -31,7 +31,7 @@
 
 		$$.strictEqual(isFn($.fracs.modplug), true, '$.fracs.modplug is function');
 
-		$$.strictEqual($.fracs.version, '%BUILD_VERSION%', 'version matches');
+		$$.strictEqual($.fracs.version, '{{pkg.version}}', 'version matches');
 
 		$$.strictEqual(isFn($.fracs.Rect), true, '$.fracs.Rect is function');
 		$$.strictEqual(isFn($.fracs.Fractions), true, '$.fracs.Fractions is function');

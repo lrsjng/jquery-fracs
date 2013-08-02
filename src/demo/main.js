@@ -1,9 +1,4 @@
 
-// @include "../inc/jquery-1.7.js"
-// @include "../inc/jquery-ui-core-effects.min.js"
-// @include "../jquery.fracs-%BUILD_VERSION%.js"
-// @include "../jquery.outline-%BUILD_VERSION%.js"
-
 (function(window, $) {
 	'use strict';
 
@@ -97,7 +92,7 @@
 				.appendTo($body);
 
 			// hardcore ie6+7 fix :/ - custom CSS styling doesn't work
-			$('html.ie6,html.ie7').find('aside.panel').width(500);
+			$('html.no-browser').find('aside.panel').width(500);
 		},
 		initFracsDemo = function () {
 

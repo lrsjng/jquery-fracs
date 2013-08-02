@@ -1,4 +1,4 @@
-/*! jQuery.fracs %BUILD_VERSION% - //larsjung.de/fracs - MIT License */
+/*! jQuery.fracs {{pkg.version}} - //larsjung.de/fracs - MIT License */
 
 (function (window, document, $) {
 	'use strict';
@@ -688,7 +688,7 @@
 		statics: {
 
 			// Build version.
-			version: '%BUILD_VERSION%',
+			version: '{{pkg.version}}',
 
 			// Publish object constructors (for testing).
 			Rect: Rect,
