@@ -1,16 +1,16 @@
 # jQuery.fracs
 
 * Website with download, docs and demo: <http://larsjung.de/fracs>
-* Sources: <http://github.com/lrsjng/jQuery.fracs>
+* Sources: <https://github.com/lrsjng/jQuery.fracs>
 
-jQuery.fracs is provided under the terms of the [MIT License](http://github.com/lrsjng/jQuery.fracs/blob/master/LICENSE.txt).
+jQuery.fracs is provided under the terms of the [MIT License](https://github.com/lrsjng/jQuery.fracs/blob/develop/LICENSE.md).
 
 
 ## Changelog
 
-### v0.12 - *2012-??-??*
+### v0.12 - *2013-??-??*
 
-* 
+* ...
 
 
 ### v0.11 - *2012-03-03*
