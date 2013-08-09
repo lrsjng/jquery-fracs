@@ -2,69 +2,31 @@
 'use strict';
 
 
-var path = require('path'),
-
-	pkg = require('./package.json'),
-
-	root = path.resolve(__dirname),
-	src = path.join(root, 'src'),
-	build = path.join(root, 'build'),
-
-	jshint = {
-		// Enforcing Options
-		bitwise: true,
-		curly: true,
-		eqeqeq: true,
-		forin: true,
-		latedef: true,
-		newcap: true,
-		noempty: true,
-		plusplus: true,
-		trailing: true,
-		undef: true,
-
-		// Environments
-		browser: true,
-
-		// Globals
-		predef: [
-			'jQuery'
-		]
-	},
-
-	mapSrc = function (blob) {
-
-		return blob.source.replace(src, build).replace(/\.less$/, '.css').replace(/\.jade$/, '');
-	},
-
-	mapRoot = function (blob) {
-
-		return blob.source.replace(root, build);
-	};
-
-
 module.exports = function (make) {
 
-	var Event = make.Event,
+
+	var path = require('path'),
+		pkg = require('./package.json'),
+
 		$ = make.fQuery,
-		moment = make.moment,
-		stamp, replacements;
+
+		root = path.resolve(__dirname),
+		src = path.join(root, 'src'),
+		build = path.join(root, 'build');
 
 
-	make.version('>=0.9.0');
+	make.version('>=0.10.0');
 	make.defaults('release');
 
 
 	make.before(function () {
 
-		stamp = moment();
-
-		replacements = {
+		make.env = {
 			pkg: pkg,
-			stamp: stamp.format('YYYY-MM-DD HH:mm:ss')
+			stamp: make.moment().format('YYYY-MM-DD HH:mm:ss')
 		};
 
-		Event.info({ method: 'before', message: pkg.version + ' ' + replacements.stamp });
+		$.info({ method: 'before', message: pkg.version + ' ' + make.env.stamp });
 	});
 
 
@@ -77,11 +39,8 @@ module.exports = function (make) {
 
 		$.git(root, function (err, result) {
 
-			pkg.version += result.revListOriginMasterHead.length + '.' + result.revParseHead.slice(0, 7);
-			Event.info({
-				method: 'check-version',
-				message: 'version set to ' + pkg.version
-			});
+			pkg.version += result.buildSuffix;
+			$.info({ method: 'check-version', message: 'version set to ' + pkg.version });
 			done();
 		});
 	});
@@ -89,45 +48,57 @@ module.exports = function (make) {
 
 	make.target('clean', [], 'delete build folder').sync(function () {
 
-		$.rmfr($.I_AM_SURE, build);
+		$.DELETE(build);
 	});
 
 
 	make.target('lint', [], 'lint all JavaScript files with JSHint').sync(function () {
 
-		$(src + ': *.js, ! inc/**')
-			.jshint(jshint);
+		var options = {
+				// Enforcing Options
+				bitwise: true,
+				curly: true,
+				eqeqeq: true,
+				forin: true,
+				latedef: true,
+				newcap: true,
+				noempty: true,
+				plusplus: true,
+				trailing: true,
+				undef: true,
+
+				// Environments
+				browser: true
+			},
+			global = {
+				'jQuery': true
+			};
+
+		$(src + ': *.js').log(-3)
+			.jshint(options, global);
 	});
 
 
 	make.target('build', ['check-version'], 'build all updated files').sync(function () {
 
-		var scriptName = 'jquery.fracs';
-		$(src + ': ' + scriptName + '.js')
-			.handlebars(replacements)
-			.write($.OVERWRITE, path.join(build, scriptName + '-' + pkg.version + '.js'))
+		$(src + ': *.js')
+			.handlebars(make.env)
+			.WRITE($.map.p(src, build).s('.js', '-' + pkg.version + '.js'))
 			.uglifyjs()
-			.write($.OVERWRITE, path.join(build, scriptName + '-' + pkg.version + '.min.js'));
-
-		scriptName = 'jquery.outline';
-		$(src + ': ' + scriptName + '.js')
-			.handlebars(replacements)
-			.write($.OVERWRITE, path.join(build, scriptName + '-' + pkg.version + '.js'))
-			.uglifyjs()
-			.write($.OVERWRITE, path.join(build, scriptName + '-' + pkg.version + '.min.js'));
+			.WRITE($.map.p(src, build).s('.js', '-' + pkg.version + '.min.js'));
 
 		$(src + ': demo/main.less, test/main.less')
 			.less()
-			.handlebars(replacements)
-			.write($.OVERWRITE, mapSrc);
+			.handlebars(make.env)
+			.WRITE($.map.p(src, build).s('.less', '.css'));
 
 		$(src + ': **, ! *.js, ! **/*.less, ! inc/**')
-			.handlebars(replacements)
-			.write($.OVERWRITE, mapSrc);
+			.handlebars(make.env)
+			.WRITE($.map.p(src, build));
 
 		$(root + ': README*, LICENSE*')
-			.handlebars(replacements)
-			.write($.OVERWRITE, mapRoot);
+			.handlebars(make.env)
+			.WRITE($.map.p(root, build));
 	});
 
 
