@@ -105,7 +105,7 @@
 					$s, $group;
 
 				$section.add($panel.find('.idx'))
-					.css('background-color', Modernizr.rgba ? 'rgba(32,128,255,' + fracs.possible + ')' : color(255, 255, 255, 32, 128, 255, fracs.possible));
+					.css('background-color', Modernizr.rgba ? 'rgba(29,119,194,' + fracs.possible + ')' : color(255, 255, 255, 29, 119, 194, fracs.possible));
 
 				$panel
 					.find('.visible').text(round(fracs.visible, 4)).end()
@@ -205,10 +205,10 @@
 					fillStyle: 'rgb(190,190,190)'
 				}],
 				viewportStyle: {
-					fillStyle: 'rgba(104,169,255,0.3)'
+					fillStyle: 'rgba(29,119,194,0.3)'
 				},
 				viewportDragStyle: {
-					fillStyle: 'rgba(104,169,255,0.5)'
+					fillStyle: 'rgba(29,119,194,0.4)'
 				}
 			});
 
@@ -221,10 +221,10 @@
 					fillStyle: 'auto'
 				}],
 				viewportStyle: {
-					fillStyle: 'rgba(104,169,255,0.3)'
+					fillStyle: 'rgba(29,119,194,0.3)'
 				},
 				viewportDragStyle: {
-					fillStyle: 'rgba(104,169,255,0.5)'
+					fillStyle: 'rgba(29,119,194,0.4)'
 				}
 			}, $('#container'));
 
@@ -237,7 +237,7 @@
 
 		this
 			.stop(true)
-			.css('background-color', 'rgb(250,250,150)')
+			.css('background-color', 'rgb(250,250,200)')
 			.animate({'background-color': '#fff'}, 1000);
 	};
 
