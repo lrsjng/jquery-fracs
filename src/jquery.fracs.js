@@ -259,6 +259,9 @@
 			rect = (isHTMLElement(rect) && Rect.ofElement(rect)) || rect;
 			viewport = (isHTMLElement(viewport) && Rect.ofViewport(viewport)) || viewport || Rect.ofViewport();
 
+			if (!(rect instanceof Rect)) {
+				return new Fractions();
+			}
 			intersection = rect.intersection(viewport);
 			if (!intersection) {
 				return new Fractions();
