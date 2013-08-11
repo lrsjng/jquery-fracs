@@ -21,9 +21,11 @@ module.exports = function (make) {
 
 	make.before(function () {
 
+		var moment = make.moment();
+
 		make.env = {
 			pkg: pkg,
-			stamp: make.moment().format('YYYY-MM-DD HH:mm:ss')
+			stamp: moment.format('YYYY-MM-DD HH:mm:ss')
 		};
 
 		$.info({ method: 'before', message: pkg.version + ' ' + make.env.stamp });
