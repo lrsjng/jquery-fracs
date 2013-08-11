@@ -1,8 +1,10 @@
 
-(function ($, $$) {
+(function () {
 	'use strict';
 
-	var $window = $(window),
+	var $ = jQuery,
+		$$ = QUnit,
+		$window = $(window),
 		$document = $(document),
 		isFn = $.isFunction,
 		byId = function (id) {
@@ -361,8 +363,6 @@
 		}, $('#scr'));
 	});
 
-
-
 	// Plug-In
 	// =======
 
@@ -373,6 +373,4 @@
 	// Methods
 	// -------
 	$$.module('plug-in methods');
-
-
-}(jQuery, QUnit));
+}());

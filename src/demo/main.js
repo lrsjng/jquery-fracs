@@ -1,8 +1,9 @@
 
-(function ($) {
+(function () {
 	'use strict';
 
-	var round = function (value, decs) {
+	var $ = jQuery,
+		round = function (value, decs) {
 
 			var pow;
 
@@ -251,4 +252,4 @@
 		initOutlineDemo();
 	});
 
-}(jQuery));
+}());
