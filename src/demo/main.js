@@ -1,13 +1,9 @@
 
-// @include "../inc/jquery-1.7.js"
-// @include "../inc/jquery-ui-core-effects.min.js"
-// @include "../jquery.fracs-%BUILD_VERSION%.js"
-// @include "../jquery.outline-%BUILD_VERSION%.js"
-
-(function(window, $) {
+(function () {
 	'use strict';
 
-	var round = function (value, decs) {
+	var $ = jQuery,
+		round = function (value, decs) {
 
 			var pow;
 
@@ -76,6 +72,7 @@
 			var box1top = $('#box-1').offset().top,
 				box1height = $('#box-1').height(),
 				$elOut = $('<div id="container"/>')
+							.append('simple "&lt;div&gt; as viewport" demo')
 							.css({
 								top: box1top,
 								height: box1height
@@ -97,7 +94,7 @@
 				.appendTo($body);
 
 			// hardcore ie6+7 fix :/ - custom CSS styling doesn't work
-			$('html.ie6,html.ie7').find('aside.panel').width(500);
+			$('html.no-browser').find('aside.panel').width(500);
 		},
 		initFracsDemo = function () {
 
@@ -110,7 +107,7 @@
 					$s, $group;
 
 				$section.add($panel.find('.idx'))
-					.css('background-color', Modernizr.rgba ? 'rgba(32,128,255,' + fracs.possible + ')' : color(255, 255, 255, 32, 128, 255, fracs.possible));
+					.css('background-color', Modernizr.rgba ? 'rgba(29,119,194,' + fracs.possible + ')' : color(255, 255, 255, 29, 119, 194, fracs.possible));
 
 				$panel
 					.find('.visible').text(round(fracs.visible, 4)).end()
@@ -210,10 +207,10 @@
 					fillStyle: 'rgb(190,190,190)'
 				}],
 				viewportStyle: {
-					fillStyle: 'rgba(104,169,255,0.3)'
+					fillStyle: 'rgba(29,119,194,0.3)'
 				},
 				viewportDragStyle: {
-					fillStyle: 'rgba(104,169,255,0.5)'
+					fillStyle: 'rgba(29,119,194,0.4)'
 				}
 			});
 
@@ -226,10 +223,10 @@
 					fillStyle: 'auto'
 				}],
 				viewportStyle: {
-					fillStyle: 'rgba(104,169,255,0.3)'
+					fillStyle: 'rgba(29,119,194,0.3)'
 				},
 				viewportDragStyle: {
-					fillStyle: 'rgba(104,169,255,0.5)'
+					fillStyle: 'rgba(29,119,194,0.4)'
 				}
 			}, $('#container'));
 
@@ -242,7 +239,7 @@
 
 		this
 			.stop(true)
-			.css('background-color', 'rgb(250,250,150)')
+			.css('background-color', 'rgb(250,250,200)')
 			.animate({'background-color': '#fff'}, 1000);
 	};
 
@@ -256,4 +253,4 @@
 		initOutlineDemo();
 	});
 
-}(window, jQuery));
+}());

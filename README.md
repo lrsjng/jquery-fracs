@@ -1,12 +1,21 @@
 # jQuery.fracs
 
-* Website with download, docs and demo: <http://larsjung.de/fracs>
-* Sources: <http://github.com/lrsjng/jQuery.fracs>
+* Website with download, docs and demo: <http://larsjung.de/fracs/>
+* Sources: <https://github.com/lrsjng/jQuery.fracs>
 
-jQuery.fracs is provided under the terms of the [MIT License](http://github.com/lrsjng/jQuery.fracs/blob/master/LICENSE.txt).
+jQuery.fracs is provided under the terms of the [MIT License](https://github.com/lrsjng/jQuery.fracs/blob/develop/LICENSE.md).
 
 
 ## Changelog
+
+
+### v0.12.0 - *2013-08-11*
+
+* fixes some small issues
+* updates `modplug` to `1.0`
+* updates demo and tests
+* changes build process
+
 
 ### v0.11 - *2012-03-03*
 

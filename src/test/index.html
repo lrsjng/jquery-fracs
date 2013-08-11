@@ -2,12 +2,13 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>jQuery.fracs %BUILD_VERSION% Test Suite</title>
-	<link rel="stylesheet" type="text/css" href="main.css">
+	<title>jQuery.fracs {{pkg.version}} Test Suite</title>
+	<link rel="stylesheet" href="../lib/qunit-1.12.0.css">
+	<link rel="stylesheet" href="main.css">
 </head>
 <body>
 	<div id="tests">
-		<h1 id="qunit-header">jQuery.fracs %BUILD_VERSION% Test Suite</h1>
+		<h1 id="qunit-header">jQuery.fracs {{pkg.version}} Test Suite</h1>
 		<h2 id="qunit-banner"></h2>
 		<div id="qunit-testrunner-toolbar"></div>
 		<h2 id="qunit-userAgent"></h2>
@@ -15,7 +16,11 @@
 	</div>
 	<div id="test-elements">
 	</div>
+
+	<script src="../lib/qunit-1.12.0.js"></script>
+	<script src="../lib/jquery-1.10.2.min.js"></script>
+	<script src="../jquery.fracs-{{pkg.version}}.js"></script>
+	<script src="../jquery.outline-{{pkg.version}}.js"></script>
 	<script src="main.js"></script>
-	<script src="tests.js"></script>
 </body>
 </html>

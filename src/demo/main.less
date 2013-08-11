@@ -1,31 +1,28 @@
 @charset "UTF-8";
 
 
-@import "../inc/h5bp-norm";
-@import "../inc/mixins";
-
-
 body {
 	font-family: Ubuntu, Arial, sans;
 	font-size: 16px;
 	color: #333;
+	position: absolute;
 
 	a, a:visited, a:active {
-		color: #2080ff;
+		color: #1d77c2;
 		text-decoration: none;
-		.transition(all 0.2s ease-in-out);
 
 		&:hover {
-			color: #68A9ff;
+			color: #555;
+			background-color: rgba(0,0,0,0.05);
 		}
 	}
 
 	> h1 {
 		display: inline-block;
 		margin: 30px;
-		padding: 10px;
-		font-size: 3em;
-		border-bottom: 4px solid #eee;
+		padding: 4px;
+		font-size: 2em;
+		border-bottom: 2px solid #eee;
 	}
 	> section {
 		position: relative;
@@ -42,7 +39,7 @@ body {
 			overflow: hidden;
 			margin: 10px;
 			padding: 8px 16px 16px 16px;
-			.border-radius(5px);
+			border-radius: 5px;
 			background-color: rgba(255,255,255,0.5);
 
 			.idx {
@@ -62,17 +59,17 @@ body {
 		width: 200px;
 		height: 200px;
 		border: 1px solid #ccc;
-		.border-radius(9px);
+		border-radius: 9px;
 
 		> .scrollbar {
 			margin: 4px;
 			width: 10px;
 			background-color: #ccc;
-			.border-radius(5px);
+			border-radius: 5px;
 
 			.drag {
 				background-color: #aaa;
-				.border-radius(5px);
+				border-radius: 5px;
 			}
 			&.dragOn .drag {
 				background-color: #caa;
@@ -106,7 +103,7 @@ body {
 	aside.panel {
 		font-size: 0.85em;
 		position: fixed;
-		bottom: 8px;
+		top: 8px;
 		right: 8px;
 		background-color: #fff;
 		z-index: 1;
@@ -136,7 +133,7 @@ body {
 					padding: 0;
 					cursor: pointer;
 					border: 1px solid rgba(0,0,0,0);
-					.border-radius(4px);
+					border-radius: 4px;
 
 					&.header {
 						font-weight: bold;
@@ -189,6 +186,4 @@ body {
 			}
 		}
 	}
-
 }
-
