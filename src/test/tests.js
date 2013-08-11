@@ -1,7 +1,6 @@
-(function (window, document, $, $$) {
-'use strict';
-/*jslint browser: true, confusion: true, vars: true, white: true */
-/*globals window, jQuery, QUnit */
+
+(function ($, $$) {
+	'use strict';
 
 	var $window = $(window),
 		$document = $(document),
@@ -319,7 +318,7 @@
 	// -----------
 	$$.module('ScrollState');
 
-	$$.test('tests', function () {
+	$$.test('tests', 0, function () {
 
 		$('<div id="scr"/>')
 			.addClass('box')
@@ -376,5 +375,4 @@
 	$$.module('plug-in methods');
 
 
-}(window, document, jQuery, QUnit));
-
+}(jQuery, QUnit));

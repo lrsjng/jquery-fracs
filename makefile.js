@@ -89,12 +89,12 @@ module.exports = function (make) {
 			.uglifyjs()
 			.WRITE($.map.p(src, build).s('.js', '-' + pkg.version + '.min.js'));
 
-		$(src + ': demo/main.less, test/main.less')
+		$(src + ': demo/*.less, test/*.less')
 			.less()
 			.handlebars(make.env)
 			.WRITE($.map.p(src, build).s('.less', '.css'));
 
-		$(src + ': **, ! *.js, ! **/*.less, ! inc/**')
+		$(src + ': **, ! *.js, ! **/*.less')
 			.handlebars(make.env)
 			.WRITE($.map.p(src, build));
 

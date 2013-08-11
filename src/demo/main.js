@@ -1,5 +1,5 @@
 
-(function(window, $) {
+(function ($) {
 	'use strict';
 
 	var round = function (value, decs) {
@@ -251,4 +251,4 @@
 		initOutlineDemo();
 	});
 
-}(window, jQuery));
+}(jQuery));
