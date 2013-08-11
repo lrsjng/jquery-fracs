@@ -9,6 +9,11 @@ jQuery.fracs is provided under the terms of the [MIT License](https://github.com
 ## Changelog
 
 
+### develop branch
+
+* ...
+
+
 ### v0.12.0 - *2013-08-11*
 
 * fixes some small issues
