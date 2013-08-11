@@ -8,9 +8,12 @@ jQuery.fracs is provided under the terms of the [MIT License](https://github.com
 
 ## Changelog
 
+
 ### v0.12 - *2013-??-??*
 
-* ...
+* fixes some small issues
+* updates `modplug` to `1.0`
+* changes build process
 
 
 ### v0.11 - *2012-03-03*
