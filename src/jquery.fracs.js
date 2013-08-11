@@ -596,15 +596,20 @@
 
 
 
-
-	// modplug 0.7
+	// modplug 1.0
 	// ===========
 
 	// Use <http://larsjung.de/modplug> to attach the plug-in to jQuery.
 	var modplug = function (namespace, options) {
 
+			// Some references to enhance minification.
+		var slice = [].slice,
+			$ = jQuery,
+			extend = $.extend,
+			isFn = $.isFunction,
+
 			// Save the initial settings.
-		var settings = extend({}, options),
+			settings = extend({}, options),
 
 			// Helper function to apply default methods.
 			applyMethod = function (obj, args, methodName, methods) {
@@ -641,8 +646,8 @@
 				return applyMethod(this, slice.call(arguments), settings.defaultMethod, methods);
 			},
 
-			// Adds/overwrites plug-in methods. This function gets exposed as
-			// `$.<namespace>.modplug` to make the plug-in extendable.
+			// Adds/overwrites plugin methods. This function gets exposed as
+			// `$.<namespace>.modplug` to make the plugin extendable.
 			plug = function (options) {
 
 				if (options) {
@@ -650,26 +655,25 @@
 					extend(methods, options.methods);
 				}
 
-				// Make sure that `$.<namespace>.modplug` points to this
-				// function after adding new methods.
+				// Make sure that `$.<namespace>.modplug` points to this function
+				// after adding new methods.
 				statics.modplug = plug;
 			};
 
-		// Save objects or methods previously registered to the desired
-		// namespace. They are available via `$.<namespace>.modplug.prev`.
+		// Save objects or methods previously registered to the desired namespace.
+		// They are available via `$.<namespace>.modplug.prev`.
 		plug.prev = {
 			statics: $[namespace],
 			methods: $.fn[namespace]
 		};
 
-		// Init the plug-in by adding the specified statics and methods.
+		// Init the plugin by adding the specified statics and methods.
 		plug(options);
 
-		// Register the plug-in.
+		// Register the plugin.
 		$[namespace] = statics;
 		$.fn[namespace] = methods;
 	};
-
 
 
 
