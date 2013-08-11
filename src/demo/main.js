@@ -72,6 +72,7 @@
 			var box1top = $('#box-1').offset().top,
 				box1height = $('#box-1').height(),
 				$elOut = $('<div id="container"/>')
+							.append('simple "&lt;div&gt; as viewport" demo')
 							.css({
 								top: box1top,
 								height: box1height
