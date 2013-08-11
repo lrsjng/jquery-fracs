@@ -9,7 +9,7 @@ jQuery.fracs is provided under the terms of the [MIT License](https://github.com
 ## Changelog
 
 
-### v0.12 - *2013-??-??*
+### develop branch
 
 * fixes some small issues
 * updates `modplug` to `1.0`
