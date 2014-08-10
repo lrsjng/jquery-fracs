@@ -1,7 +1,7 @@
 {
   "name": "jquery-fracs",
   "displayName": "jQuery.fracs",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "description": "determine the visible fractions of an HTML element",
   "homepage": "http://larsjung.de/fracs/",
   "bugs": "https://github.com/lrsjng/jquery-fracs/issues",

@@ -1,7 +1,7 @@
 {
   "name": "jquery-fracs",
-  "version": "0.13.0",
-  "description": "a simple vertical scroll panel",
+  "version": "0.13.1",
+  "description": "determine the visible fractions of an HTML element",
   "homepage": "http://larsjung.de/fracs/",
   "authors": [
     "Lars Jung <lrsjng@gmail.com> (http://larsjung.de)"

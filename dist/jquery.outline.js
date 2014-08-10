@@ -1,4 +1,4 @@
-/*! jQuery.outline 0.13.0 - //larsjung.de/fracs - MIT License */
+/*! jQuery.outline 0.13.1 - //larsjung.de/fracs - MIT License */
 
 (function (window, $) {
 	'use strict';
