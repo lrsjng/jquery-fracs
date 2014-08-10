@@ -12,6 +12,7 @@ module.exports = function (make) {
 
 		root = path.resolve(__dirname),
 		src = path.join(root, 'src'),
+		dist = path.join(root, 'dist'),
 		build = path.join(root, 'build');
 
 
@@ -19,38 +20,10 @@ module.exports = function (make) {
 	make.defaults('release');
 
 
-	make.before(function () {
-
-		var moment = make.moment();
-
-		make.env = {
-			pkg: pkg,
-			stamp: moment.format('YYYY-MM-DD HH:mm:ss')
-		};
-
-		$.info({ method: 'before', message: pkg.version + ' ' + make.env.stamp });
-	});
-
-
-	make.target('check-version', [], 'add git info to dev builds').async(function (done, fail) {
-
-		if (!/\+$/.test(pkg.version)) {
-			done();
-			return;
-		}
-
-		$.git(root, function (err, result) {
-
-			pkg.version += result.buildSuffix;
-			$.info({ method: 'check-version', message: 'version set to ' + pkg.version });
-			done();
-		});
-	});
-
-
 	make.target('clean', [], 'delete build folder').sync(function () {
 
 		$.DELETE(build);
+		$.DELETE(dist);
 	});
 
 
@@ -81,30 +54,37 @@ module.exports = function (make) {
 	});
 
 
-	make.target('build', ['check-version'], 'build all updated files').sync(function () {
+	make.target('build', ['clean', 'lint'], 'build all updated files').sync(function () {
+
+		var env = {
+				pkg: pkg
+			};
 
 		$(src + ': *.js')
-			.handlebars(make.env)
+			.includify()
+			.handlebars(env)
+			.WRITE($.map.p(src, dist))
 			.WRITE($.map.p(src, build).s('.js', '-' + pkg.version + '.js'))
 			.uglifyjs()
+			.WRITE($.map.p(src, dist).s('.js', '.min.js'))
 			.WRITE($.map.p(src, build).s('.js', '-' + pkg.version + '.min.js'));
 
 		$(src + ': demo/*.less, test/*.less')
 			.less()
-			.handlebars(make.env)
+			.handlebars(env)
 			.WRITE($.map.p(src, build).s('.less', '.css'));
 
 		$(src + ': **, ! *.js, ! **/*.less')
-			.handlebars(make.env)
+			.handlebars(env)
 			.WRITE($.map.p(src, build));
 
 		$(root + ': README*, LICENSE*')
-			.handlebars(make.env)
+			.handlebars(env)
 			.WRITE($.map.p(root, build));
 	});
 
 
-	make.target('release', ['clean', 'build'], 'create a zipball').async(function (done, fail) {
+	make.target('release', ['build'], 'create a zipball').async(function (done, fail) {
 
 		$(build + ': **').shzip({
 			target: path.join(build, pkg.name + '-' + pkg.version + '.zip'),

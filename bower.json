@@ -1,0 +1,28 @@
+{
+  "name": "jquery-fracs",
+  "version": "0.13.0",
+  "description": "a simple vertical scroll panel",
+  "homepage": "http://larsjung.de/fracs/",
+  "authors": [
+    "Lars Jung <lrsjng@gmail.com> (http://larsjung.de)"
+  ],
+  "license": "MIT",
+  "main": "dist/jquery.fracs.js",
+  "keywords": [
+    "jquery",
+    "javascript",
+    "visible",
+    "fraction"
+  ],
+  "ignore": [
+    "**/.*",
+    "bower_components",
+    "build",
+    "local",
+    "makefile.js",
+    "node_modules",
+    "src",
+    "test",
+    "tests"
+  ]
+}
