@@ -1,13 +1,14 @@
 {
-  "name": "jquery.fracs",
+  "name": "jquery-fracs",
   "displayName": "jQuery.fracs",
-  "version": "0.12.0+",
+  "version": "0.13.0",
   "description": "determine the visible fractions of an HTML element",
-  "url": "http://larsjung.de/fracs/",
-  "author": "Lars Jung",
+  "homepage": "http://larsjung.de/fracs/",
+  "bugs": "https://github.com/lrsjng/jquery-fracs/issues",
+  "author": "Lars Jung <lrsjng@gmail.com> (http://larsjung.de)",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lrsjng/jQuery.fracs.git"
+    "url": "https://github.com/lrsjng/jquery-fracs.git"
   }
 }

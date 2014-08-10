@@ -1,115 +1,40 @@
 # jQuery.fracs
 
-* Website with download, docs and demo: <http://larsjung.de/fracs/>
-* Sources: <https://github.com/lrsjng/jQuery.fracs>
+[![web][web-img]][web] [![GitHub][github-img]][github] [![bower][bower-img]][bower]
 
-jQuery.fracs is provided under the terms of the [MIT License](https://github.com/lrsjng/jQuery.fracs/blob/develop/LICENSE.md).
-
-
-## Changelog
+jQuery plugin to determine the visible fractions of HTML elements.
+For bug reports and feature requests please use [issues][github-issues].
 
 
-### develop branch
+## License
+The MIT License (MIT)
 
-* ...
+Copyright (c) 2014 Lars Jung (http://larsjung.de)
 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-### v0.12.0 - *2013-08-11*
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
-* fixes some small issues
-* updates `modplug` to `1.0`
-* updates demo and tests
-* changes build process
-
-
-### v0.11 - *2012-03-03*
-
-* completely refactored and !not! compatible with previous versions
-* now depends on jQuery 1.7
-* fixes `ScrollState`
-* `ScrollState` is now available for all elements
-* removes `Cursor`
-* removes most `$.fracs.*` methods
-* moves all js code into one file
-* adds tests
-* adds comments
-* updates to `modplug 0.7`
-* removes `release` folder
-* adds `docco` build dependency for docs
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 
 
-### v0.10 - *2011-09-17*
+[web]: http://larsjung.de/fracs/
+[github]: https://github.com/lrsjng/jquery-fracs
+[bower]: http://bower.io/search/?q=jquery-fracs
+[github-issues]: https://github.com/lrsjng/jquery-fracs/issues
 
-* refactored and redesigned
-* added `autoFocus` to `OutlineOptions` and changed default `duration` to `0`
-* added callbacks for the `max` and `min` methods
-* added some cursor related methods
-* added the corresponding objects `Element`, `Group` and `Cursor`
-
-
-### v0.9 - *2011-08-13*
-
-* now also provided: core lib without the large Outline feature (~66% in size)
-* shortcut for the static method fracs
-* static method scrollState and object ScrollState changed
-* refactorings, finally found my modular plugin style
-
-
-### v0.8.1 - *2011-08-10*
-
-* added viewport styling to `OutlineOptions`
-* fixed text selection on dragging
-
-
-### v0.8 - *2011-08-09*
-
-* added `duration`, `focusWidth` and `focusHeight` to `OutlineOptions`
-* added static methods
-    * `jQuery.fracs.scroll`
-    * `jQuery.fracs.scrollState`
-* added methods to `Rect`
-    * `bind`
-    * `unbind`
-    * `check`
-    * `fracs`
-
-
-### v0.7.1 - *2011-08-01*
-
-* fixed unchecked use of console.log
-
-
-### v0.7 - *2011-07-27*
-
-* changed license to MIT license, see `LICENSE.txt`
-
-
-### v0.6 - *2011-07-26*
-
-* added envelope
-* started test suite
-
-
-### v0.5 - *2011-07-21*
-
-* added soft link, outline, min, max
-* refactorings
-
-
-### v0.4 - *2011-07-15*
-
-* added scroll methods
-* added FracsElement
-
-
-### v0.3 - *2011-07-13*
-
-* some API changes
-* cleaned code
-* first test of grouping elements
-* added FracsGroup
-
-
-### v0.2 - *2011-07-12*
-
-* improved demo
+[web-img]: http://img.shields.io/badge/web-larsjung.de/fracs-a0a060.svg?style=flat
+[github-img]: http://img.shields.io/badge/GitHub-lrsjng/jquery--fracs-a0a060.svg?style=flat
+[bower-img]: http://img.shields.io/badge/bower-jquery--fracs-a0a060.svg?style=flat
