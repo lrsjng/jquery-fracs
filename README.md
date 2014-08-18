@@ -3,7 +3,6 @@
 [![web][web-img]][web] [![GitHub][github-img]][github] [![bower][bower-img]][bower]
 
 jQuery plugin to determine the visible fractions of HTML elements.
-For bug reports and feature requests please use [issues][github-issues].
 
 
 ## License
@@ -33,7 +32,6 @@ THE SOFTWARE.
 [web]: http://larsjung.de/fracs/
 [github]: https://github.com/lrsjng/jquery-fracs
 [bower]: http://bower.io/search/?q=jquery-fracs
-[github-issues]: https://github.com/lrsjng/jquery-fracs/issues
 
 [web-img]: http://img.shields.io/badge/web-larsjung.de/fracs-a0a060.svg?style=flat
 [github-img]: http://img.shields.io/badge/GitHub-lrsjng/jquery--fracs-a0a060.svg?style=flat

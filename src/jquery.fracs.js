@@ -1,5 +1,3 @@
-/*! jQuery.fracs {{pkg.version}} - //larsjung.de/fracs - MIT License */
-
 (function (window, document, $) {
 	'use strict';
 
