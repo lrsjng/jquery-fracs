@@ -1,4 +1,4 @@
-/* jQuery.fracs 0.14.0 - http://larsjung.de/fracs/ */
+/* jQuery.fracs 0.14.1 - http://larsjung.de/jquery-fracs/ */
 (function (window, document, $) {
 	'use strict';
 
@@ -693,7 +693,7 @@
 		statics: {
 
 			// Build version.
-			version: '0.14.0',
+			version: '0.14.1',
 
 			// Publish object constructors (for testing).
 			Rect: Rect,

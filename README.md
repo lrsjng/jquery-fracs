@@ -1,6 +1,6 @@
 # jQuery.fracs
 
-[![web][web-img]][web] [![GitHub][github-img]][github] [![bower][bower-img]][bower]
+[![web][web-img]][web] [![GitHub][github-img]][github] [![bower][bower-img]][github]
 
 jQuery plugin to determine the visible fractions of HTML elements.
 
@@ -31,7 +31,6 @@ THE SOFTWARE.
 
 [web]: http://larsjung.de/fracs/
 [github]: https://github.com/lrsjng/jquery-fracs
-[bower]: http://bower.io/search/?q=jquery-fracs
 
 [web-img]: http://img.shields.io/badge/web-larsjung.de/fracs-a0a060.svg?style=flat
 [github-img]: http://img.shields.io/badge/GitHub-lrsjng/jquery--fracs-a0a060.svg?style=flat

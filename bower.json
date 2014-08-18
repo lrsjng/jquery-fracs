@@ -1,19 +1,13 @@
 {
   "name": "jquery-fracs",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "description": "determine the visible fractions of an HTML element",
-  "homepage": "http://larsjung.de/fracs/",
+  "homepage": "http://larsjung.de/jquery-fracs/",
   "authors": [
     "Lars Jung <lrsjng@gmail.com> (http://larsjung.de)"
   ],
   "license": "MIT",
   "main": "dist/jquery.fracs.js",
-  "keywords": [
-    "jquery",
-    "javascript",
-    "visible",
-    "fraction"
-  ],
   "ignore": [
     "**/.*",
     "bower_components",
