@@ -1,59 +1,60 @@
 <!DOCTYPE html>
-<!--[if lt IE 9]> <html class="no-js no-browser" lang="en"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
-<head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-	<title>jQuery.fracs {{pkg.version}} Demo</title>
-	<meta name="description" content="Test and demo page for jQuery.fracs">
-	<meta name="author" content="Lars Jung">
-	<meta name="viewport" content="width=device-width">
-	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Ubuntu:regular,italic,bold">
-	<link rel="stylesheet" href="../lib/normalize-1.1.1.css">
-	<link rel="stylesheet" href="main.css">
-	<script src="../lib/modernizr-2.6.2.min.js"></script>
-</head>
-<body>
-	<aside class="panel">
-		<h1><a href="http://larsjung.de/fracs" title="jQuery.fracs project page">jQuery.fracs</a> {{pkg.version}} Demo</h1>
-		<section>
-			<h2>Fractions</h2>
-			<ul class="fracs">
-				<li class='header'>
-					<span class='idx'>#</span><span class='info' title="fraction of the element that is visible compared to the maximal possible area that might be visible">possible</span><span class='info' title="fraction of the element that is visible">visible</span><span class='info' title="fraction of the viewport (window) that is taken by this element">viewport</span>
-				</li>
-			</ul>
-			<h2>Group Maximums (#4 .. #8)</h2>
-			<ul class="groups">
-				<li><span>possible:</span><span class='possible'>undef.</span></li>
-				<li><span>viewport:</span><span class='viewport'>undef.</span></li>
-			</ul>
-			<h2>ScrollState</h2>
-			<ul class="scrollstate">
-				<li><span>width:</span><span class='width'>undef.</span></li>
-				<li><span>height:</span><span class='height'>undef.</span></li>
-			</ul>
-			<ul class="scrollstate">
-				<li><span>left:</span><span class='left'>undef.</span></li>
-				<li><span>top:</span><span class='top'>undef.</span></li>
-			</ul>
-			<ul class="scrollstate">
-				<li><span>right:</span><span class='right'>undef.</span></li>
-				<li><span>bottom:</span><span class='bottom'>undef.</span></li>
-			</ul>
-		</section>
-		<section>
-			<h2 id="outlineHeader">Outline</h2>
-			<span id="docDims">Document: ?x?</span>
-			<span id="vpDims">Viewport: ?x?</span>
-			<canvas id="outline" width="300" height="300"></canvas>
-		</section>
-	</aside>
+<html lang="en">
 
-	<script src="../lib/jquery-1.10.2.min.js"></script>
-	<script src="../lib/jquery.animate-colors-20120928.min.js"></script>
-	<script src="../jquery.fracs-{{pkg.version}}.js"></script>
-	<script src="../jquery.outline-{{pkg.version}}.js"></script>
-	<script src="main.js"></script>
+<head>
+    <meta charset="utf-8">
+    <title>{{pkg.displayName}} {{pkg.version}} Demo</title>
+    <meta name="description" content="Demo page for {{pkg.displayName}} {{pkg.version}}">
+    <meta name="author" content="Lars Jung">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Ubuntu:regular,italic,bold">
+    <link rel="stylesheet" href="../lib/normalize-3.0.1.css">
+    <link rel="stylesheet" href="main.css">
+    <script src="../lib/modernizr-2.8.3.min.js"></script>
+</head>
+
+<body>
+    <aside class="panel">
+        <h1><a href="{{pkg.homepage}}" title="{{pkg.displayName}} project page">{{pkg.displayName}}</a> {{pkg.version}} Demo</h1>
+        <section>
+            <h2>Fractions</h2>
+            <ul class="fracs">
+                <li class='header'>
+                    <span class='idx'>#</span><span class='info' title="fraction of the element that is visible compared to the maximal possible area that might be visible">possible</span><span class='info' title="fraction of the element that is visible">visible</span><span class='info' title="fraction of the viewport (window) that is taken by this element">viewport</span>
+                </li>
+            </ul>
+            <h2>Group Maximums (#4 .. #8)</h2>
+            <ul class="groups">
+                <li><span>possible:</span><span class='possible'>undef.</span></li>
+                <li><span>viewport:</span><span class='viewport'>undef.</span></li>
+            </ul>
+            <h2>ScrollState</h2>
+            <ul class="scrollstate">
+                <li><span>width:</span><span class='width'>undef.</span></li>
+                <li><span>height:</span><span class='height'>undef.</span></li>
+            </ul>
+            <ul class="scrollstate">
+                <li><span>left:</span><span class='left'>undef.</span></li>
+                <li><span>top:</span><span class='top'>undef.</span></li>
+            </ul>
+            <ul class="scrollstate">
+                <li><span>right:</span><span class='right'>undef.</span></li>
+                <li><span>bottom:</span><span class='bottom'>undef.</span></li>
+            </ul>
+        </section>
+        <section>
+            <h2 id="outlineHeader">Outline</h2>
+            <span id="docDims">Document: ?x?</span>
+            <span id="vpDims">Viewport: ?x?</span>
+            <canvas id="outline" width="300" height="300"></canvas>
+        </section>
+    </aside>
+
+    <script src="../lib/jquery-1.11.1.min.js"></script>
+    <script src="../lib/jquery.colors-1.6.0.min.js"></script>
+    <script src="../jquery.fracs-{{pkg.version}}.js"></script>
+    <script src="../jquery.outline-{{pkg.version}}.js"></script>
+    <script src="main.js"></script>
 </body>
+
 </html>

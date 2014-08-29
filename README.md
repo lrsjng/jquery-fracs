@@ -1,6 +1,6 @@
 # jQuery.fracs
 
-[![web][web-img]][web] [![GitHub][github-img]][github] [![bower][bower-img]][github]
+[![license][license-img]][github] [![web][web-img]][web] [![github][github-img]][github] [![bower][bower-img]][github]
 
 jQuery plugin to determine the visible fractions of HTML elements.
 
@@ -29,9 +29,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-[web]: http://larsjung.de/fracs/
+[web]: http://larsjung.de/jquery-fracs/
 [github]: https://github.com/lrsjng/jquery-fracs
 
-[web-img]: http://img.shields.io/badge/web-larsjung.de/fracs-a0a060.svg?style=flat
-[github-img]: http://img.shields.io/badge/GitHub-lrsjng/jquery--fracs-a0a060.svg?style=flat
-[bower-img]: http://img.shields.io/badge/bower-jquery--fracs-a0a060.svg?style=flat
+[license-img]: http://img.shields.io/badge/license-MIT-a0a060.svg?style=flat-square
+[web-img]: http://img.shields.io/badge/web-larsjung.de/fracs-a0a060.svg?style=flat-square
+[github-img]: http://img.shields.io/badge/github-lrsjng/jquery--fracs-a0a060.svg?style=flat-square
+[bower-img]: http://img.shields.io/badge/bower-lrsjng/jquery--fracs-a0a060.svg?style=flat-square

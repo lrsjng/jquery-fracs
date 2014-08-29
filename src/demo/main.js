@@ -1,256 +1,269 @@
-
 (function () {
-	'use strict';
+'use strict';
 
-	var $ = jQuery,
-		round = function (value, decs) {
+var $ = jQuery;
 
-			var pow;
+function round(value, decs) {
 
-			if (isNaN(decs) || decs <= 0) {
-				return Math.round(value);
-			}
-			pow = Math.pow(10, decs);
-			return Math.round(value * pow) / pow;
-		},
-		color = function (r1, g1, b1, r2, g2, b2, frac) {
+    var pow;
 
-			var invFrac = 1 - frac,
-				r = Math.floor(r1 * invFrac + r2 * frac),
-				g = Math.floor(g1 * invFrac + g2 * frac),
-				b = Math.floor(b1 * invFrac + b2 * frac);
+    if (isNaN(decs) || decs <= 0) {
+        return Math.round(value);
+    }
+    pow = Math.pow(10, decs);
+    return Math.round(value * pow) / pow;
+}
 
-			return 'rgb(' + r + ',' + g + ',' + b + ')';
-		},
-		generateContent = function () {
+function color(r1, g1, b1, r2, g2, b2, frac) {
 
-			var $body = $('body'),
-				$panelFracs = $('.panel .fracs'),
-				scrollToFn = function ($target) {
-					return function () {
-						$target.fracs('scrollToThis', 50, 50, 500);
-					};
-				},
-				i, $section, $label, $ul, $rectsul, $li;
+    var invFrac = 1 - frac;
+    var r = Math.floor(r1 * invFrac + r2 * frac);
+    var g = Math.floor(g1 * invFrac + g2 * frac);
+    var b = Math.floor(b1 * invFrac + b2 * frac);
 
-			for (i = 1; i < 10; i += 1) {
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
+}
 
-				//section
-				$section = $('<section id="box-' + i + '" class="box" title="scroll to this element" />')
-					.appendTo($body)
-					.width(i * 300)
-					.height(Math.round(Math.random() * 600 + 100));
+function generateContent() {
 
-				$label = $('<div class="label"><span class="idx">#' + i + '</span></div>')
-					.appendTo($section);
+    var $body = $('body');
+    var $panelFracs = $('.panel .fracs');
+    var i, $section, $label, $ul, $rectsul, $li;
 
-				$ul = $('<ul />')
-					.appendTo($label)
-					.append($('<li><span class="info possible" /> of max possible visibility</li>'))
-					.append($('<li><span class="info visible" /> visible</li>'))
-					.append($('<li><span class="info viewport" /> of viewport</li>'));
+    function scrollToFn($target) {
 
-				$rectsul = $('<li>visible rect <span class="info dims" /><ul /></li>')
-					.appendTo($ul)
-					.find('ul')
-						.append($('<li>document space <span class="info rect" /></li>'))
-						.append($('<li>element space <span class="info rectElementSpace" /></li>'))
-						.append($('<li>viewport space <span class="info rectViewportSpace" /></li>'));
-
-				// panel
-				$li = $('<li id="box-entry-' + i + '" class="section" title="scroll to this element" />')
-					.appendTo($panelFracs)
-					.append($('<span class="idx">' + i + '</span>'))
-					.append($('<span class="info possible" /><span class="info visible" /><span class="info viewport" />'));
-
-				$section.add($li).click(scrollToFn($section));
-
-				$section.data('panel', $li);
-			}
+        return function () { $target.fracs('scrollToThis', 50, 50, 500); };
+    }
 
 
-			var box1top = $('#box-1').offset().top,
-				box1height = $('#box-1').height(),
-				$elOut = $('<div id="container"/>')
-							.append('simple "&lt;div&gt; as viewport" demo')
-							.css({
-								top: box1top,
-								height: box1height
-							})
-							.appendTo($body);
+    for (i = 1; i < 10; i += 1) {
 
-			for (i = 1; i < 10; i += 1) {
-				$('<div class="small-box"/>')
-					.css({
-						width: i * 80,
-						height: Math.round(Math.random() * 60 + 10)
-					})
-					.appendTo($elOut);
-			}
-			$('<canvas id="container-outline" width="100" height="100" />')
-				.css({
-					top: box1top
-				})
-				.appendTo($body);
+        //section
+        $section = $('<section id="box-' + i + '" class="box" title="scroll to this element" />')
+            .appendTo($body)
+            .width(i * 300)
+            .height(Math.round(Math.random() * 600 + 100));
 
-			// hardcore ie6+7 fix :/ - custom CSS styling doesn't work
-			$('html.no-browser').find('aside.panel').width(500);
-		},
-		initFracsDemo = function () {
+        $label = $('<div class="label"><span class="idx">#' + i + '</span></div>')
+            .appendTo($section);
 
-			// init fracs
-			$('.box').fracs(function (fracs) {
+        $ul = $('<ul />')
+            .appendTo($label)
+            .append($('<li><span class="info possible" /> of max possible visibility</li>'))
+            .append($('<li><span class="info visible" /> visible</li>'))
+            .append($('<li><span class="info viewport" /> of viewport</li>'));
 
-				var $section = $(this),
-					$panel = $section.data('panel'),
-					$label = $section.find('.label'),
-					$s, $group;
+        $rectsul = $('<li>visible rect <span class="info dims" /><ul /></li>')
+            .appendTo($ul)
+            .find('ul')
+                .append($('<li>document space <span class="info rect" /></li>'))
+                .append($('<li>element space <span class="info rectElementSpace" /></li>'))
+                .append($('<li>viewport space <span class="info rectViewportSpace" /></li>'));
 
-				$section.add($panel.find('.idx'))
-					.css('background-color', Modernizr.rgba ? 'rgba(29,119,194,' + fracs.possible + ')' : color(255, 255, 255, 29, 119, 194, fracs.possible));
+        // panel
+        $li = $('<li id="box-entry-' + i + '" class="section" title="scroll to this element" />')
+            .appendTo($panelFracs)
+            .append($('<span class="idx">' + i + '</span>'))
+            .append($('<span class="info possible" /><span class="info visible" /><span class="info viewport" />'));
 
-				$panel
-					.find('.visible').text(round(fracs.visible, 4)).end()
-					.find('.viewport').text(round(fracs.viewport, 4)).end()
-					.find('.possible').text(round(fracs.possible, 4)).end()
-					.highlight();
+        $section.add($li).click(scrollToFn($section));
 
-				$label
-					.find('.visible').text(round(fracs.visible * 100, 1) + '%').end()
-					.find('.viewport').text(round(fracs.viewport * 100, 1) + '%').end()
-					.find('.possible').text(round(fracs.possible * 100, 1) + '%');
+        $section.data('panel', $li);
+    }
 
-				if (!fracs.rects) {
-					$label
-						.find('.rects').text('undefined');
-				} else {
-					$label
-						.find('.dims').text('w/h: ' + fracs.rects.document.width + 'x' + fracs.rects.document.height).end()
-						.find('.rect').text('l/t: ' + fracs.rects.document.left + ',' + fracs.rects.document.top).end()
-						.find('.rectElementSpace').text('l/t: ' + fracs.rects.element.left + ',' + fracs.rects.element.top).end()
-						.find('.rectViewportSpace').text('l/t: ' + fracs.rects.viewport.left + ',' + fracs.rects.viewport.top).end()
-						.stop(true)
-						.animate({
-							left: fracs.rects.element.left + 'px',
-							top: fracs.rects.element.top + 'px'
-						}, 100);
-				}
-			});
 
-			// initial check
-			$('.box').fracs('check');
+    var box1top = $('#box-1').offset().top;
+    var box1height = $('#box-1').height();
+    var $elOut = $('<div id="container"/>')
+                    .append('simple "&lt;div&gt; as viewport" demo')
+                    .css({
+                        top: box1top,
+                        height: box1height
+                    })
+                    .appendTo($body);
 
-			// test unbind
-			$('#box-6')
-				.fracs('unbind')
-				.find('.label').empty().append('<span class="idx">#6</span> (unbound)');
-		},
-		initGroupDemo = function () {
+    for (i = 1; i < 10; i += 1) {
+        $('<div class="small-box"/>')
+            .css({
+                width: i * 80,
+                height: Math.round(Math.random() * 60 + 10)
+            })
+            .appendTo($elOut);
+    }
+    $('<canvas id="container-outline" width="100" height="100" />')
+        .css({
+            top: box1top
+        })
+        .appendTo($body);
 
-			var $group = $('#box-4,#box-5,#box-6,#box-7,#box-8');
+    // hardcore ie6+7 fix :/ - custom CSS styling doesn't work
+    $('html.no-browser').find('aside.panel').width(500);
+}
 
-			$.each(['possible', 'visible', 'viewport'], function(idx, value) {
+function initFracsDemo() {
 
-				$group.fracs('max', value, function (best) {
+    // init fracs
+    $('.box').fracs(function (fracs) {
 
-					$('.panel .groups .' + value)
-						.text(best ? $(best).find('.idx').text() : 'undef.')
-						.highlight();
-				});
-			});
-		},
-		initScrollStateDemo = function () {
+        var $section = $(this);
+        var $panel = $section.data('panel');
+        var $label = $section.find('.label');
+        var $s, $group;
 
-			$(window).fracs('scrollState', function (state, prevState) {
+        $section.add($panel.find('.idx'))
+            .css('background-color', Modernizr.rgba ? 'rgba(29,119,194,' + fracs.possible + ')' : color(255, 255, 255, 29, 119, 194, fracs.possible));
 
-				$.each(['width', 'height', 'left', 'top', 'right', 'bottom'], function (idx, value) {
+        $panel
+            .find('.visible').text(round(fracs.visible, 4)).end()
+            .find('.viewport').text(round(fracs.viewport, 4)).end()
+            .find('.possible').text(round(fracs.possible, 4)).end()
+            .highlight();
 
-					var val = state[value],
-						pval;
+        $label
+            .find('.visible').text(round(fracs.visible * 100, 1) + '%').end()
+            .find('.viewport').text(round(fracs.viewport * 100, 1) + '%').end()
+            .find('.possible').text(round(fracs.possible * 100, 1) + '%');
 
-					if (!prevState || val !== prevState[value]) {
+        if (!fracs.rects) {
+            $label
+                .find('.rects').text('undefined');
+        } else {
+            $label
+                .find('.dims').text('w/h: ' + fracs.rects.document.width + 'x' + fracs.rects.document.height).end()
+                .find('.rect').text('l/t: ' + fracs.rects.document.left + ',' + fracs.rects.document.top).end()
+                .find('.rectElementSpace').text('l/t: ' + fracs.rects.element.left + ',' + fracs.rects.element.top).end()
+                .find('.rectViewportSpace').text('l/t: ' + fracs.rects.viewport.left + ',' + fracs.rects.viewport.top).end()
+                .stop(true)
+                .animate({
+                    left: fracs.rects.element.left + 'px',
+                    top: fracs.rects.element.top + 'px'
+                }, 100);
+        }
+    });
 
-						pval = isNaN(val) ? 'undef.' : ((value === 'width' || value === 'height') ? round(val * 100, 1) + '%' : val + 'px');
+    // initial check
+    $('.box').fracs('check');
 
-						$('.panel .scrollstate .' + value)
-							.text(pval)
-							.highlight();
-					}
-				});
-			});
-		},
-		initDimsDemo = function () {
+    // test unbind
+    $('#box-6')
+        .fracs('unbind')
+        .find('.label').empty().append('<span class="idx">#6</span> (unbound)');
+}
 
-			var onResize = function () {
+function initGroupDemo() {
 
-					var doc = $(window).fracs('content'),
-						vp = $(window).fracs('viewport');
+    var $group = $('#box-4,#box-5,#box-6,#box-7,#box-8');
 
-					$('#docDims').text('Document: ' + doc.width + 'x' + doc.height);
-					$('#vpDims').text('Viewport: ' + vp.width + 'x' + vp.height);
-				};
+    $.each(['possible', 'visible', 'viewport'], function(idx, value) {
 
-			$(window).bind('resize', onResize);
-			onResize();
-		},
-		initOutlineDemo = function () {
+        $group.fracs('max', value, function (best) {
 
-			$('#outline').fracs('outline', {
-				crop: true,
-				styles: [{
-					selector: '.box',
-					strokeWidth: 'auto',
-					strokeStyle: 'auto',
-					fillStyle: 'auto'
-				}, {
-					selector: 'body > h1',
-					fillStyle: 'rgb(190,190,190)'
-				}],
-				viewportStyle: {
-					fillStyle: 'rgba(29,119,194,0.3)'
-				},
-				viewportDragStyle: {
-					fillStyle: 'rgba(29,119,194,0.4)'
-				}
-			});
+            $('.panel .groups .' + value)
+                .text(best ? $(best).find('.idx').text() : 'undef.')
+                .highlight();
+        });
+    });
+}
 
-			$('#container-outline').fracs('outline', {
-				crop: true,
-				styles: [{
-					selector: '.small-box',
-					strokeWidth: 'auto',
-					strokeStyle: 'auto',
-					fillStyle: 'auto'
-				}],
-				viewportStyle: {
-					fillStyle: 'rgba(29,119,194,0.3)'
-				},
-				viewportDragStyle: {
-					fillStyle: 'rgba(29,119,194,0.4)'
-				}
-			}, $('#container'));
+function initScrollStateDemo() {
 
-			if (!Modernizr.canvas) {
-				$('canvas').hide();
-			}
-		};
+    $(window).fracs('scrollState', function (state, prevState) {
 
-	$.fn.highlight = function () {
+        $.each(['width', 'height', 'left', 'top', 'right', 'bottom'], function (idx, value) {
 
-		this
-			.stop(true)
-			.css('background-color', 'rgb(250,250,200)')
-			.animate({'background-color': '#fff'}, 1000);
-	};
+            var val = state[value],
+                pval;
 
-	$(function () {
+            if (!prevState || val !== prevState[value]) {
 
-		generateContent();
-		initGroupDemo();
-		initFracsDemo();
-		initScrollStateDemo();
-		initDimsDemo();
-		initOutlineDemo();
-	});
+                pval = isNaN(val) ? 'undef.' : ((value === 'width' || value === 'height') ? round(val * 100, 1) + '%' : val + 'px');
+
+                $('.panel .scrollstate .' + value)
+                    .text(pval)
+                    .highlight();
+            }
+        });
+    });
+}
+
+function initDimsDemo() {
+
+    function onResize() {
+
+        var doc = $(window).fracs('content');
+        var vp = $(window).fracs('viewport');
+
+        $('#docDims').text('Document: ' + doc.width + 'x' + doc.height);
+        $('#vpDims').text('Viewport: ' + vp.width + 'x' + vp.height);
+    }
+
+    $(window).bind('resize', onResize);
+    onResize();
+}
+
+function initOutlineDemo() {
+
+    $('#outline').fracs('outline', {
+        crop: true,
+        styles: [{
+            selector: '.box',
+            strokeWidth: 'auto',
+            strokeStyle: 'auto',
+            fillStyle: 'auto'
+        }, {
+            selector: 'body > h1',
+            fillStyle: 'rgb(190,190,190)'
+        }],
+        viewportStyle: {
+            fillStyle: 'rgba(29,119,194,0.3)'
+        },
+        viewportDragStyle: {
+            fillStyle: 'rgba(29,119,194,0.4)'
+        }
+    });
+
+    $('#container-outline').fracs('outline', {
+        crop: true,
+        styles: [{
+            selector: '.small-box',
+            strokeWidth: 'auto',
+            strokeStyle: 'auto',
+            fillStyle: 'auto'
+        }],
+        viewportStyle: {
+            fillStyle: 'rgba(29,119,194,0.3)'
+        },
+        viewportDragStyle: {
+            fillStyle: 'rgba(29,119,194,0.4)'
+        }
+    }, $('#container'));
+
+    if (!Modernizr.canvas) {
+        $('canvas').hide();
+    }
+}
+
+function init() {
+
+    generateContent();
+    initGroupDemo();
+    initFracsDemo();
+    initScrollStateDemo();
+    initDimsDemo();
+    initOutlineDemo();
+}
+
+
+
+$.fn.highlight = function () {
+
+    this
+        .stop(true)
+        .css('background-color', 'rgb(250,250,200)')
+        .animate({'background-color': '#fff'}, 1000);
+};
+
+
+$(init);
 
 }());
