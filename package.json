@@ -1,7 +1,7 @@
 {
   "name": "jquery-fracs",
   "displayName": "jQuery.fracs",
-  "version": "0.15.0",
+  "version": "0.15.1",
   "description": "determine the visible fractions of an HTML element",
   "homepage": "http://larsjung.de/jquery-fracs/",
   "bugs": "https://github.com/lrsjng/jquery-fracs/issues",
@@ -12,13 +12,13 @@
     "url": "https://github.com/lrsjng/jquery-fracs.git"
   },
   "devDependencies": {
-    "fquery": "~0.13.3",
-    "fquery-handlebars": "~0.1.0",
+    "fquery": "~0.16.2",
+    "fquery-handlebars": "~0.2.0",
     "fquery-includeit": "~0.2.0",
     "fquery-jshint": "~0.2.0",
-    "fquery-jszip": "~0.1.0",
-    "fquery-less": "~0.1.5",
+    "fquery-jszip": "~0.4.0",
+    "fquery-less": "~0.2.0",
     "fquery-uglifyjs": "~0.2.1",
-    "mkr": "~0.4.0"
+    "mkr": "~0.6.1"
   }
 }

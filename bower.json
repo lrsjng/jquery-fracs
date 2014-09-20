@@ -1,6 +1,6 @@
 {
   "name": "jquery-fracs",
-  "version": "0.15.0",
+  "version": "0.15.1",
   "description": "determine the visible fractions of an HTML element",
   "homepage": "http://larsjung.de/jquery-fracs/",
   "authors": [
@@ -13,14 +13,8 @@
     "url": "https://github.com/lrsjng/jquery-fracs.git"
   },
   "ignore": [
-    "**/.*",
-    "bower_components",
-    "build",
-    "local",
-    "mkrfile.js",
-    "node_modules",
-    "src",
-    "test",
-    "tests"
+    "*",
+    "!dist/*",
+    "!*.md"
   ]
 }

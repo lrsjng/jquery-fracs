@@ -1,4 +1,4 @@
-/* jQuery.fracs 0.15.0 - http://larsjung.de/jquery-fracs/ */
+/* jQuery.fracs 0.15.1 - http://larsjung.de/jquery-fracs/ */
 (function () {
 'use strict';
 
