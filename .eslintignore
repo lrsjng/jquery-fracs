@@ -1,5 +1,5 @@
 /build/
 /coverage/
-/local/
+/dist/
+/vendor/
 /node_modules/
-/npm-debug.log

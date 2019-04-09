@@ -1,0 +1,20 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset='utf-8')
+        meta(http-equiv='x-ua-compatible', content='ie=edge')
+        title #{pkg.title} #{pkg.version} Test Suite
+        meta(name='description', content=`Test suite for ${pkg.title} (${pkg.homepage})`)
+        meta(name='viewport', content='width=device-width, initial-scale=1')
+        link(href='main.css', rel='stylesheet')
+
+    body
+        h1 #{pkg.title} #{pkg.version} Test Suite
+
+        div#test-elements
+
+        script(src='jquery.min.js')
+        script(src=`../jquery.fracs-${pkg.version}.js`)
+        script(src=`../jquery.outline-${pkg.version}.js`)
+        script(src='scar.min.js')
+        script(src='main.js')

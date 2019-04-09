@@ -1,24 +1,31 @@
 {
   "name": "jquery-fracs",
-  "displayName": "jQuery.fracs",
-  "version": "0.15.1",
-  "description": "determine the visible fractions of an HTML element",
-  "homepage": "http://larsjung.de/jquery-fracs/",
+  "title": "jQuery.fracs",
+  "version": "0.16.0",
+  "description": "Determine the visible fractions of HTML elements.",
+  "homepage": "https://larsjung.de/jquery-fracs/",
   "bugs": "https://github.com/lrsjng/jquery-fracs/issues",
-  "author": "Lars Jung <lrsjng@gmail.com> (http://larsjung.de)",
+  "author": "Lars Jung <lrsjng@gmail.com> (https://larsjung.de)",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/lrsjng/jquery-fracs.git"
   },
+  "scripts": {
+    "lint": "eslint .",
+    "build": "node ghu.js release",
+    "precommit": "npm run -s lint && npm run -s build"
+  },
   "devDependencies": {
-    "fquery": "~0.16.2",
-    "fquery-handlebars": "~0.2.0",
-    "fquery-includeit": "~0.2.0",
-    "fquery-jshint": "~0.2.0",
-    "fquery-jszip": "~0.4.0",
-    "fquery-less": "~0.2.0",
-    "fquery-uglifyjs": "~0.2.1",
-    "mkr": "~0.6.1"
+    "@babel/core": "7.4.3",
+    "@babel/preset-env": "7.4.3",
+    "eslint": "5.16.0",
+    "ghu": "0.17.0",
+    "jquery": "3.3.1",
+    "normalize.css": "8.0.1",
+    "scar": "1.5.0"
+  },
+  "engines": {
+    "node": ">=8.0.0"
   }
 }

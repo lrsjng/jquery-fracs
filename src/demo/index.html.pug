@@ -1,0 +1,52 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset='utf-8')
+        meta(http-equiv='x-ua-compatible', content='ie=edge')
+        title #{pkg.title} #{pkg.version} · Demo
+        meta(name='description', content=`Demo for ${pkg.title} (${pkg.homepage})`)
+        meta(name='viewport', content='width=device-width, initial-scale=1')
+        link(href='//fonts.googleapis.com/css?family=Ubuntu', rel='stylesheet')
+        link(href='main.css', rel='stylesheet')
+
+    body
+        aside.panel
+            h1
+                a(href=`${pkg.homepage}` title=`${pkg.title} project page`) #{pkg.title}
+                |  #{pkg.version} Demo
+
+            section
+                h2 Fractions
+                ul.fracs
+                    li.header
+                        span.idx #
+                        span.info possible
+                        span.info visible
+                        span.info viewport
+
+                h2 Group Maximums (#4 .. #8)
+                ul.groups
+                    li #[span possible:]#[span.possible undef.]
+                    li #[span viewport:]#[span.viewport undef.]
+
+                h2 ScrollState
+                ul.scrollstate
+                    li #[span width:]#[span.width undef.]
+                    li #[span height:]#[span.height undef.]
+                ul.scrollstate
+                    li #[span left:]#[span.left undef.]
+                    li #[span top:]#[span.top undef.]
+                ul.scrollstate
+                    li #[span right:]#[span.right undef.]
+                    li #[span bottom:]#[span.bottom undef.]
+
+            section
+                h2#outlineHeader Outline
+                span#docDims Document: ?x?
+                span#vpDims Viewport: ?x?
+                canvas#outline(width="300" height="300")
+
+        script(src='jquery.min.js')
+        script(src=`../jquery.fracs-${pkg.version}.js`)
+        script(src=`../jquery.outline-${pkg.version}.js`)
+        script(src='main.js')
