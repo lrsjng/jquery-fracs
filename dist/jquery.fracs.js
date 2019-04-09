@@ -56,23 +56,23 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
     return current;
   };
 
-  var equal = function equal(obj1, obj2, props) {
-    if (obj1 === obj2) {
+  var equal = function equal(x, y, props) {
+    if (x === y) {
       return true;
     }
 
-    if (!obj1 || !obj2 || obj1.constructor !== obj2.constructor) {
+    if (!x || !y || x.constructor !== y.constructor) {
       return false;
     }
 
     for (var i = 0, l = props.length; i < l; i += 1) {
       var prop = props[i];
 
-      if (obj1[prop] && is_fn(obj1[prop].equals) && !obj1[prop].equals(obj2[prop])) {
+      if (x[prop] && is_fn(x[prop].equals) && !x[prop].equals(y[prop])) {
         return false;
       }
 
-      if (obj1[prop] !== obj2[prop]) {
+      if (x[prop] !== y[prop]) {
         return false;
       }
     }
@@ -484,7 +484,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
 
       return undefined;
     }
-  }); // modplug 1.6 modified
+  });
 
   var modplug = function modplug(options) {
     var statics = function statics() {
@@ -507,26 +507,15 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
       return Reflect.apply(method, this, args);
     };
 
-    var plug = function plug(opts) {
-      if (opts) {
-        extend(statics, opts.statics);
-        extend(methods, opts.methods);
-      }
-
-      statics.modplug = plug;
-    };
-
-    plug(options);
+    extend(statics, options.statics);
+    extend(methods, options.methods);
     $.fracs = statics;
     $.fn.fracs = methods;
   }; // Register the plug-in
   // ====================
-  // The namespace used to register the plug-in and to attach data to
-  // elements.
-
-
-  var namespace = 'fracs'; // The methods are sorted in alphabetical order. All methods that do not
+  // The methods are sorted in alphabetical order. All methods that do not
   // provide a return value will return `this` to enable method chaining.
+
 
   modplug({
     // Static methods
@@ -534,14 +523,16 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
     // These methods are accessible via `$.fracs.<methodname>`.
     statics: {
       // Publish object constructors (for testing).
-      Rect: Rect,
-      Fractions: Fractions,
-      Group: Group,
-      ScrollState: ScrollState,
-      Viewport: Viewport,
-      FracsCallbacks: FracsCallbacks,
-      GroupCallbacks: GroupCallbacks,
-      ScrollStateCallbacks: ScrollStateCallbacks,
+      _: {
+        Rect: Rect,
+        Fractions: Fractions,
+        Group: Group,
+        ScrollState: ScrollState,
+        Viewport: Viewport,
+        FracsCallbacks: FracsCallbacks,
+        GroupCallbacks: GroupCallbacks,
+        ScrollStateCallbacks: ScrollStateCallbacks
+      },
       // ### fracs
       // This is the **default method**. So instead of calling
       // `$.fracs.fracs(...)` simply call `$.fracs(...)`.
@@ -613,7 +604,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
         }
 
         viewport = get_html_el(viewport);
-        var ns = namespace + '.fracs.' + get_id(viewport);
+        var ns = 'fracs.fracs.' + get_id(viewport);
 
         if (action === 'unbind') {
           return this.each(function cb() {
@@ -742,7 +733,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
       //
       //      .fracs('scrollState', 'check'): jQuery
       scrollState: function scrollState(action, callback) {
-        var ns = namespace + '.scrollState';
+        var ns = 'fracs.scrollState';
 
         if (!is_typeof(action, 'string')) {
           callback = action;

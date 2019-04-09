@@ -6,33 +6,25 @@
     const $doc = $(DOC);
     const is_fn = $.isFunction;
     const by_id = id => DOC.getElementById(id);
-    const get_members_count = obj => {
-        let count = 0;
-        $.each(obj, () => { count += 1; });
-        return count;
-    };
 
     const test = WIN.scar.test;
     const assert = WIN.scar.assert;
 
-    test('plugin access', () => {
+    test('Plugin access', () => {
         assert.ok(is_fn($.fracs), '$.fracs is function');
-        assert.equal(get_members_count($.fracs), 11, '$.fracs has right number of members');
+        assert.equal(Object.keys($.fracs).length, 2, '$.fracs has right number of members');
 
-        assert.ok(is_fn($.fracs.modplug), '$.fracs.modplug is function');
-
-        assert.ok(is_fn($.fracs.Rect), '$.fracs.Rect is function');
-        assert.ok(is_fn($.fracs.Fractions), '$.fracs.Fractions is function');
-        assert.ok(is_fn($.fracs.Group), '$.fracs.Group is function');
-        assert.ok(is_fn($.fracs.ScrollState), '$.fracs.ScrollState is function');
-        assert.ok(is_fn($.fracs.Viewport), '$.fracs.Viewport is function');
-        assert.ok(is_fn($.fracs.FracsCallbacks), '$.fracs.FracsCallbacks is function');
-        assert.ok(is_fn($.fracs.GroupCallbacks), '$.fracs.GroupCallbacks is function');
-        assert.ok(is_fn($.fracs.ScrollStateCallbacks), '$.fracs.ScrollStateCallbacks is function');
-        assert.ok(is_fn($.fracs.Outline), '$.fracs.Outline is function');
+        assert.equal(Object.keys($.fracs._).length, 8, '$.fracs._ has right number of members');
+        assert.ok(is_fn($.fracs._.Rect), '$.fracs._.Rect is function');
+        assert.ok(is_fn($.fracs._.Fractions), '$.fracs._.Fractions is function');
+        assert.ok(is_fn($.fracs._.Group), '$.fracs._.Group is function');
+        assert.ok(is_fn($.fracs._.ScrollState), '$.fracs._.ScrollState is function');
+        assert.ok(is_fn($.fracs._.Viewport), '$.fracs._.Viewport is function');
+        assert.ok(is_fn($.fracs._.FracsCallbacks), '$.fracs._.FracsCallbacks is function');
+        assert.ok(is_fn($.fracs._.GroupCallbacks), '$.fracs._.GroupCallbacks is function');
+        assert.ok(is_fn($.fracs._.ScrollStateCallbacks), '$.fracs._.ScrollStateCallbacks is function');
 
         assert.ok(is_fn($.fracs.fracs), '$.fracs.fracs is function');
-
         assert.ok(is_fn($().fracs), '$().fracs is function');
     });
 
@@ -40,15 +32,9 @@
     // Objects
     // =======
 
-    const Rect = $.fracs.Rect;
-    const Fractions = $.fracs.Fractions;
-    // const Group = $.fracs.Group;
-    // const ScrollState = $.fracs.ScrollState;
-    // const Viewport = $.fracs.Viewport;
-    // const FracsCallbacks = $.fracs.FracsCallbacks;
-    // const GroupCallbacks = $.fracs.GroupCallbacks;
-    // const ScrollStateCallbacks = $.fracs.ScrollStateCallbacks;
-    const createElement = (() => {
+    const Rect = $.fracs._.Rect;
+    const Fractions = $.fracs._.Fractions;
+    const create_test_el = (() => {
         let idx = 0;
         return css => {
             idx += 1;
@@ -58,7 +44,7 @@
                 .text(idx)
                 .appendTo($('#test-elements'));
 
-            return $.fracs.Rect.ofElement(by_id('el-' + idx));
+            return Rect.ofElement(by_id('el-' + idx));
         };
     })();
 
@@ -154,39 +140,39 @@
     test('Rect ofElement', () => {
         const left = -100;
         let top = 0;
-        let rect1;
+        let rect;
 
         top += 100;
-        rect1 = createElement({left, top, width: 20, height: 30});
-        assert.deepEqual(rect1, new Rect(left, top, 20, 30), 'dims');
+        rect = create_test_el({left, top, width: 20, height: 30});
+        assert.deepEqual(rect, new Rect(left, top, 20, 30), 'dims');
 
         top += 100;
-        rect1 = createElement({left, top, width: 20, height: 30, padding: 1});
-        assert.deepEqual(rect1, new Rect(left, top, 22, 32), 'padding');
+        rect = create_test_el({left, top, width: 20, height: 30, padding: 1});
+        assert.deepEqual(rect, new Rect(left, top, 22, 32), 'padding');
 
         top += 100;
-        rect1 = createElement({left, top, width: 20, height: 30, paddingLeft: 1});
-        assert.deepEqual(rect1, new Rect(left, top, 21, 30), 'one sided padding');
+        rect = create_test_el({left, top, width: 20, height: 30, paddingLeft: 1});
+        assert.deepEqual(rect, new Rect(left, top, 21, 30), 'one sided padding');
 
         top += 100;
-        rect1 = createElement({left, top, width: 20, height: 30, borderWidth: 2});
-        assert.deepEqual(rect1, new Rect(left, top, 24, 34), 'border');
+        rect = create_test_el({left, top, width: 20, height: 30, borderWidth: 2});
+        assert.deepEqual(rect, new Rect(left, top, 24, 34), 'border');
 
         top += 100;
-        rect1 = createElement({left, top, width: 20, height: 30, borderLeftWidth: 2});
-        assert.deepEqual(rect1, new Rect(left, top, 22, 30), 'one sided border');
+        rect = create_test_el({left, top, width: 20, height: 30, borderLeftWidth: 2});
+        assert.deepEqual(rect, new Rect(left, top, 22, 30), 'one sided border');
 
         top += 100;
-        rect1 = createElement({left, top, width: 20, height: 30, padding: 1, borderWidth: 2});
-        assert.deepEqual(rect1, new Rect(left, top, 26, 36), 'padding and border');
+        rect = create_test_el({left, top, width: 20, height: 30, padding: 1, borderWidth: 2});
+        assert.deepEqual(rect, new Rect(left, top, 26, 36), 'padding and border');
 
         top += 100;
-        rect1 = createElement({left, top, width: 20, height: 30, display: 'none'});
-        assert.equal(rect1, null, 'display: none; element returns null');
+        rect = create_test_el({left, top, width: 20, height: 30, display: 'none'});
+        assert.equal(rect, null, 'display: none; element returns null');
 
         top += 100;
-        rect1 = createElement({left, top, width: 20, height: 30, visibility: 'hidden'});
-        assert.deepEqual(rect1, new Rect(left, top, 20, 30), 'visibility: hidden; element returns rect');
+        rect = create_test_el({left, top, width: 20, height: 30, visibility: 'hidden'});
+        assert.deepEqual(rect, new Rect(left, top, 20, 30), 'visibility: hidden; element returns rect');
     });
 
 
@@ -227,52 +213,6 @@
         assert.ok(fr1.rectsEqual(fr2), 'rects equal');
         assert.ok(!fr1.rectsEqual(fr3), 'rects unequal');
         assert.ok(fr1.rectsEqual(fr4), 'rects equal');
-    });
-
-
-    // ScrollState
-    // -----------
-
-    test('ScrollState tests', () => {
-        $('<div id="scr"/>')
-            .addClass('box')
-            .css({
-                overflow: 'auto'
-            })
-            .text('scr')
-            .appendTo($('#test-elements'));
-
-        const $scr = $('#scr');
-
-        $('<div id="cnt"/>')
-            .addClass('box')
-            .css({
-                left: 10,
-                top: 10,
-                width: 300,
-                height: 100,
-                backgroundColor: 'rgba(0,0,0,0.3)'
-            })
-            .text('cnt')
-            .appendTo($scr);
-
-        $('<canvas id="cvs" width="100" height="100"/>')
-            .css({
-                position: 'absolute',
-                left: 100,
-                top: 300,
-                backgroundColor: '#fff',
-                border: '1px solid #555'
-            })
-            .appendTo($('#test-elements'));
-
-        $('#cvs').fracs('outline', {
-            crop: true,
-            styles: [{
-                selector: 'div',
-                fillStyle: 'auto'
-            }]
-        }, $('#scr'));
     });
 
 

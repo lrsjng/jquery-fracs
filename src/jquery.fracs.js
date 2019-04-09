@@ -37,19 +37,19 @@
         return current;
     };
 
-    const equal = (obj1, obj2, props) => {
-        if (obj1 === obj2) {
+    const equal = (x, y, props) => {
+        if (x === y) {
             return true;
         }
-        if (!obj1 || !obj2 || obj1.constructor !== obj2.constructor) {
+        if (!x || !y || x.constructor !== y.constructor) {
             return false;
         }
         for (let i = 0, l = props.length; i < l; i += 1) {
             const prop = props[i];
-            if (obj1[prop] && is_fn(obj1[prop].equals) && !obj1[prop].equals(obj2[prop])) {
+            if (x[prop] && is_fn(x[prop].equals) && !x[prop].equals(y[prop])) {
                 return false;
             }
-            if (obj1[prop] !== obj2[prop]) {
+            if (x[prop] !== y[prop]) {
                 return false;
             }
         }
@@ -510,7 +510,6 @@
     });
 
 
-    // modplug 1.6 modified
     const modplug = options => {
         const statics = (...args) => statics.fracs(...args);
 
@@ -523,15 +522,8 @@
             return Reflect.apply(method, this, args);
         };
 
-        const plug = opts => {
-            if (opts) {
-                extend(statics, opts.statics);
-                extend(methods, opts.methods);
-            }
-            statics.modplug = plug;
-        };
-
-        plug(options);
+        extend(statics, options.statics);
+        extend(methods, options.methods);
 
         $.fracs = statics;
         $.fn.fracs = methods;
@@ -541,10 +533,6 @@
     // Register the plug-in
     // ====================
 
-    // The namespace used to register the plug-in and to attach data to
-    // elements.
-    const namespace = 'fracs';
-
     // The methods are sorted in alphabetical order. All methods that do not
     // provide a return value will return `this` to enable method chaining.
     modplug({
@@ -553,14 +541,16 @@
         // These methods are accessible via `$.fracs.<methodname>`.
         statics: {
             // Publish object constructors (for testing).
-            Rect,
-            Fractions,
-            Group,
-            ScrollState,
-            Viewport,
-            FracsCallbacks,
-            GroupCallbacks,
-            ScrollStateCallbacks,
+            _: {
+                Rect,
+                Fractions,
+                Group,
+                ScrollState,
+                Viewport,
+                FracsCallbacks,
+                GroupCallbacks,
+                ScrollStateCallbacks
+            },
 
             // ### fracs
             // This is the **default method**. So instead of calling
@@ -635,7 +625,7 @@
                 }
                 viewport = get_html_el(viewport);
 
-                const ns = namespace + '.fracs.' + get_id(viewport);
+                const ns = 'fracs.fracs.' + get_id(viewport);
 
                 if (action === 'unbind') {
                     return this.each(function cb() {
@@ -763,7 +753,7 @@
             //
             //      .fracs('scrollState', 'check'): jQuery
             scrollState(action, callback) {
-                const ns = namespace + '.scrollState';
+                const ns = 'fracs.scrollState';
 
                 if (!is_typeof(action, 'string')) {
                     callback = action;

@@ -9,40 +9,33 @@ html(lang="en")
         link(href='main.css', rel='stylesheet')
 
     body
-        aside.panel
+        div#panel
             h1
                 a(href=`${pkg.homepage}` title=`${pkg.title} project page`) #{pkg.title}
                 |  #{pkg.version} Demo
 
             section
-                span#docDims Document: ?x?
-                span#vpDims Viewport: ?x?
-
-                h2 Fractions
-                ul.fracs
+                ul#fracs
                     li.header
                         span.idx #
                         span.info possible
                         span.info visible
                         span.info viewport
 
-                h2 Group Maximums (#4 .. #8)
-                ul.groups
-                    li #[span possible:]#[span.info.possible undef.]
-                    li #[span viewport:]#[span.info.viewport undef.]
+                h2 Dimensions
+                ul#dims
+                    li #[span doc:]#[span.info.doc undef.]
+                    li #[span viewport:]#[span.info.vp undef.]
 
                 h2 ScrollState
-                ul.scrollstate
+                ul#scrollstate
                     li #[span width:]#[span.info.width undef.]
                     li #[span height:]#[span.info.height undef.]
-                ul.scrollstate
                     li #[span left:]#[span.info.left undef.]
                     li #[span top:]#[span.info.top undef.]
-                ul.scrollstate
                     li #[span right:]#[span.info.right undef.]
                     li #[span bottom:]#[span.info.bottom undef.]
 
         script(src='jquery.min.js')
         script(src=`../jquery.fracs-${pkg.version}.js`)
-        script(src=`../jquery.outline-${pkg.version}.js`)
         script(src='main.js')
