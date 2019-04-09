@@ -16,6 +16,22 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
   var math_min = Math.min;
   var math_round = Math.round;
 
+  var is_typeof = function is_typeof(obj, type) {
+    return _typeof(obj) === type;
+  };
+
+  var is_instanceof = function is_instanceof(obj, type) {
+    return obj instanceof type;
+  };
+
+  var is_html_el = function is_html_el(obj) {
+    return obj && obj.nodeType;
+  };
+
+  var get_html_el = function get_html_el(obj) {
+    return is_html_el(obj) ? obj : is_instanceof(obj, $) ? obj[0] : undefined;
+  };
+
   var get_id = function () {
     var ids = {};
     var next_id = 1;
@@ -32,22 +48,6 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
       return ids[el];
     };
   }();
-
-  var is_typeof = function is_typeof(obj, type) {
-    return _typeof(obj) === type;
-  };
-
-  var is_instanceof = function is_instanceof(obj, type) {
-    return obj instanceof type;
-  };
-
-  var is_html_el = function is_html_el(obj) {
-    return obj && obj.nodeType;
-  };
-
-  var get_html_el = function get_html_el(obj) {
-    return is_html_el(obj) ? obj : is_instanceof(obj, $) ? obj[0] : undefined;
-  };
 
   var reduce = function reduce(elements, fn, current) {
     $.each(elements, function (idx, el) {
@@ -223,7 +223,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
       rect = is_html_el(rect) && Rect.ofElement(rect) || rect;
       viewport = is_html_el(viewport) && Rect.ofViewport(viewport) || viewport || Rect.ofViewport();
 
-      if (!(rect instanceof Rect)) {
+      if (!is_instanceof(rect, Rect)) {
         return new Fractions();
       }
 
@@ -486,7 +486,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
     }
   }); // modplug 1.6 modified
 
-  var modplug = function modplug(namespace, options) {
+  var modplug = function modplug(options) {
     var statics = function statics() {
       return statics.fracs.apply(statics, arguments);
     };
@@ -517,8 +517,8 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
     };
 
     plug(options);
-    $[namespace] = statics;
-    $.fn[namespace] = methods;
+    $.fracs = statics;
+    $.fn.fracs = methods;
   }; // Register the plug-in
   // ====================
   // The namespace used to register the plug-in and to attach data to
@@ -528,7 +528,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
   var namespace = 'fracs'; // The methods are sorted in alphabetical order. All methods that do not
   // provide a return value will return `this` to enable method chaining.
 
-  modplug(namespace, {
+  modplug({
     // Static methods
     // --------------
     // These methods are accessible via `$.fracs.<methodname>`.

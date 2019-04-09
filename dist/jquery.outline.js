@@ -12,7 +12,7 @@
   var Viewport = fracs.Viewport; // Outline
   // -------
 
-  var DEFAULTS = {
+  var OUTLINE_DEFAULTS = {
     crop: false,
     duration: 0,
     focusWidth: 0.5,
@@ -46,7 +46,7 @@
     }
 
     viewport = viewport || WIN;
-    var settings = extend({}, DEFAULTS, options);
+    var settings = extend({}, OUTLINE_DEFAULTS, options);
     var $canvas = $(canvas);
     var width = $canvas.attr('width');
     var height = $canvas.attr('height');
@@ -188,7 +188,7 @@
   // data to elements.
 
 
-  var namespace = 'fracs.outline'; // The methods are sorted in alphabetical order. All methods that do
+  var OUTLINE_NS = 'fracs.outline'; // The methods are sorted in alphabetical order. All methods that do
   // not provide a return value will return `this` to enable method chaining.
 
   fracs.modplug({
@@ -209,8 +209,6 @@
       //
       //      .outline([options: OutlineOptions]): jQuery
       outline: function outline(action, options, viewport) {
-        console.log('YIPPU');
-
         if (typeof action !== 'string') {
           viewport = options;
           options = action;
@@ -223,7 +221,7 @@
 
         if (action === 'redraw') {
           return this.each(function cb() {
-            var outline = $(this).data(namespace);
+            var outline = $(this).data(OUTLINE_NS);
 
             if (outline) {
               outline.redraw();
@@ -232,13 +230,13 @@
         }
 
         return this.each(function cb() {
-          var outline = $(this).data(namespace);
+          var outline = $(this).data(OUTLINE_NS);
 
           if (!outline) {
             outline = new Outline(this, options, viewport);
 
             if (outline) {
-              $(this).data(namespace, outline);
+              $(this).data(OUTLINE_NS, outline);
             }
           }
         });

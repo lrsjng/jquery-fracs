@@ -24,7 +24,6 @@ ghu.task('clean', 'delete build folder', () => {
 
 ghu.task('build:scripts', runtime => {
     return read(`${SRC}/*.js`)
-        .then(includeit())
         .then(babel({presets: ['@babel/preset-env']}))
         .then(wrap(runtime.commentJs))
         .then(write(mapfn.p(SRC, DIST), {overwrite: true}))
@@ -35,60 +34,34 @@ ghu.task('build:scripts', runtime => {
         .then(write(mapfn.p(SRC, BUILD).s('.js', `-${runtime.pkg.version}.min.js`), {overwrite: true}));
 });
 
-ghu.task('build:demo', runtime => {
+ghu.task('build:other', runtime => {
     return Promise.all([
-        read(`${SRC}/demo/*.pug`)
+        read(`${SRC}/**/*.pug`)
             .then(pug({pkg: runtime.pkg}))
             .then(write(mapfn.p(SRC, BUILD).s('.pug', ''), {overwrite: true})),
-        read(`${SRC}/demo/*.less`)
+        read(`${SRC}/**/*.less`)
             .then(includeit())
             .then(less())
             .then(cssmin())
             .then(write(mapfn.p(SRC, BUILD).s('.less', '.css'), {overwrite: true})),
-        read(`${SRC}/demo/*.js`)
-            .then(includeit())
+        read(`${SRC}/demo/*.js, ${SRC}/test/*.js`)
             .then(babel({presets: ['@babel/preset-env']}))
             .then(uglify())
-            .then(wrap(runtime.commentJs))
-            .then(write(mapfn.p(SRC, BUILD), {overwrite: true})),
-
-        read(`${ROOT}/node_modules/jquery/dist/jquery.min.js`)
-            .then(write(`${BUILD}/demo/jquery.min.js`, {overwrite: true}))
-    ]);
-});
-
-ghu.task('build:test', runtime => {
-    return Promise.all([
-        read(`${SRC}/test/*.pug`)
-            .then(pug({pkg: runtime.pkg}))
-            .then(write(mapfn.p(SRC, BUILD).s('.pug', ''), {overwrite: true})),
-        read(`${SRC}/test/*.less`)
-            .then(includeit())
-            .then(less())
-            .then(cssmin())
-            .then(write(mapfn.p(SRC, BUILD).s('.less', '.css'), {overwrite: true})),
-        read(`${SRC}/test/*.js`)
-            .then(includeit())
-            .then(babel({presets: ['@babel/preset-env']}))
-            // .then(uglify())
             .then(wrap(runtime.commentJs))
             .then(write(mapfn.p(SRC, BUILD), {overwrite: true})),
 
         read(`${ROOT}/node_modules/scar/dist/scar.min.js`)
             .then(write(`${BUILD}/test/scar.min.js`, {overwrite: true})),
         read(`${ROOT}/node_modules/jquery/dist/jquery.min.js`)
-            .then(write(`${BUILD}/test/jquery.min.js`, {overwrite: true}))
-    ]);
-});
+            .then(write(`${BUILD}/demo/jquery.min.js`, {overwrite: true}))
+            .then(write(`${BUILD}/test/jquery.min.js`, {overwrite: true})),
 
-ghu.task('build:copy', () => {
-    return Promise.all([
         read(`${ROOT}/*.md`)
             .then(write(mapfn.p(ROOT, BUILD), {overwrite: true}))
     ]);
 });
 
-ghu.task('build', ['build:scripts', 'build:demo', 'build:test', 'build:copy']);
+ghu.task('build', ['build:scripts', 'build:other']);
 
 ghu.task('zip', ['build'], runtime => {
     return read(`${BUILD}/**/*`)
