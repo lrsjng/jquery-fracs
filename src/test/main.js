@@ -194,9 +194,6 @@
     // ---------
 
     test('Fractions constructor', () => {
-        // const rect1 = new Rect(30, 50, 400, 300);
-        // const rect2 = new Rect(100, 200, 400, 300);
-        // const rect3 = new Rect(10, 20, 40, 30);
         const fr = new Fractions();
 
         assert.ok(fr instanceof Fractions, 'instanceof Fractions');
@@ -210,9 +207,6 @@
         const rect1 = new Rect(30, 50, 400, 300);
         const rect2 = new Rect(100, 200, 400, 300);
         const rect3 = new Rect(10, 20, 40, 30);
-        // const rect4 = new Rect(130, 150, 1400, 1300);
-        // const rect5 = new Rect(100, 20, 40, 30);
-        // const rect6 = new Rect(123, 20, 40, 30);
         const fr1 = new Fractions(0.1, 0.2, 0.3, {document: rect1, element: rect2, viewport: rect3});
         const fr2 = new Fractions(0.1, 0.2, 0.3, {document: rect1, element: rect2, viewport: rect3});
         const fr3 = new Fractions(0.1, 0.2, 0.3, {document: rect3, element: rect2, viewport: rect1});
@@ -257,7 +251,7 @@
                 top: 10,
                 width: 300,
                 height: 100,
-                backgroundColor: 'rgba(255,0,0,0.5)'
+                backgroundColor: 'rgba(0,0,0,0.3)'
             })
             .text('cnt')
             .appendTo($scr);
@@ -268,7 +262,7 @@
                 left: 100,
                 top: 300,
                 backgroundColor: '#fff',
-                border: '1px solid #ccc'
+                border: '1px solid #555'
             })
             .appendTo($('#test-elements'));
 

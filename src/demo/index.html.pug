@@ -15,6 +15,9 @@ html(lang="en")
                 |  #{pkg.version} Demo
 
             section
+                span#docDims Document: ?x?
+                span#vpDims Viewport: ?x?
+
                 h2 Fractions
                 ul.fracs
                     li.header
@@ -25,25 +28,19 @@ html(lang="en")
 
                 h2 Group Maximums (#4 .. #8)
                 ul.groups
-                    li #[span possible:]#[span.possible undef.]
-                    li #[span viewport:]#[span.viewport undef.]
+                    li #[span possible:]#[span.info.possible undef.]
+                    li #[span viewport:]#[span.info.viewport undef.]
 
                 h2 ScrollState
                 ul.scrollstate
-                    li #[span width:]#[span.width undef.]
-                    li #[span height:]#[span.height undef.]
+                    li #[span width:]#[span.info.width undef.]
+                    li #[span height:]#[span.info.height undef.]
                 ul.scrollstate
-                    li #[span left:]#[span.left undef.]
-                    li #[span top:]#[span.top undef.]
+                    li #[span left:]#[span.info.left undef.]
+                    li #[span top:]#[span.info.top undef.]
                 ul.scrollstate
-                    li #[span right:]#[span.right undef.]
-                    li #[span bottom:]#[span.bottom undef.]
-
-            section
-                h2#outlineHeader Outline
-                span#docDims Document: ?x?
-                span#vpDims Viewport: ?x?
-                canvas#outline(width="300" height="300")
+                    li #[span right:]#[span.info.right undef.]
+                    li #[span bottom:]#[span.info.bottom undef.]
 
         script(src='jquery.min.js')
         script(src=`../jquery.fracs-${pkg.version}.js`)

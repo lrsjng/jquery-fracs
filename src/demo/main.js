@@ -15,7 +15,7 @@
         const $panelFracs = $('.panel .fracs');
         const scrollToFn = $target => () => $target.fracs('scrollToThis', 50, 50, 500);
 
-        for (let i = 1; i < 10; i += 1) {
+        for (let i = 1; i < 9; i += 1) {
             const $section = $('<section id="box-' + i + '" class="box" title="scroll to this element" />')
                 .appendTo($body)
                 .width(i * 300)
@@ -47,37 +47,9 @@
 
             $section.data('panel', $li);
         }
-
-        const box1top = $('#box-1').offset().top;
-        const box1height = $('#box-1').height();
-        const $elOut = $('<div id="container"/>')
-            .append('simple "&lt;div&gt; as viewport" demo')
-            .css({
-                top: box1top,
-                height: box1height
-            })
-            .appendTo($body);
-
-        for (let i = 1; i < 10; i += 1) {
-            $('<div class="small-box"/>')
-                .css({
-                    width: i * 80,
-                    height: Math.round(Math.random() * 60 + 10)
-                })
-                .appendTo($elOut);
-        }
-        $('<canvas id="container-outline" width="100" height="100" />')
-            .css({
-                top: box1top
-            })
-            .appendTo($body);
-
-        // hardcore ie6+7 fix :/ - custom CSS styling doesn't work
-        $('html.no-browser').find('aside.panel').width(500);
     };
 
     const init_fracs_demo = () => {
-        // init fracs
         $('.box').fracs(function cb(fracs) {
             const $section = $(this);
             const $panel = $section.data('panel');
@@ -87,23 +59,23 @@
                 .css('background-color', 'rgba(29,119,194,' + fracs.possible + ')');
 
             $panel
-                .find('.visible').text(round(fracs.visible, 4)).end()
-                .find('.viewport').text(round(fracs.viewport, 4)).end()
-                .find('.possible').text(round(fracs.possible, 4)).end();
+                .find('.visible').text(round(fracs.visible * 100) + '%').end()
+                .find('.viewport').text(round(fracs.viewport * 100) + '%').end()
+                .find('.possible').text(round(fracs.possible * 100) + '%').end();
 
             $label
-                .find('.visible').text(round(fracs.visible * 100, 1) + '%').end()
-                .find('.viewport').text(round(fracs.viewport * 100, 1) + '%').end()
-                .find('.possible').text(round(fracs.possible * 100, 1) + '%');
+                .find('.visible').text(round(fracs.visible * 100) + '%').end()
+                .find('.viewport').text(round(fracs.viewport * 100) + '%').end()
+                .find('.possible').text(round(fracs.possible * 100) + '%');
 
             if (!fracs.rects) {
                 $label.find('.rects').text('undefined');
             } else {
                 $label
-                    .find('.dims').text('w/h: ' + fracs.rects.document.width + 'x' + fracs.rects.document.height).end()
-                    .find('.rect').text('l/t: ' + fracs.rects.document.left + ',' + fracs.rects.document.top).end()
-                    .find('.rectElementSpace').text('l/t: ' + fracs.rects.element.left + ',' + fracs.rects.element.top).end()
-                    .find('.rectViewportSpace').text('l/t: ' + fracs.rects.viewport.left + ',' + fracs.rects.viewport.top).end()
+                    .find('.dims').text('WxH: ' + fracs.rects.document.width + 'x' + fracs.rects.document.height).end()
+                    .find('.rect').text('L,T: ' + fracs.rects.document.left + ',' + fracs.rects.document.top).end()
+                    .find('.rectElementSpace').text('L,T: ' + fracs.rects.element.left + ',' + fracs.rects.element.top).end()
+                    .find('.rectViewportSpace').text('L,T: ' + fracs.rects.viewport.left + ',' + fracs.rects.viewport.top).end()
                     .stop(true)
                     .animate({
                         left: fracs.rects.element.left + 'px',
@@ -112,10 +84,8 @@
             }
         });
 
-        // initial check
         $('.box').fracs('check');
 
-        // test unbind
         $('#box-6')
             .fracs('unbind')
             .find('.label').empty().append('<span class="idx">#6</span> (unbound)');
@@ -138,7 +108,7 @@
                 let pval;
 
                 if (!prevState || val !== prevState[value]) {
-                    pval = isNaN(val) ? 'undef.' : value === 'width' || value === 'height' ? round(val * 100, 1) + '%' : val + 'px';
+                    pval = isNaN(val) ? 'undef.' : value === 'width' || value === 'height' ? round(val * 100) + '%' : val + 'px';
                     $('.panel .scrollstate .' + value).text(pval);
                 }
             });
@@ -157,50 +127,12 @@
         on_resize();
     };
 
-    const init_outline_demo = () => {
-        $('#outline').fracs('outline', {
-            crop: true,
-            styles: [{
-                selector: '.box',
-                strokeWidth: 'auto',
-                strokeStyle: 'auto',
-                fillStyle: 'auto'
-            }, {
-                selector: 'body > h1',
-                fillStyle: 'rgb(190,190,190)'
-            }],
-            viewportStyle: {
-                fillStyle: 'rgba(29,119,194,0.3)'
-            },
-            viewportDragStyle: {
-                fillStyle: 'rgba(29,119,194,0.4)'
-            }
-        });
-
-        $('#container-outline').fracs('outline', {
-            crop: true,
-            styles: [{
-                selector: '.small-box',
-                strokeWidth: 'auto',
-                strokeStyle: 'auto',
-                fillStyle: 'auto'
-            }],
-            viewportStyle: {
-                fillStyle: 'rgba(29,119,194,0.3)'
-            },
-            viewportDragStyle: {
-                fillStyle: 'rgba(29,119,194,0.4)'
-            }
-        }, $('#container'));
-    };
-
     const init = () => {
         generate_content();
         init_group_demo();
         init_fracs_demo();
         init_scrollstate_demo();
         init_dims_demo();
-        init_outline_demo();
     };
 
     $(init);

@@ -18,11 +18,11 @@
         focusHeight: 0.5,
         autoFocus: true,
         styles: [
-            {selector: 'header,footer,section,article', fillStyle: 'rgb(230,230,230)'},
-            {selector: 'h1,h2,h3,h4', fillStyle: 'rgb(255,144,55)'}
+            {selector: 'header,footer,section,article', fillStyle: 'rgba(0,0,0,0.5)'},
+            {selector: 'h1,h2,h3,h4', fillStyle: 'rgba(0,0,0,0.5)'}
         ],
-        viewportStyle: {fillStyle: 'rgba(255,144,55,0.3)'},
-        viewportDragStyle: {fillStyle: 'rgba(255,144,55,0.5)'},
+        viewportStyle: {fillStyle: 'rgba(0,0,0,0.3)'},
+        viewportDragStyle: {fillStyle: 'rgba(0,0,0,0.5)'},
         invertViewport: false
     };
 
