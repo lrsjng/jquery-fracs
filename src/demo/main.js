@@ -23,10 +23,10 @@
                 .append($('<li><span class="info possible" /> of max possible visibility</li>'))
                 .append($('<li><span class="info visible" /> visible</li>'))
                 .append($('<li><span class="info viewport" /> of viewport</li>'))
-                .append($('<li>visible rect <span class="info dims" /></li>'))
-                .append($('<li>document space <span class="info rect" /></li>'))
-                .append($('<li>element space <span class="info rectElementSpace" /></li>'))
-                .append($('<li>viewport space <span class="info rectViewportSpace" /></li>'));
+                .append($('<li>visible rect WXH: <span class="info dims" /></li>'))
+                .append($('<li>document space L/T: <span class="info rect" /></li>'))
+                .append($('<li>element space L/T: <span class="info rectElementSpace" /></li>'))
+                .append($('<li>viewport space L/T: <span class="info rectViewportSpace" /></li>'));
 
             // panel
             const $li = $('<li id="box-entry-' + i + '" class="section" title="scroll to this element" />')
@@ -46,18 +46,12 @@
             const $label = $section.find('.label');
 
             $panel.find('.idx')
-                .css('color', fracs.possible > 0.4 ? '#fff' : 'inherit')
-                .css('background-color', 'rgba(29,119,194,' + fracs.possible + ')');
+                .css('color', fracs.possible > 0.4 ? '#fff' : 'inherit');
 
             $section.add($panel.find('.idx'))
                 .css('background-color', 'rgba(29,119,194,' + fracs.possible + ')');
 
-            $panel
-                .find('.visible').text(round(fracs.visible * 100) + '%').end()
-                .find('.viewport').text(round(fracs.viewport * 100) + '%').end()
-                .find('.possible').text(round(fracs.possible * 100) + '%').end();
-
-            $label
+            $panel.add($label)
                 .find('.visible').text(round(fracs.visible * 100) + '%').end()
                 .find('.viewport').text(round(fracs.viewport * 100) + '%').end()
                 .find('.possible').text(round(fracs.possible * 100) + '%');
@@ -66,10 +60,10 @@
                 $label.find('.rects').text('undefined');
             } else {
                 $label
-                    .find('.dims').text('WxH: ' + fracs.rects.document.width + 'x' + fracs.rects.document.height).end()
-                    .find('.rect').text('L/T: ' + fracs.rects.document.left + '/' + fracs.rects.document.top).end()
-                    .find('.rectElementSpace').text('L/T: ' + fracs.rects.element.left + '/' + fracs.rects.element.top).end()
-                    .find('.rectViewportSpace').text('L/T: ' + fracs.rects.viewport.left + '/' + fracs.rects.viewport.top).end()
+                    .find('.dims').text(fracs.rects.document.width + 'x' + fracs.rects.document.height).end()
+                    .find('.rect').text(fracs.rects.document.left + '/' + fracs.rects.document.top).end()
+                    .find('.rectElementSpace').text(fracs.rects.element.left + '/' + fracs.rects.element.top).end()
+                    .find('.rectViewportSpace').text(fracs.rects.viewport.left + '/' + fracs.rects.viewport.top).end()
                     .stop(true)
                     .animate({
                         left: fracs.rects.element.left + 'px',
