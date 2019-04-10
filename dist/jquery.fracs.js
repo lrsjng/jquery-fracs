@@ -8,8 +8,8 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
 
   var DOC = WIN.document;
   var $ = WIN.jQuery;
-  var $win = $(WIN);
-  var $doc = $(DOC);
+  var $WIN = $(WIN);
+  var $DOC = $(DOC);
   var extend = $.extend;
   var is_fn = $.isFunction;
   var math_max = Math.max;
@@ -129,7 +129,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
   extend(Rect, {
     ofContent: function ofContent(el, in_content_space) {
       if (!el || el === DOC || el === WIN) {
-        return new Rect(0, 0, $doc.width(), $doc.height());
+        return new Rect(0, 0, $DOC.width(), $DOC.height());
       }
 
       if (in_content_space) {
@@ -140,7 +140,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
     },
     ofViewport: function ofViewport(el, in_content_space) {
       if (!el || el === DOC || el === WIN) {
-        return new Rect($win.scrollLeft(), $win.scrollTop(), $win.width(), $win.height());
+        return new Rect($WIN.scrollLeft(), $WIN.scrollTop(), $WIN.width(), $WIN.height());
       }
 
       if (in_content_space) {
@@ -290,7 +290,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
       }, duration);
     },
     scroll: function scroll(left, top, duration) {
-      var $el = this.el === WIN ? $win : $(this.el);
+      var $el = this.el === WIN ? $WIN : $(this.el);
       left = left || 0;
       top = top || 0;
       this.scrollTo($el.scrollLeft() + left, $el.scrollTop() + top, duration);
@@ -351,7 +351,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
       return true;
     },
     // Auto-check configuration.
-    $autoTarget: $win,
+    $autoTarget: $WIN,
     autoEvents: 'load resize scroll',
     // Enables/disables automated checking for changes on the specified `window`
     // events.
@@ -422,375 +422,344 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
 
       return undefined;
     }
-  });
+  }); // Public API accessible via `$(selector).fracs('<methodname>', ...)`.
 
-  var modplug = function modplug(options) {
-    var statics = function statics() {
-      return statics.fracs.apply(statics, arguments);
-    };
-
-    var methods = function methods() {
-      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-
-      // eslint-disable-line
-      var method = methods.fracs;
-
-      if (is_fn(methods[args[0]])) {
-        method = methods[args[0]];
-        args = args.slice(1);
-      }
-
-      return Reflect.apply(method, this, args);
-    };
-
-    extend(statics, options.statics);
-    extend(methods, options.methods);
-    $.fracs = statics;
-    $.fn.fracs = methods;
-  }; // The methods are sorted in alphabetical order. All methods that do not
-  // provide a return value will return `this` to enable method chaining.
-
-
-  modplug({
-    // Static methods
-    // --------------
-    // These methods are accessible via `$.fracs.<methodname>`.
-    statics: {
-      // Publish object constructors (for testing).
-      _: {
-        Rect: Rect,
-        Fractions: Fractions,
-        Group: Group,
-        ScrollState: ScrollState,
-        Viewport: Viewport,
-        FracsCallbacks: FracsCallbacks,
-        GroupCallbacks: GroupCallbacks,
-        ScrollStateCallbacks: ScrollStateCallbacks
-      },
-      // ### fracs
-      // This is the **default method**. So instead of calling
-      // `$.fracs.fracs(...)` simply call `$.fracs(...)`.
-      //
-      // Returns the fractions for a given `Rect` and `viewport`,
-      // viewport defaults to `$.fracs.viewport()`.
-      //
-      //      $.fracs(rect: Rect, [viewport: Rect]): Fractions
-      fracs: function fracs(rect, viewport) {
-        return Fractions.of(rect, viewport);
-      }
+  var methods = {
+    // ### 'content'
+    // Returns the content rect of the first selected element in content space.
+    // If no element is selected it returns the document rect.
+    //
+    //      .fracs('content'): Rect
+    content: function content(in_content_space) {
+      return this.length ? Rect.ofContent(this[0], in_content_space) : null;
     },
-    // Instance methods
-    // ----------------
-    // These methods are accessible via `$(selector).fracs('<methodname>', ...)`.
-    methods: {
-      // ### 'content'
-      // Returns the content rect of the first selected element in content space.
-      // If no element is selected it returns the document rect.
-      //
-      //      .fracs('content'): Rect
-      content: function content(in_content_space) {
-        return this.length ? Rect.ofContent(this[0], in_content_space) : null;
-      },
-      // ### 'envelope'
-      // Returns the smallest rectangle that containes all selected elements.
-      //
-      //      .fracs('envelope'): Rect
-      envelope: function envelope() {
-        return reduce(this, function cb(current) {
-          var rect = Rect.ofElement(this);
-          return current ? current.envelope(rect) : rect;
-        });
-      },
-      // ### 'fracs'
-      // This is the **default method**. So the first parameter `'fracs'`
-      // can be omitted.
-      //
-      // Returns the fractions for the first selected element.
-      //
-      //      .fracs(): Fractions
-      //
-      // Binds a callback function that will be invoked if fractions have changed
-      // after a `window resize` or `window scroll` event.
-      //
-      //      .fracs(callback(fracs: Fractions, prevFracs: Fractions)): jQuery
-      //
-      // Unbinds the specified callback function.
-      //
-      //      .fracs('unbind', callback): jQuery
-      //
-      // Unbinds all callback functions.
-      //
-      //      .fracs('unbind'): jQuery
-      //
-      // Checks if fractions changed and if so invokes all bound callback functions.
-      //
-      //      .fracs('check'): jQuery
-      fracs: function fracs(action, callback, viewport) {
-        if (!is_typeof(action, 'string')) {
-          viewport = callback;
-          callback = action;
-          action = null;
-        }
+    // ### 'envelope'
+    // Returns the smallest rectangle that containes all selected elements.
+    //
+    //      .fracs('envelope'): Rect
+    envelope: function envelope() {
+      return reduce(this, function cb(current) {
+        var rect = Rect.ofElement(this);
+        return current ? current.envelope(rect) : rect;
+      });
+    },
+    // ### 'fracs'
+    // This is the **default method**. So the first parameter `'fracs'`
+    // can be omitted.
+    //
+    // Returns the fractions for the first selected element.
+    //
+    //      .fracs(): Fractions
+    //
+    // Binds a callback function that will be invoked if fractions have changed
+    // after a `window resize` or `window scroll` event.
+    //
+    //      .fracs(callback(fracs: Fractions, prevFracs: Fractions)): jQuery
+    //
+    // Unbinds the specified callback function.
+    //
+    //      .fracs('unbind', callback): jQuery
+    //
+    // Unbinds all callback functions.
+    //
+    //      .fracs('unbind'): jQuery
+    //
+    // Checks if fractions changed and if so invokes all bound callback functions.
+    //
+    //      .fracs('check'): jQuery
+    fracs: function fracs(action, callback, viewport) {
+      if (!is_typeof(action, 'string')) {
+        viewport = callback;
+        callback = action;
+        action = null;
+      }
 
-        if (!is_fn(callback)) {
-          viewport = callback;
-          callback = null;
-        }
+      if (!is_fn(callback)) {
+        viewport = callback;
+        callback = null;
+      }
 
-        viewport = get_html_el(viewport);
-        var ns = 'fracs.fracs.' + get_id(viewport);
+      viewport = get_html_el(viewport);
+      var ns = 'fracs.fracs.' + get_id(viewport);
 
-        if (action === 'unbind') {
-          return this.each(function cb() {
-            var cbs = $(this).data(ns);
-
-            if (cbs) {
-              cbs.unbind(callback);
-            }
-          });
-        } else if (action === 'check') {
-          return this.each(function cb() {
-            var cbs = $(this).data(ns);
-
-            if (cbs) {
-              cbs.check();
-            }
-          });
-        } else if (is_fn(callback)) {
-          return this.each(function cb() {
-            var $this = $(this);
-            var cbs = $this.data(ns);
-
-            if (!cbs) {
-              cbs = new FracsCallbacks(this, viewport);
-              $this.data(ns, cbs);
-            }
-
-            cbs.bind(callback);
-          });
-        }
-
-        return this.length ? Fractions.of(this[0], viewport) : null;
-      },
-      // ### 'intersection'
-      // Returns the greatest rectangle that is contained in all selected elements.
-      //
-      //      .fracs('intersection'): Rect
-      intersection: function intersection() {
-        return reduce(this, function cb(current) {
-          var rect = Rect.ofElement(this);
-          return current ? current.intersection(rect) : rect;
-        });
-      },
-      // ### 'max'
-      // Reduces the set of selected elements to those with the maximum value
-      // of the specified property.
-      // Valid values for property are `possible`, `visible`, `viewport`,
-      // `width`, `height`, `left`, `right`, `top`, `bottom`.
-      //
-      //      .fracs('max', property: String): jQuery
-      //
-      // Binds a callback function to the set of selected elements that gets
-      // triggert whenever the element with the highest value of the specified
-      // property changes.
-      //
-      //      .fracs('max', property: String, callback(best: Element, prevBest: Element)): jQuery
-      max: function max(prop, callback, viewport) {
-        if (!is_fn(callback)) {
-          viewport = callback;
-          callback = null;
-        }
-
-        viewport = get_html_el(viewport);
-
-        if (callback) {
-          new GroupCallbacks(this, viewport, prop, true).bind(callback);
-          return this;
-        }
-
-        return this.pushStack(new Group(this, viewport).best(prop, true).el);
-      },
-      // ### 'min'
-      // Reduces the set of selected elements to those with the minimum value
-      // of the specified property.
-      // Valid values for property are `possible`, `visible`, `viewport`,
-      // `width`, `height`, `left`, `right`, `top`, `bottom`.
-      //
-      //      .fracs('min', property: String): jQuery
-      //
-      // Binds a callback function to the set of selected elements that gets
-      // triggert whenever the element with the lowest value of the specified
-      // property changes.
-      //
-      //      .fracs('min', property: String, callback(best: Element, prevBest: Element)): jQuery
-      min: function min(prop, callback, viewport) {
-        if (!is_fn(callback)) {
-          viewport = callback;
-          callback = null;
-        }
-
-        viewport = get_html_el(viewport);
-
-        if (callback) {
-          new GroupCallbacks(this, viewport, prop).bind(callback);
-          return this;
-        }
-
-        return this.pushStack(new Group(this, viewport).best(prop).el);
-      },
-      // ### 'rect'
-      // Returns the dimensions for the first selected element in document space.
-      //
-      //      .fracs('rect'): Rect
-      rect: function rect() {
-        return this.length ? Rect.ofElement(this[0]) : null;
-      },
-      // ### 'scrollState'
-      // Returns the current scroll state for the first selected element.
-      //
-      //      .fracs('scrollState'): ScrollState
-      //
-      // Binds a callback function that will be invoked if scroll state has changed
-      // after a `resize` or `scroll` event.
-      //
-      //      .fracs('scrollState', callback(scrollState: scrollState, prevScrollState: scrollState)): jQuery
-      //
-      // Unbinds the specified callback function.
-      //
-      //      .fracs('scrollState', 'unbind', callback): jQuery
-      //
-      // Unbinds all callback functions.
-      //
-      //      .fracs('scrollState', 'unbind'): jQuery
-      //
-      // Checks if scroll state changed and if so invokes all bound callback functions.
-      //
-      //      .fracs('scrollState', 'check'): jQuery
-      scrollState: function scrollState(action, callback) {
-        var ns = 'fracs.scrollState';
-
-        if (!is_typeof(action, 'string')) {
-          callback = action;
-          action = null;
-        }
-
-        if (action === 'unbind') {
-          return this.each(function cb() {
-            var cbs = $(this).data(ns);
-
-            if (cbs) {
-              cbs.unbind(callback);
-            }
-          });
-        } else if (action === 'check') {
-          return this.each(function cb() {
-            var cbs = $(this).data(ns);
-
-            if (cbs) {
-              cbs.check();
-            }
-          });
-        } else if (is_fn(callback)) {
-          return this.each(function cb() {
-            var $this = $(this);
-            var cbs = $this.data(ns);
-
-            if (!cbs) {
-              cbs = new ScrollStateCallbacks(this);
-              $this.data(ns, cbs);
-            }
-
-            cbs.bind(callback);
-          });
-        }
-
-        return this.length ? new ScrollState(this[0]) : null;
-      },
-      // ### 'scroll'
-      // Scrolls the selected elements relative to its current position,
-      // `padding` defaults to `0`, `duration` to `1000`.
-      //
-      //      .fracs('scroll', element: HTMLElement/jQuery, [left: int,] [top: int,] [duration: int]): jQuery
-      scroll: function scroll(left, top, duration) {
+      if (action === 'unbind') {
         return this.each(function cb() {
-          new Viewport(this).scroll(left, top, duration);
-        });
-      },
-      // ### 'scrollTo'
-      // Scrolls the selected elements to the specified element or an absolute position,
-      // `padding` defaults to `0`, `duration` to `1000`.
-      //
-      //      .fracs('scrollTo', element: HTMLElement/jQuery, [left: int,] [top: int,] [duration: int]): jQuery
-      //      .fracs('scrollTo', [left: int,] [top: int,] [duration: int]): jQuery
-      scrollTo: function scrollTo(el, left, top, duration) {
-        if ($.isNumeric(el)) {
-          duration = top;
-          top = left;
-          left = el;
-          el = null;
-        }
+          var cbs = $(this).data(ns);
 
-        el = get_html_el(el);
-        return this.each(function cb() {
-          if (el) {
-            new Viewport(this).scrollToElement(el, left, top, duration);
-          } else {
-            new Viewport(this).scrollTo(left, top, duration);
+          if (cbs) {
+            cbs.unbind(callback);
           }
         });
-      },
-      // ### 'scrollToThis'
-      // Scrolls the viewport (window) to the first selected element in the specified time,
-      // `padding` defaults to `0`, `duration` to `1000`.
-      //
-      //      .fracs('scrollToThis', [left: int,] [top: int,] [duration: int,] [viewport: HTMLElement/jQuery]): jQuery
-      scrollToThis: function scrollToThis(left, top, duration, viewport) {
-        viewport = new Viewport(get_html_el(viewport));
-        viewport.scrollToElement(this[0], left, top, duration);
-        return this;
-      },
-      // ### 'softLink'
-      // Converts all selected page intern links `<a href="#...">` into soft links.
-      // Uses `scrollTo` to scroll to the location.
-      //
-      //      .fracs('softLink', [left: int,] [top: int,] [duration: int,] [viewport: HTMLElement/jQuery]): jQuery
-      softLink: function softLink(left, top, duration, viewport) {
-        viewport = new Viewport(get_html_el(viewport));
-        return this.filter('a[href^=#]').each(function cb() {
-          var $a = $(this);
-          $a.on('click', function () {
-            viewport.scrollToElement($($a.attr('href'))[0], left, top, duration);
-          });
-        });
-      },
-      // ### 'sort'
-      // Sorts the set of selected elements by the specified property.
-      // Valid values for property are `possible`, `visible`, `viewport`,
-      // `width`, `height`, `left`, `right`, `top`, `bottom`. The default
-      // sort order is descending.
-      //
-      //      .fracs('sort', prop: String, [ascending: boolean]): jQuery
-      sort: function sort(prop, ascending, viewport) {
-        if (!is_typeof(ascending, 'boolean')) {
-          viewport = ascending;
-          ascending = null;
-        }
+      } else if (action === 'check') {
+        return this.each(function cb() {
+          var cbs = $(this).data(ns);
 
-        viewport = get_html_el(viewport);
-        return this.pushStack($.map(new Group(this, viewport).sorted(prop, !ascending), function (entry) {
-          return entry.el;
-        }));
-      },
-      // ### 'viewport'
-      // Returns the current viewport of the first selected element in content space.
-      // If no element is selected it returns the document's viewport.
-      //
-      //      .fracs('viewport'): Rect
-      viewport: function viewport(in_content_space) {
-        return this.length ? Rect.ofViewport(this[0], in_content_space) : null;
+          if (cbs) {
+            cbs.check();
+          }
+        });
+      } else if (is_fn(callback)) {
+        return this.each(function cb() {
+          var $this = $(this);
+          var cbs = $this.data(ns);
+
+          if (!cbs) {
+            cbs = new FracsCallbacks(this, viewport);
+            $this.data(ns, cbs);
+          }
+
+          cbs.bind(callback);
+        });
       }
+
+      return this.length ? Fractions.of(this[0], viewport) : null;
+    },
+    // ### 'intersection'
+    // Returns the greatest rectangle that is contained in all selected elements.
+    //
+    //      .fracs('intersection'): Rect
+    intersection: function intersection() {
+      return reduce(this, function cb(current) {
+        var rect = Rect.ofElement(this);
+        return current ? current.intersection(rect) : rect;
+      });
+    },
+    // ### 'max'
+    // Reduces the set of selected elements to those with the maximum value
+    // of the specified property.
+    // Valid values for property are `possible`, `visible`, `viewport`,
+    // `width`, `height`, `left`, `right`, `top`, `bottom`.
+    //
+    //      .fracs('max', property: String): jQuery
+    //
+    // Binds a callback function to the set of selected elements that gets
+    // triggert whenever the element with the highest value of the specified
+    // property changes.
+    //
+    //      .fracs('max', property: String, callback(best: Element, prevBest: Element)): jQuery
+    max: function max(prop, callback, viewport) {
+      if (!is_fn(callback)) {
+        viewport = callback;
+        callback = null;
+      }
+
+      viewport = get_html_el(viewport);
+
+      if (callback) {
+        new GroupCallbacks(this, viewport, prop, true).bind(callback);
+        return this;
+      }
+
+      return this.pushStack(new Group(this, viewport).best(prop, true).el);
+    },
+    // ### 'min'
+    // Reduces the set of selected elements to those with the minimum value
+    // of the specified property.
+    // Valid values for property are `possible`, `visible`, `viewport`,
+    // `width`, `height`, `left`, `right`, `top`, `bottom`.
+    //
+    //      .fracs('min', property: String): jQuery
+    //
+    // Binds a callback function to the set of selected elements that gets
+    // triggert whenever the element with the lowest value of the specified
+    // property changes.
+    //
+    //      .fracs('min', property: String, callback(best: Element, prevBest: Element)): jQuery
+    min: function min(prop, callback, viewport) {
+      if (!is_fn(callback)) {
+        viewport = callback;
+        callback = null;
+      }
+
+      viewport = get_html_el(viewport);
+
+      if (callback) {
+        new GroupCallbacks(this, viewport, prop).bind(callback);
+        return this;
+      }
+
+      return this.pushStack(new Group(this, viewport).best(prop).el);
+    },
+    // ### 'rect'
+    // Returns the dimensions for the first selected element in document space.
+    //
+    //      .fracs('rect'): Rect
+    rect: function rect() {
+      return this.length ? Rect.ofElement(this[0]) : null;
+    },
+    // ### 'scrollState'
+    // Returns the current scroll state for the first selected element.
+    //
+    //      .fracs('scrollState'): ScrollState
+    //
+    // Binds a callback function that will be invoked if scroll state has changed
+    // after a `resize` or `scroll` event.
+    //
+    //      .fracs('scrollState', callback(scrollState: scrollState, prevScrollState: scrollState)): jQuery
+    //
+    // Unbinds the specified callback function.
+    //
+    //      .fracs('scrollState', 'unbind', callback): jQuery
+    //
+    // Unbinds all callback functions.
+    //
+    //      .fracs('scrollState', 'unbind'): jQuery
+    //
+    // Checks if scroll state changed and if so invokes all bound callback functions.
+    //
+    //      .fracs('scrollState', 'check'): jQuery
+    scrollState: function scrollState(action, callback) {
+      var ns = 'fracs.scrollState';
+
+      if (!is_typeof(action, 'string')) {
+        callback = action;
+        action = null;
+      }
+
+      if (action === 'unbind') {
+        return this.each(function cb() {
+          var cbs = $(this).data(ns);
+
+          if (cbs) {
+            cbs.unbind(callback);
+          }
+        });
+      } else if (action === 'check') {
+        return this.each(function cb() {
+          var cbs = $(this).data(ns);
+
+          if (cbs) {
+            cbs.check();
+          }
+        });
+      } else if (is_fn(callback)) {
+        return this.each(function cb() {
+          var $this = $(this);
+          var cbs = $this.data(ns);
+
+          if (!cbs) {
+            cbs = new ScrollStateCallbacks(this);
+            $this.data(ns, cbs);
+          }
+
+          cbs.bind(callback);
+        });
+      }
+
+      return this.length ? new ScrollState(this[0]) : null;
+    },
+    // ### 'scroll'
+    // Scrolls the selected elements relative to its current position,
+    // `padding` defaults to `0`, `duration` to `1000`.
+    //
+    //      .fracs('scroll', element: HTMLElement/jQuery, [left: int,] [top: int,] [duration: int]): jQuery
+    scroll: function scroll(left, top, duration) {
+      return this.each(function cb() {
+        new Viewport(this).scroll(left, top, duration);
+      });
+    },
+    // ### 'scrollTo'
+    // Scrolls the selected elements to the specified element or an absolute position,
+    // `padding` defaults to `0`, `duration` to `1000`.
+    //
+    //      .fracs('scrollTo', element: HTMLElement/jQuery, [left: int,] [top: int,] [duration: int]): jQuery
+    //      .fracs('scrollTo', [left: int,] [top: int,] [duration: int]): jQuery
+    scrollTo: function scrollTo(el, left, top, duration) {
+      if ($.isNumeric(el)) {
+        duration = top;
+        top = left;
+        left = el;
+        el = null;
+      }
+
+      el = get_html_el(el);
+      return this.each(function cb() {
+        if (el) {
+          new Viewport(this).scrollToElement(el, left, top, duration);
+        } else {
+          new Viewport(this).scrollTo(left, top, duration);
+        }
+      });
+    },
+    // ### 'scrollToThis'
+    // Scrolls the viewport (window) to the first selected element in the specified time,
+    // `padding` defaults to `0`, `duration` to `1000`.
+    //
+    //      .fracs('scrollToThis', [left: int,] [top: int,] [duration: int,] [viewport: HTMLElement/jQuery]): jQuery
+    scrollToThis: function scrollToThis(left, top, duration, viewport) {
+      viewport = new Viewport(get_html_el(viewport));
+      viewport.scrollToElement(this[0], left, top, duration);
+      return this;
+    },
+    // ### 'softLink'
+    // Converts all selected page intern links `<a href="#...">` into soft links.
+    // Uses `scrollTo` to scroll to the location.
+    //
+    //      .fracs('softLink', [left: int,] [top: int,] [duration: int,] [viewport: HTMLElement/jQuery]): jQuery
+    softLink: function softLink(left, top, duration, viewport) {
+      viewport = new Viewport(get_html_el(viewport));
+      return this.filter('a[href^=#]').each(function cb() {
+        var $a = $(this);
+        $a.on('click', function () {
+          viewport.scrollToElement($($a.attr('href'))[0], left, top, duration);
+        });
+      });
+    },
+    // ### 'sort'
+    // Sorts the set of selected elements by the specified property.
+    // Valid values for property are `possible`, `visible`, `viewport`,
+    // `width`, `height`, `left`, `right`, `top`, `bottom`. The default
+    // sort order is descending.
+    //
+    //      .fracs('sort', prop: String, [ascending: boolean]): jQuery
+    sort: function sort(prop, ascending, viewport) {
+      if (!is_typeof(ascending, 'boolean')) {
+        viewport = ascending;
+        ascending = null;
+      }
+
+      viewport = get_html_el(viewport);
+      return this.pushStack($.map(new Group(this, viewport).sorted(prop, !ascending), function (entry) {
+        return entry.el;
+      }));
+    },
+    // ### 'viewport'
+    // Returns the current viewport of the first selected element in content space.
+    // If no element is selected it returns the document's viewport.
+    //
+    //      .fracs('viewport'): Rect
+    viewport: function viewport(in_content_space) {
+      return this.length ? Rect.ofViewport(this[0], in_content_space) : null;
     }
-  });
+  };
+
+  $.fracs = function (rect, viewport) {
+    return Fractions.of(rect, viewport);
+  };
+
+  $.fracs._ = {
+    // published for testing
+    Rect: Rect,
+    Fractions: Fractions,
+    Group: Group,
+    ScrollState: ScrollState,
+    Viewport: Viewport,
+    FracsCallbacks: FracsCallbacks,
+    GroupCallbacks: GroupCallbacks,
+    ScrollStateCallbacks: ScrollStateCallbacks
+  };
+
+  $.fn.fracs = function main() {
+    var method = methods.fracs;
+
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    if (is_fn(methods[args[0]])) {
+      method = methods[args.shift()];
+    }
+
+    return Reflect.apply(method, this, args);
+  };
 })();

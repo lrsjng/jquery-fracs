@@ -2,8 +2,8 @@
     const WIN = window; // eslint-disable-line
     const DOC = WIN.document;
     const $ = WIN.jQuery;
-    const $win = $(WIN);
-    const $doc = $(DOC);
+    const $WIN = $(WIN);
+    const $DOC = $(DOC);
     const is_fn = $.isFunction;
     const by_id = id => DOC.getElementById(id);
 
@@ -12,8 +12,9 @@
 
     test('Plugin access', () => {
         assert.ok(is_fn($.fracs), '$.fracs is function');
-        assert.equal(Object.keys($.fracs).length, 2, '$.fracs has right number of members');
+        assert.ok(is_fn($().fracs), '$().fracs is function');
 
+        assert.equal(Object.keys($.fracs).length, 1, '$.fracs has right number of members');
         assert.equal(Object.keys($.fracs._).length, 8, '$.fracs._ has right number of members');
         assert.ok(is_fn($.fracs._.Rect), '$.fracs._.Rect is function');
         assert.ok(is_fn($.fracs._.Fractions), '$.fracs._.Fractions is function');
@@ -23,9 +24,6 @@
         assert.ok(is_fn($.fracs._.FracsCallbacks), '$.fracs._.FracsCallbacks is function');
         assert.ok(is_fn($.fracs._.GroupCallbacks), '$.fracs._.GroupCallbacks is function');
         assert.ok(is_fn($.fracs._.ScrollStateCallbacks), '$.fracs._.ScrollStateCallbacks is function');
-
-        assert.ok(is_fn($.fracs.fracs), '$.fracs.fracs is function');
-        assert.ok(is_fn($().fracs), '$().fracs is function');
     });
 
 
@@ -121,18 +119,18 @@
 
     test('Rect ofContent', () => {
         const rect1 = Rect.ofContent();
-        const w = $doc.width();
-        const h = $doc.height();
+        const w = $DOC.width();
+        const h = $DOC.height();
 
         assert.deepEqual(rect1, new Rect(0, 0, w, h), 'dims');
     });
 
     test('Rect ofViewport', () => {
         const rect1 = Rect.ofViewport();
-        const l = $win.scrollLeft();
-        const t = $win.scrollTop();
-        const w = $win.width();
-        const h = $win.height();
+        const l = $WIN.scrollLeft();
+        const t = $WIN.scrollTop();
+        const w = $WIN.width();
+        const h = $WIN.height();
 
         assert.deepEqual(rect1, new Rect(l, t, w, h), 'dims');
     });
