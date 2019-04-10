@@ -33,5 +33,5 @@ THE SOFTWARE.
 [github]: https://github.com/lrsjng/jquery-fracs
 
 [license-img]: https://img.shields.io/badge/license-MIT-a0a060.svg?style=flat-square
-[web-img]: https://img.shields.io/badge/web-larsjung.de/fracs-a0a060.svg?style=flat-square
+[web-img]: https://img.shields.io/badge/web-larsjung.de/jquery--fracs-a0a060.svg?style=flat-square
 [github-img]: https://img.shields.io/badge/github-lrsjng/jquery--fracs-a0a060.svg?style=flat-square
