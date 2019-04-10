@@ -306,24 +306,19 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
     }
   }); // Callbacks
   // =========
-  // callbacks mix-in
-  // ----------------
-  // Expects `context: HTMLElement` and `updatedValue: function`.
 
   var callback_mixin = {
+    // expects `context: HTMLElement` and `updatedValue: function`
+    $target: $WIN,
     init: function init() {
       this.callbacks = $.Callbacks('memory unique');
-      this.currVal = null;
-      this.prevVal = null; // A proxy to make `check` bindable to events.
-
-      this.checkProxy = $.proxy(this.check, this);
-      this.autoCheck();
+      this.curr_val = null;
+      this.prev_val = null;
+      this.$target.on('load resize scroll', $.proxy(this.check, this));
     },
-    // Adds a new callback function.
     bind: function bind(callback) {
       this.callbacks.add(callback);
     },
-    // Removes a previously added callback function.
     unbind: function unbind(callback) {
       if (callback) {
         this.callbacks.remove(callback);
@@ -331,32 +326,17 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
         this.callbacks.empty();
       }
     },
-    // Triggers all callbacks with the current values.
-    trigger: function trigger() {
-      this.callbacks.fireWith(this.context, [this.currVal, this.prevVal]);
-    },
-    // Checks if value changed, updates attributes `currVal` and
-    // `prevVal` accordingly and triggers the callbacks. Returns
-    // `true` if value changed, otherwise `false`.
     check: function check(event) {
-      var value = this.updatedValue(event);
+      var val = this.updatedValue(event);
 
-      if (value === undefined) {
+      if (val === undefined) {
         return false;
       }
 
-      this.prevVal = this.currVal;
-      this.currVal = value;
-      this.trigger();
+      this.prev_val = this.curr_val;
+      this.curr_val = val;
+      this.callbacks.fireWith(this.context, [this.curr_val, this.prev_val]);
       return true;
-    },
-    // Auto-check configuration.
-    $autoTarget: $WIN,
-    autoEvents: 'load resize scroll',
-    // Enables/disables automated checking for changes on the specified `window`
-    // events.
-    autoCheck: function autoCheck(on) {
-      this.$autoTarget[on === false ? 'off' : 'on'](this.autoEvents, this.checkProxy);
     }
   };
 
@@ -368,10 +348,10 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
 
   extend(FracsCallbacks.prototype, callback_mixin, {
     updatedValue: function updatedValue() {
-      var value = Fractions.of(this.context, this.viewport);
+      var val = Fractions.of(this.context, this.viewport);
 
-      if (!this.currVal || !this.currVal.equals(value)) {
-        return value;
+      if (!val.equals(this.curr_val)) {
+        return val;
       }
 
       return undefined;
@@ -392,7 +372,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
       if (best) {
         best = best.val > 0 ? best.el : null;
 
-        if (this.currVal !== best) {
+        if (this.curr_val !== best) {
           return best;
         }
       }
@@ -406,7 +386,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
       this.context = WIN;
     } else {
       this.context = el;
-      this.$autoTarget = $(el);
+      this.$target = $(el);
     }
 
     this.init();
@@ -414,10 +394,10 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
 
   extend(ScrollStateCallbacks.prototype, callback_mixin, {
     updatedValue: function updatedValue() {
-      var value = new ScrollState(this.context);
+      var val = new ScrollState(this.context);
 
-      if (!this.currVal || !this.currVal.equals(value)) {
-        return value;
+      if (!val.equals(this.curr_val)) {
+        return val;
       }
 
       return undefined;
@@ -454,7 +434,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
     // Binds a callback function that will be invoked if fractions have changed
     // after a `window resize` or `window scroll` event.
     //
-    //      .fracs(callback(fracs: Fractions, prevFracs: Fractions)): jQuery
+    //      .fracs(callback(fracs: Fractions, prev_fracs: Fractions)): jQuery
     //
     // Unbinds the specified callback function.
     //
@@ -480,7 +460,7 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
       }
 
       viewport = get_html_el(viewport);
-      var ns = 'fracs.fracs.' + get_id(viewport);
+      var ns = 'fracs.' + get_id(viewport);
 
       if (action === 'unbind') {
         return this.each(function cb() {
@@ -690,20 +670,6 @@ function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterat
       viewport = new Viewport(get_html_el(viewport));
       viewport.scrollToElement(this[0], left, top, duration);
       return this;
-    },
-    // ### 'softLink'
-    // Converts all selected page intern links `<a href="#...">` into soft links.
-    // Uses `scrollTo` to scroll to the location.
-    //
-    //      .fracs('softLink', [left: int,] [top: int,] [duration: int,] [viewport: HTMLElement/jQuery]): jQuery
-    softLink: function softLink(left, top, duration, viewport) {
-      viewport = new Viewport(get_html_el(viewport));
-      return this.filter('a[href^=#]').each(function cb() {
-        var $a = $(this);
-        $a.on('click', function () {
-          viewport.scrollToElement($($a.attr('href'))[0], left, top, duration);
-        });
-      });
     },
     // ### 'sort'
     // Sorts the set of selected elements by the specified property.

@@ -316,27 +316,22 @@
     // Callbacks
     // =========
 
-    // callbacks mix-in
-    // ----------------
-    // Expects `context: HTMLElement` and `updatedValue: function`.
     const callback_mixin = {
+        // expects `context: HTMLElement` and `updatedValue: function`
+
+        $target: $WIN,
+
         init() {
             this.callbacks = $.Callbacks('memory unique');
-            this.currVal = null;
-            this.prevVal = null;
-
-            // A proxy to make `check` bindable to events.
-            this.checkProxy = $.proxy(this.check, this);
-
-            this.autoCheck();
+            this.curr_val = null;
+            this.prev_val = null;
+            this.$target.on('load resize scroll', $.proxy(this.check, this));
         },
 
-        // Adds a new callback function.
         bind(callback) {
             this.callbacks.add(callback);
         },
 
-        // Removes a previously added callback function.
         unbind(callback) {
             if (callback) {
                 this.callbacks.remove(callback);
@@ -345,39 +340,18 @@
             }
         },
 
-        // Triggers all callbacks with the current values.
-        trigger() {
-            this.callbacks.fireWith(this.context, [this.currVal, this.prevVal]);
-        },
-
-        // Checks if value changed, updates attributes `currVal` and
-        // `prevVal` accordingly and triggers the callbacks. Returns
-        // `true` if value changed, otherwise `false`.
         check(event) {
-            const value = this.updatedValue(event);
-
-            if (value === undefined) {
+            const val = this.updatedValue(event);
+            if (val === undefined) {
                 return false;
             }
 
-            this.prevVal = this.currVal;
-            this.currVal = value;
-            this.trigger();
+            this.prev_val = this.curr_val;
+            this.curr_val = val;
+            this.callbacks.fireWith(this.context, [this.curr_val, this.prev_val]);
             return true;
-        },
-
-        // Auto-check configuration.
-        $autoTarget: $WIN,
-        autoEvents: 'load resize scroll',
-
-        // Enables/disables automated checking for changes on the specified `window`
-        // events.
-        autoCheck(on) {
-            this.$autoTarget[on === false ? 'off' : 'on'](this.autoEvents, this.checkProxy);
         }
     };
-
-
 
 
     function FracsCallbacks(el, viewport) {
@@ -388,16 +362,13 @@
 
     extend(FracsCallbacks.prototype, callback_mixin, {
         updatedValue() {
-            const value = Fractions.of(this.context, this.viewport);
-
-            if (!this.currVal || !this.currVal.equals(value)) {
-                return value;
+            const val = Fractions.of(this.context, this.viewport);
+            if (!val.equals(this.curr_val)) {
+                return val;
             }
             return undefined;
         }
     });
-
-
 
 
     function GroupCallbacks(els, viewport, prop, desc) {
@@ -412,7 +383,7 @@
             let best = this.context.best(this.property, this.descending);
             if (best) {
                 best = best.val > 0 ? best.el : null;
-                if (this.currVal !== best) {
+                if (this.curr_val !== best) {
                     return best;
                 }
             }
@@ -421,24 +392,21 @@
     });
 
 
-
-
     function ScrollStateCallbacks(el) {
         if (!el || el === WIN || el === DOC) {
             this.context = WIN;
         } else {
             this.context = el;
-            this.$autoTarget = $(el);
+            this.$target = $(el);
         }
         this.init();
     }
 
     extend(ScrollStateCallbacks.prototype, callback_mixin, {
         updatedValue() {
-            const value = new ScrollState(this.context);
-
-            if (!this.currVal || !this.currVal.equals(value)) {
-                return value;
+            const val = new ScrollState(this.context);
+            if (!val.equals(this.curr_val)) {
+                return val;
             }
             return undefined;
         }
