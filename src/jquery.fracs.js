@@ -30,13 +30,6 @@
         };
     })();
 
-    const reduce = (els, fn, current) => {
-        $.each(els, (idx, el) => {
-            current = Reflect.apply(fn, el, [current, idx, el]);
-        });
-        return current;
-    };
-
     const equal = (x, y, props) => {
         if (x === y) {
             return true;
@@ -186,12 +179,12 @@
                 return new Fractions();
             }
 
-            const intersectionArea = intersection.area();
-            const possibleArea = math_min(rect.width, viewport.width) * math_min(rect.height, viewport.height);
+            const intersection_area = intersection.area();
+            const possible_area = math_min(rect.width, viewport.width) * math_min(rect.height, viewport.height);
             return new Fractions(
-                intersectionArea / rect.area(),
-                intersectionArea / viewport.area(),
-                intersectionArea / possibleArea,
+                intersection_area / rect.area(),
+                intersection_area / viewport.area(),
+                intersection_area / possible_area,
                 {
                     document: intersection,
                     element: intersection.relativeTo(rect),
@@ -291,13 +284,6 @@
             $el.stop(true).animate({scrollLeft: left, scrollTop: top}, duration);
         },
 
-        scroll(left, top, duration) {
-            const $el = this.el === WIN ? $WIN : $(this.el);
-            left = left || 0;
-            top = top || 0;
-            this.scrollTo($el.scrollLeft() + left, $el.scrollTop() + top, duration);
-        },
-
         scrollToRect(rect, left, top, duration) {
             left = left || 0;
             top = top || 0;
@@ -313,19 +299,15 @@
 
 
 
-    // Callbacks
-    // =========
-
     const callback_mixin = {
-        // expects `context: HTMLElement` and `updatedValue: function`
+        context: null,
+        updatedValue: () => null,
 
-        $target: $WIN,
-
-        init() {
+        init(target) {
             this.callbacks = $.Callbacks('memory unique');
             this.curr_val = null;
             this.prev_val = null;
-            this.$target.on('load resize scroll', $.proxy(this.check, this));
+            $(target || WIN).on('load resize scroll', $.proxy(this.check, this));
         },
 
         bind(callback) {
@@ -397,9 +379,8 @@
             this.context = WIN;
         } else {
             this.context = el;
-            this.$target = $(el);
         }
-        this.init();
+        this.init(this.context);
     }
 
     extend(ScrollStateCallbacks.prototype, callback_mixin, {
@@ -415,29 +396,29 @@
 
 
 
-    // Public API accessible via `$(selector).fracs('<methodname>', ...)`.
+    // # Public API
+    // accessible via `$(selector).fracs('<methodname>', ...)`.
+
     const methods = {
-        // ### 'content'
+        // ## 'content'
         // Returns the content rect of the first selected element in content space.
         // If no element is selected it returns the document rect.
-        //
-        //      .fracs('content'): Rect
         content(in_content_space) {
             return this.length ? Rect.ofContent(this[0], in_content_space) : null;
         },
 
-        // ### 'envelope'
+        // ## 'envelope'
         // Returns the smallest rectangle that containes all selected elements.
-        //
-        //      .fracs('envelope'): Rect
         envelope() {
-            return reduce(this, function cb(current) {
-                const rect = Rect.ofElement(this);
-                return current ? current.envelope(rect) : rect;
+            let res;
+            $.each(this, (idx, el) => {
+                const rect = Rect.ofElement(el);
+                res = res ? res.envelope(rect) : rect;
             });
+            return res;
         },
 
-        // ### 'fracs'
+        // ## 'fracs'
         // This is the **default method**. So the first parameter `'fracs'`
         // can be omitted.
         //
@@ -504,18 +485,18 @@
             return this.length ? Fractions.of(this[0], viewport) : null;
         },
 
-        // ### 'intersection'
+        // ## 'intersection'
         // Returns the greatest rectangle that is contained in all selected elements.
-        //
-        //      .fracs('intersection'): Rect
         intersection() {
-            return reduce(this, function cb(current) {
-                const rect = Rect.ofElement(this);
-                return current ? current.intersection(rect) : rect;
+            let res;
+            $.each(this, (idx, el) => {
+                const rect = Rect.ofElement(el);
+                res = res ? res.intersection(rect) : rect;
             });
+            return res;
         },
 
-        // ### 'max'
+        // ## 'max'
         // Reduces the set of selected elements to those with the maximum value
         // of the specified property.
         // Valid values for property are `possible`, `visible`, `viewport`,
@@ -527,7 +508,7 @@
         // triggert whenever the element with the highest value of the specified
         // property changes.
         //
-        //      .fracs('max', property: String, callback(best: Element, prevBest: Element)): jQuery
+        //      .fracs('max', property: String, callback(best: Element, prev_best: Element)): jQuery
         max(prop, callback, viewport) {
             if (!is_fn(callback)) {
                 viewport = callback;
@@ -543,7 +524,7 @@
             return this.pushStack(new Group(this, viewport).best(prop, true).el);
         },
 
-        // ### 'min'
+        // ## 'min'
         // Reduces the set of selected elements to those with the minimum value
         // of the specified property.
         // Valid values for property are `possible`, `visible`, `viewport`,
@@ -555,7 +536,7 @@
         // triggert whenever the element with the lowest value of the specified
         // property changes.
         //
-        //      .fracs('min', property: String, callback(best: Element, prevBest: Element)): jQuery
+        //      .fracs('min', property: String, callback(best: Element, prev_best: Element)): jQuery
         min(prop, callback, viewport) {
             if (!is_fn(callback)) {
                 viewport = callback;
@@ -571,15 +552,13 @@
             return this.pushStack(new Group(this, viewport).best(prop).el);
         },
 
-        // ### 'rect'
+        // ## 'rect'
         // Returns the dimensions for the first selected element in document space.
-        //
-        //      .fracs('rect'): Rect
         rect() {
             return this.length ? Rect.ofElement(this[0]) : null;
         },
 
-        // ### 'scrollState'
+        // ## 'scrollState'
         // Returns the current scroll state for the first selected element.
         //
         //      .fracs('scrollState'): ScrollState
@@ -637,9 +616,9 @@
             return this.length ? new ScrollState(this[0]) : null;
         },
 
-        // ### 'scroll'
+        // ## 'scroll'
         // Scrolls the selected elements relative to its current position,
-        // `padding` defaults to `0`, `duration` to `1000`.
+        // `left` and `top` paddings default to `0`, `duration` to `1000`.
         //
         //      .fracs('scroll', element: HTMLElement/jQuery, [left: int,] [top: int,] [duration: int]): jQuery
         scroll(left, top, duration) {
@@ -648,9 +627,9 @@
             });
         },
 
-        // ### 'scrollTo'
+        // ## 'scrollTo'
         // Scrolls the selected elements to the specified element or an absolute position,
-        // `padding` defaults to `0`, `duration` to `1000`.
+        // `left` and `top` paddings default to `0`, `duration` to `1000`.
         //
         //      .fracs('scrollTo', element: HTMLElement/jQuery, [left: int,] [top: int,] [duration: int]): jQuery
         //      .fracs('scrollTo', [left: int,] [top: int,] [duration: int]): jQuery
@@ -673,24 +652,20 @@
             });
         },
 
-        // ### 'scrollToThis'
-        // Scrolls the viewport (window) to the first selected element in the specified time,
-        // `padding` defaults to `0`, `duration` to `1000`.
-        //
-        //      .fracs('scrollToThis', [left: int,] [top: int,] [duration: int,] [viewport: HTMLElement/jQuery]): jQuery
+        // ## 'scrollToThis'
+        // Scrolls the viewport (defaults to window) to the first selected element in the specified time,
+        // `left` and `top` paddings default to `0`, `duration` to `1000`.
         scrollToThis(left, top, duration, viewport) {
             viewport = new Viewport(get_html_el(viewport));
             viewport.scrollToElement(this[0], left, top, duration);
             return this;
         },
 
-        // ### 'sort'
-        // Sorts the set of selected elements by the specified property.
-        // Valid values for property are `possible`, `visible`, `viewport`,
+        // ## 'sort'
+        // Sorts the set of selected elements by the specified prop.
+        // Valid values for prop are `possible`, `visible`, `viewport`,
         // `width`, `height`, `left`, `right`, `top`, `bottom`. The default
         // sort order is descending.
-        //
-        //      .fracs('sort', prop: String, [ascending: boolean]): jQuery
         sort(prop, ascending, viewport) {
             if (!is_typeof(ascending, 'boolean')) {
                 viewport = ascending;
@@ -701,11 +676,9 @@
             return this.pushStack($.map(new Group(this, viewport).sorted(prop, !ascending), entry => entry.el));
         },
 
-        // ### 'viewport'
-        // Returns the current viewport of the first selected element in content space.
+        // ## 'viewport'
+        // Returns the current viewport of the first selected element.
         // If no element is selected it returns the document's viewport.
-        //
-        //      .fracs('viewport'): Rect
         viewport(in_content_space) {
             return this.length ? Rect.ofViewport(this[0], in_content_space) : null;
         }
