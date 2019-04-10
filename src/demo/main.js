@@ -9,7 +9,7 @@
         const $panel_fracs = $('#fracs');
         const get_scrollto_fn = $target => () => $target.fracs('scrollToThis', 50, 50, 500);
 
-        for (let i = 1; i < 9; i += 1) {
+        for (let i = 1; i <= 9; i += 1) {
             const $section = $('<section id="box-' + i + '" class="box" title="scroll to this element" />')
                 .appendTo($body)
                 .width(i * 300)
@@ -23,7 +23,7 @@
                 .append($('<li><span class="info possible" /> of max possible visibility</li>'))
                 .append($('<li><span class="info visible" /> visible</li>'))
                 .append($('<li><span class="info viewport" /> of viewport</li>'))
-                .append($('<li>visible rect WXH: <span class="info dims" /></li>'))
+                .append($('<li>visible rect WxH: <span class="info dims" /></li>'))
                 .append($('<li>document space L/T: <span class="info rect" /></li>'))
                 .append($('<li>element space L/T: <span class="info rectElementSpace" /></li>'))
                 .append($('<li>viewport space L/T: <span class="info rectViewportSpace" /></li>'));

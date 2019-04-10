@@ -30,8 +30,8 @@
         };
     })();
 
-    const reduce = (elements, fn, current) => {
-        $.each(elements, (idx, el) => {
+    const reduce = (els, fn, current) => {
+        $.each(els, (idx, el) => {
             current = Reflect.apply(fn, el, [current, idx, el]);
         });
         return current;
@@ -59,47 +59,28 @@
 
 
 
-    // Objects
-    // =======
-
-    // Rect
-    // ----
-    // Holds the position and dimensions of a rectangle. The position might be
-    // relative to document, viewport or element space.
     function Rect(left, top, width, height) {
-        // Top left corner of the rectangle rounded to integers.
         this.left = math_round(left);
         this.top = math_round(top);
-
-        // Dimensions rounded to integers.
         this.width = math_round(width);
         this.height = math_round(height);
-
-        // Bottom right corner of the rectangle.
         this.right = this.left + this.width;
         this.bottom = this.top + this.height;
     }
 
-    // ### Prototype
     extend(Rect.prototype, {
-        // Checks if this instance equals `that` in position and dimensions.
         equals(that) {
             return equal(this, that, ['left', 'top', 'width', 'height']);
         },
 
-        // Returns the area of this rectangle.
         area() {
             return this.width * this.height;
         },
 
-        // Returns a new `Rect` representig this rect relative to `rect`.
         relativeTo(rect) {
             return new Rect(this.left - rect.left, this.top - rect.top, this.width, this.height);
         },
 
-        // Returns a new rectangle representing the intersection of this
-        // instance and `rect`. If there is no intersection the return value
-        // is `null`.
         intersection(rect) {
             if (!is_instanceof(rect, Rect)) {
                 return null;
@@ -115,8 +96,6 @@
             return width >= 0 && height >= 0 ? new Rect(left, top, width, height) : null;
         },
 
-        // Returns a new rectangle representing the smallest rectangle
-        // containing this instance and `rect`.
         envelope(rect) {
             if (!is_instanceof(rect, Rect)) {
                 return this;
@@ -133,43 +112,31 @@
         }
     });
 
-    // ### Static methods
     extend(Rect, {
-        // Returns a new instance of `Rect` representing the content of the
-        // specified element. Since the coordinates are in content space the
-        // `left` and `top` values are always set to `0`. If `inDocSpace` is
-        // `true` the rect gets returned in document space.
-        ofContent(el, inContentSpace) {
+        ofContent(el, in_content_space) {
             if (!el || el === DOC || el === WIN) {
                 return new Rect(0, 0, $doc.width(), $doc.height());
             }
 
-            if (inContentSpace) {
+            if (in_content_space) {
                 return new Rect(0, 0, el.scrollWidth, el.scrollHeight);
             }
 
             return new Rect(el.offsetLeft - el.scrollLeft, el.offsetTop - el.scrollTop, el.scrollWidth, el.scrollHeight);
         },
 
-        // Returns a new instance of `Rect` representing the viewport of the
-        // specified element. If `inDocSpace` is `true` the rect gets returned
-        // in document space instead of content space.
-        ofViewport(el, inContentSpace) {
+        ofViewport(el, in_content_space) {
             if (!el || el === DOC || el === WIN) {
                 return new Rect($win.scrollLeft(), $win.scrollTop(), $win.width(), $win.height());
             }
 
-            if (inContentSpace) {
+            if (in_content_space) {
                 return new Rect(el.scrollLeft, el.scrollTop, el.clientWidth, el.clientHeight);
             }
 
             return new Rect(el.offsetLeft, el.offsetTop, el.clientWidth, el.clientHeight);
         },
 
-        // Returns a new instance of `Rect` representing a given
-        // `HTMLElement`. The dimensions respect padding and border widths. If
-        // the element is invisible (as determined by jQuery) the return value
-        // is null.
         ofElement(el) {
             const $el = $(el);
             if (!$el.is(':visible')) {
@@ -183,11 +150,7 @@
 
 
 
-    // Fractions
-    // ---------
-    // The heart of the library. Creates and holds the
-    // fractions data for the two specified rects. `viewport` defaults to
-    // `Rect.ofViewport()`.
+
     function Fractions(visible, viewport, possible, rects) {
         this.visible = visible || 0;
         this.viewport = viewport || 0;
@@ -195,25 +158,20 @@
         this.rects = rects && extend({}, rects) || null;
     }
 
-    // ### Prototype
     extend(Fractions.prototype, {
-        // Checks if this instance equals `that` in all attributes.
         equals(that) {
             return this.fracsEqual(that) && this.rectsEqual(that);
         },
 
-        // Checks if this instance equals `that` in all fraction attributes.
         fracsEqual(that) {
             return equal(this, that, ['visible', 'viewport', 'possible']);
         },
 
-        // Checks if this instance equals `that` in all rectangle attributes.
         rectsEqual(that) {
             return equal(this.rects, that.rects, ['document', 'element', 'viewport']);
         }
     });
 
-    // ### Static methods
     extend(Fractions, {
         of(rect, viewport) {
             rect = is_html_el(rect) && Rect.ofElement(rect) || rect;
@@ -245,61 +203,48 @@
 
 
 
-    // Group
-    // -----
-    function Group(elements, viewport) {
-        this.els = elements;
+
+    function Group(els, viewport) {
+        this.els = els;
         this.viewport = viewport;
     }
 
-    // ### Helpers
+    const RECT_PROPS = ['width', 'height', 'left', 'right', 'top', 'bottom'];
+    const FRACS_PROPS = ['possible', 'visible', 'viewport'];
 
-    // Accepted values for `property` parameters below.
-    const rect_props = ['width', 'height', 'left', 'right', 'top', 'bottom'];
-    const fracs_props = ['possible', 'visible', 'viewport'];
-
-    // Returns the specified `property` for `HTMLElement element` or `0`
-    // if `property` is invalid.
-    const get_value = (el, viewport, property) => {
+    const get_value = (el, viewport, prop) => {
         let obj;
-        if (rect_props.includes(property)) {
+        if (RECT_PROPS.includes(prop)) {
             obj = Rect.ofElement(el);
-        } else if (fracs_props.includes(property)) {
+        } else if (FRACS_PROPS.includes(prop)) {
             obj = Fractions.of(el, viewport);
         }
-        return obj ? obj[property] : 0;
+        return obj ? obj[prop] : 0;
     };
 
-    // Sorting functions.
-    const sort_asc = (entry1, entry2) => entry1.val - entry2.val;
-    const sort_desc = (entry1, entry2) => entry2.val - entry1.val;
+    const sort_asc = (x, y) => x.val - y.val;
+    const sort_desc = (x, y) => y.val - x.val;
 
-    // ### Prototype
     extend(Group.prototype, {
-        // Returns a sorted list of objects `{el: HTMLElement, val: Number}`
-        // for the specified `property`. `descending` defaults to `false`.
-        sorted(property, descending) {
+        sorted(prop, desc) {
             const viewport = this.viewport;
 
             return $.map(this.els, el => {
                 return {
                     el,
-                    val: get_value(el, viewport, property)
+                    val: get_value(el, viewport, prop)
                 };
-            }).sort(descending ? sort_desc : sort_asc);
+            }).sort(desc ? sort_desc : sort_asc);
         },
 
-        // Returns the first element of the sorted list returned by `sorted` above,
-        // or `null` if this list is empty.
-        best(property, descending) {
-            return this.els.length ? this.sorted(property, descending)[0] : null;
+        best(prop, desc) {
+            return this.els.length ? this.sorted(prop, desc)[0] : null;
         }
     });
 
 
 
-    // ScrollState
-    // -----------
+
     function ScrollState(el) {
         const content = Rect.ofContent(el, true);
         const viewport = Rect.ofViewport(el, true);
@@ -316,9 +261,7 @@
         this.bottom = content.bottom - viewport.bottom;
     }
 
-    // ### Prototype
     extend(ScrollState.prototype, {
-        // Checks if this instance equals `that`.
         equals(that) {
             return equal(this, that, ['width', 'height', 'left', 'top', 'right', 'bottom', 'content', 'viewport']);
         }
@@ -326,15 +269,12 @@
 
 
 
-    // Viewport
-    // --------
+
     function Viewport(el) {
         this.el = el || WIN;
     }
 
-    // ### Prototype
     extend(Viewport.prototype, {
-        // Checks if this instance equals `that`.
         equals(that) {
             return equal(this, that, ['el']);
         },
@@ -358,17 +298,19 @@
             this.scrollTo($el.scrollLeft() + left, $el.scrollTop() + top, duration);
         },
 
-        scrollToRect(rect, paddingLeft, paddingTop, duration) {
-            paddingLeft = paddingLeft || 0;
-            paddingTop = paddingTop || 0;
-            this.scrollTo(rect.left - paddingLeft, rect.top - paddingTop, duration);
+        scrollToRect(rect, left, top, duration) {
+            left = left || 0;
+            top = top || 0;
+            this.scrollTo(rect.left - left, rect.top - top, duration);
         },
 
-        scrollToElement(el, paddingLeft, paddingTop, duration) {
+        scrollToElement(el, left, top, duration) {
             const rect = Rect.ofElement(el).relativeTo(Rect.ofContent(this.el));
-            this.scrollToRect(rect, paddingLeft, paddingTop, duration);
+            this.scrollToRect(rect, left, top, duration);
         }
     });
+
+
 
 
     // Callbacks
@@ -377,8 +319,7 @@
     // callbacks mix-in
     // ----------------
     // Expects `context: HTMLElement` and `updatedValue: function`.
-    const callbacksMixIn = {
-        // Initial setup.
+    const callback_mixin = {
         init() {
             this.callbacks = $.Callbacks('memory unique');
             this.currVal = null;
@@ -438,16 +379,14 @@
 
 
 
-    // FracsCallbacks
-    // --------------
+
     function FracsCallbacks(el, viewport) {
         this.context = el;
         this.viewport = viewport;
         this.init();
     }
 
-    // ### Prototype
-    extend(FracsCallbacks.prototype, callbacksMixIn, {
+    extend(FracsCallbacks.prototype, callback_mixin, {
         updatedValue() {
             const value = Fractions.of(this.context, this.viewport);
 
@@ -460,17 +399,15 @@
 
 
 
-    // GroupCallbacks
-    // --------------
-    function GroupCallbacks(elements, viewport, property, descending) {
-        this.context = new Group(elements, viewport);
-        this.property = property;
-        this.descending = descending;
+
+    function GroupCallbacks(els, viewport, prop, desc) {
+        this.context = new Group(els, viewport);
+        this.property = prop;
+        this.descending = desc;
         this.init();
     }
 
-    // ### Prototype
-    extend(GroupCallbacks.prototype, callbacksMixIn, {
+    extend(GroupCallbacks.prototype, callback_mixin, {
         updatedValue() {
             let best = this.context.best(this.property, this.descending);
             if (best) {
@@ -485,8 +422,7 @@
 
 
 
-    // ScrollStateCallbacks
-    // --------------------
+
     function ScrollStateCallbacks(el) {
         if (!el || el === WIN || el === DOC) {
             this.context = WIN;
@@ -497,8 +433,7 @@
         this.init();
     }
 
-    // ### Prototype
-    extend(ScrollStateCallbacks.prototype, callbacksMixIn, {
+    extend(ScrollStateCallbacks.prototype, callback_mixin, {
         updatedValue() {
             const value = new ScrollState(this.context);
 
@@ -530,8 +465,7 @@
     };
 
 
-    // Register the plug-in
-    // ====================
+
 
     // The methods are sorted in alphabetical order. All methods that do not
     // provide a return value will return `this` to enable method chaining.
@@ -574,8 +508,8 @@
             // If no element is selected it returns the document rect.
             //
             //      .fracs('content'): Rect
-            content(inContentSpace) {
-                return this.length ? Rect.ofContent(this[0], inContentSpace) : null;
+            content(in_content_space) {
+                return this.length ? Rect.ofContent(this[0], in_content_space) : null;
             },
 
             // ### 'envelope'
@@ -680,7 +614,7 @@
             // property changes.
             //
             //      .fracs('max', property: String, callback(best: Element, prevBest: Element)): jQuery
-            max(property, callback, viewport) {
+            max(prop, callback, viewport) {
                 if (!is_fn(callback)) {
                     viewport = callback;
                     callback = null;
@@ -688,11 +622,11 @@
                 viewport = get_html_el(viewport);
 
                 if (callback) {
-                    new GroupCallbacks(this, viewport, property, true).bind(callback);
+                    new GroupCallbacks(this, viewport, prop, true).bind(callback);
                     return this;
                 }
 
-                return this.pushStack(new Group(this, viewport).best(property, true).el);
+                return this.pushStack(new Group(this, viewport).best(prop, true).el);
             },
 
             // ### 'min'
@@ -708,7 +642,7 @@
             // property changes.
             //
             //      .fracs('min', property: String, callback(best: Element, prevBest: Element)): jQuery
-            min(property, callback, viewport) {
+            min(prop, callback, viewport) {
                 if (!is_fn(callback)) {
                     viewport = callback;
                     callback = null;
@@ -716,11 +650,11 @@
                 viewport = get_html_el(viewport);
 
                 if (callback) {
-                    new GroupCallbacks(this, viewport, property).bind(callback);
+                    new GroupCallbacks(this, viewport, prop).bind(callback);
                     return this;
                 }
 
-                return this.pushStack(new Group(this, viewport).best(property).el);
+                return this.pushStack(new Group(this, viewport).best(prop).el);
             },
 
             // ### 'rect'
@@ -793,7 +727,7 @@
             // Scrolls the selected elements relative to its current position,
             // `padding` defaults to `0`, `duration` to `1000`.
             //
-            //      .fracs('scroll', element: HTMLElement/jQuery, [paddingLeft: int,] [paddingTop: int,] [duration: int]): jQuery
+            //      .fracs('scroll', element: HTMLElement/jQuery, [left: int,] [top: int,] [duration: int]): jQuery
             scroll(left, top, duration) {
                 return this.each(function cb() {
                     new Viewport(this).scroll(left, top, duration);
@@ -804,13 +738,13 @@
             // Scrolls the selected elements to the specified element or an absolute position,
             // `padding` defaults to `0`, `duration` to `1000`.
             //
-            //      .fracs('scrollTo', element: HTMLElement/jQuery, [paddingLeft: int,] [paddingTop: int,] [duration: int]): jQuery
+            //      .fracs('scrollTo', element: HTMLElement/jQuery, [left: int,] [top: int,] [duration: int]): jQuery
             //      .fracs('scrollTo', [left: int,] [top: int,] [duration: int]): jQuery
-            scrollTo(el, paddingLeft, paddingTop, duration) {
+            scrollTo(el, left, top, duration) {
                 if ($.isNumeric(el)) {
-                    duration = paddingTop;
-                    paddingTop = paddingLeft;
-                    paddingLeft = el;
+                    duration = top;
+                    top = left;
+                    left = el;
                     el = null;
                 }
 
@@ -818,9 +752,9 @@
 
                 return this.each(function cb() {
                     if (el) {
-                        new Viewport(this).scrollToElement(el, paddingLeft, paddingTop, duration);
+                        new Viewport(this).scrollToElement(el, left, top, duration);
                     } else {
-                        new Viewport(this).scrollTo(paddingLeft, paddingTop, duration);
+                        new Viewport(this).scrollTo(left, top, duration);
                     }
                 });
             },
@@ -829,10 +763,10 @@
             // Scrolls the viewport (window) to the first selected element in the specified time,
             // `padding` defaults to `0`, `duration` to `1000`.
             //
-            //      .fracs('scrollToThis', [paddingLeft: int,] [paddingTop: int,] [duration: int,] [viewport: HTMLElement/jQuery]): jQuery
-            scrollToThis(paddingLeft, paddingTop, duration, viewport) {
+            //      .fracs('scrollToThis', [left: int,] [top: int,] [duration: int,] [viewport: HTMLElement/jQuery]): jQuery
+            scrollToThis(left, top, duration, viewport) {
                 viewport = new Viewport(get_html_el(viewport));
-                viewport.scrollToElement(this[0], paddingLeft, paddingTop, duration);
+                viewport.scrollToElement(this[0], left, top, duration);
                 return this;
             },
 
@@ -840,13 +774,13 @@
             // Converts all selected page intern links `<a href="#...">` into soft links.
             // Uses `scrollTo` to scroll to the location.
             //
-            //      .fracs('softLink', [paddingLeft: int,] [paddingTop: int,] [duration: int,] [viewport: HTMLElement/jQuery]): jQuery
-            softLink(paddingLeft, paddingTop, duration, viewport) {
+            //      .fracs('softLink', [left: int,] [top: int,] [duration: int,] [viewport: HTMLElement/jQuery]): jQuery
+            softLink(left, top, duration, viewport) {
                 viewport = new Viewport(get_html_el(viewport));
                 return this.filter('a[href^=#]').each(function cb() {
                     const $a = $(this);
                     $a.on('click', () => {
-                        viewport.scrollToElement($($a.attr('href'))[0], paddingLeft, paddingTop, duration);
+                        viewport.scrollToElement($($a.attr('href'))[0], left, top, duration);
                     });
                 });
             },
@@ -857,15 +791,15 @@
             // `width`, `height`, `left`, `right`, `top`, `bottom`. The default
             // sort order is descending.
             //
-            //      .fracs('sort', property: String, [ascending: boolean]): jQuery
-            sort(property, ascending, viewport) {
+            //      .fracs('sort', prop: String, [ascending: boolean]): jQuery
+            sort(prop, ascending, viewport) {
                 if (!is_typeof(ascending, 'boolean')) {
                     viewport = ascending;
                     ascending = null;
                 }
                 viewport = get_html_el(viewport);
 
-                return this.pushStack($.map(new Group(this, viewport).sorted(property, !ascending), entry => entry.el));
+                return this.pushStack($.map(new Group(this, viewport).sorted(prop, !ascending), entry => entry.el));
             },
 
             // ### 'viewport'
@@ -873,8 +807,8 @@
             // If no element is selected it returns the document's viewport.
             //
             //      .fracs('viewport'): Rect
-            viewport(inContentSpace) {
-                return this.length ? Rect.ofViewport(this[0], inContentSpace) : null;
+            viewport(in_content_space) {
+                return this.length ? Rect.ofViewport(this[0], in_content_space) : null;
             }
         }
     });
