@@ -102,10 +102,10 @@
     };
 
     const init = () => {
-        init_scrollstate_demo();
         generate_content();
-        init_dims_demo();
         init_fracs_demo();
+        init_scrollstate_demo();
+        init_dims_demo();
     };
 
     $(init);
