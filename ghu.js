@@ -1,12 +1,12 @@
-const {resolve, join} = require('path');
+const {resolve} = require('path');
 const {ghu, babel, includeit, pug, less, cssmin, jszip, mapfn, read, remove, uglify, wrap, write} = require('ghu');
 
 const NAME = 'jquery-fracs';
 
 const ROOT = resolve(__dirname);
-const SRC = join(ROOT, 'src');
-const BUILD = join(ROOT, 'build');
-const DIST = join(ROOT, 'dist');
+const SRC = resolve(ROOT, 'src');
+const BUILD = resolve(ROOT, 'build');
+const DIST = resolve(ROOT, 'dist');
 
 ghu.defaults('release');
 

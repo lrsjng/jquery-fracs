@@ -1,31 +1,24 @@
 {
   "name": "jquery-fracs",
   "title": "jQuery.fracs",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Determine the visible fractions of HTML elements.",
   "homepage": "https://larsjung.de/jquery-fracs/",
-  "bugs": "https://github.com/lrsjng/jquery-fracs/issues",
   "author": "Lars Jung <lrsjng@gmail.com> (https://larsjung.de)",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/lrsjng/jquery-fracs.git"
-  },
+  "repository": "github:lrsjng/jquery-fracs",
   "scripts": {
     "lint": "eslint .",
     "build": "node ghu.js release",
     "precommit": "npm run -s lint && npm run -s build"
   },
   "devDependencies": {
-    "@babel/core": "7.4.3",
-    "@babel/preset-env": "7.4.3",
-    "eslint": "5.16.0",
-    "ghu": "0.17.0",
-    "jquery": "3.3.1",
+    "@babel/core": "7.10.5",
+    "@babel/preset-env": "7.10.4",
+    "eslint": "7.5.0",
+    "ghu": "0.26.0",
+    "jquery": "3.5.1",
     "normalize.css": "8.0.1",
-    "scar": "1.5.0"
-  },
-  "engines": {
-    "node": ">=8.0.0"
+    "scar": "2.3.0"
   }
 }
